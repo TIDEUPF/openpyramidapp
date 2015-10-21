@@ -42,6 +42,10 @@
         height: auto !important;
     }
 
+    #question-next-button {
+        display: none;
+    }
+
 </style>
 <div id="question-frame">
     <div id="question-header-frame">
@@ -56,12 +60,7 @@
     <div id="question-middle-frame">
 
         <div>
-
-            <div><?= $question_text?></div>
-            <div id="question-textarea">
-                <textarea rows="10"></textarea>
-            </div>
-
+            <div id="question-submitted-message"><?=$question_submitted_message?></div>
         </div>
 
     </div>
@@ -69,9 +68,8 @@
     <div id="question-footer-frame">
 
         <div>
-            <div id="question-submit-button"><button class="ui-btn"><?= $question_submit_button?></button></div>
-            <div id="question-submitted-message"></div>
-            <div id="question-rating-ready"></div>
+            <div id="question-waiting-group"><?=$question_waiting_message?></div>
+            <div id="question-next-button"><button class="ui-btn"><?= $question_submit_button?></button></div>
         </div>
 
     </div>
