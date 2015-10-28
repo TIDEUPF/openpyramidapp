@@ -1,11 +1,17 @@
 <?php
 include_once('init.php');
 
+\Action\execute($action);
+
 $question_form = View\element("question_form",array(
-    'group' => 'Group A',
+    'username' => 'Pablo',
     'level' => 'Level 1/5',
     'question_text' => 'Write a question',
     'question_submit_button' => 'Submit your question',
+    'hidden_input_array' => array(
+        'a_lvl' => '2',
+        'a_peer_group_id' => '3',
+    ),
 ));
 
 $rating_form = View\element("question_rating",array(
@@ -20,11 +26,13 @@ $rating_form = View\element("question_rating",array(
     ),
     'question_rate_submit' => 'Rate',
 ));
-
+/*
 $html = View\element("page",array(
     'title' => 'title1',
     'body' => $rating_form,
     //'body' => $question_form,
+    //'body' => $login_form,
 ));
 
 echo $html;
+*/

@@ -26,3 +26,12 @@ function element($path, $vars) {
 
     return $buffer;
 }
+
+function page($params) {
+    $html = element("page",array(
+        'title' => $params['title'],
+        'body' => $params['body'],
+    ));
+
+    echo $html;
+}

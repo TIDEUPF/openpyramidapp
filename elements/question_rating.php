@@ -46,11 +46,34 @@
     }
 
     #question-next-button {
-        /*display: none;*/
+        margin-top: 1.5em;
     }
 
     #question-header-text {
         font-size: 1.35em;
+        margin-top: 0.5em;
+    }
+
+    #question-header-level {
+        float: left;
+        text-align: center;
+    }
+
+    #question-header-user {
+        float: left;
+    }
+
+    #question-header-logout {
+        float: left;
+        text-align: right;
+    }
+
+    .topbar_item {
+        width: 33%;
+    }
+
+    .question-rating-widget {
+        margin-top: 1.0em;
     }
 
     .question-text {
@@ -62,10 +85,10 @@
     <div id="question-header-frame">
 
         <div id="topbar">
-            <div id="question-header-group"><?=$username?></div>
-            <div id="question-header-level"><?=$level?></div>
+            <div id="question-header-user" class="topbar_item"><?=$username?></div>
+            <div id="question-header-level" class="topbar_item"><?=$level?></div>
+            <div id="question-header-logout" class="topbar_item">Logout</div>
             <div style="clear:both"></div>
-
         </div>
         <div>
             <div id="question-header-text"><?=$header_text?></div>
@@ -74,7 +97,7 @@
     </div>
     <div id="question-middle-frame">
         <?php foreach($question_text_array as $i=> $question_text):?>
-        <div>
+        <div class="question-rating-widget">
             <fieldset data-role="controlgroup" data-type="horizontal">
                 <legend><?=$question_text?></legend>
                 <input type="radio" name="answer-rating-<?=$i?>" id="id-answer-rating-<?=$i?>-1" value="1">
@@ -101,8 +124,15 @@
         </div>
 
     </div>
+
+        <?php foreach($hidden_input_array as $hidden_input_name => $hidden_input_value):?>
+            <input type="hidden" name="<?=$hidden_input_name?>" value="<?=$hidden_input_value?>">
+        <?php endforeach?>
+
     </form>
 </div>
 <script>
-
+    $('#question-header-logout').on('touchstart', function(e) {
+        window.location="logout.php";
+    });
 </script>

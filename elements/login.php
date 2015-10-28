@@ -49,20 +49,11 @@
 </style>
 <div id="activity-frame">
     <form action="" method="post">
-        <div id="activity-header-frame">
 
-            <div>
-                <div id="activity-header-group"><?=$username?></div>
-                <div id="activity-header-level"><?=$level?></div>
-                <div style="clear:both"></div>
-            </div>
-
-        </div>
         <div id="activity-middle-frame">
             <h2>Student Login</h2>
-            <h3><b>Login</b></h3>
             <div>
-                <label for="usr">UserId</label>
+                <label for="usr"><b>UserId</b></label>
                 <input type="text" data-clear-btn="true" name="usr" value="">
             </div>
 
@@ -71,9 +62,8 @@
         <div id="activity-footer-frame">
 
             <div>
-                <div id="activity-waiting-group"><?=$question_waiting_message?></div>
-                <div id="activity-next-button">
-                    <button type="submit" class="ui-btn"><?= $question_submit_button?></button>
+                <div>
+                    <button type="submit" class="ui-btn">Log in</button>
                 </div>
             </div>
 

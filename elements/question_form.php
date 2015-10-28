@@ -31,11 +31,21 @@
     }
 
     #question-header-level {
-        float: right;
+        float: left;
+        text-align: center;
     }
 
-    #question-header-group {
+    #question-header-user {
         float: left;
+    }
+
+    #question-header-logout {
+        float: left;
+        text-align: right;
+    }
+
+    .topbar_item {
+        width: 33%;
     }
 
     #question-textarea > textarea {
@@ -48,8 +58,9 @@
     <div id="question-header-frame">
 
         <div>
-            <div id="question-header-group"><?=$group?></div>
-            <div id="question-header-level"><?=$level?></div>
+            <div id="question-header-user" class="topbar_item"><?=$username?></div>
+            <div id="question-header-level" class="topbar_item"><?=$level?></div>
+            <div id="question-header-logout" class="topbar_item">Logout</div>
             <div style="clear:both"></div>
         </div>
 
@@ -58,7 +69,7 @@
 
         <div>
 
-            <div><?= $question_text?></div>
+            <div><h2><?= $question_text?></h2></div>
             <div id="question-textarea">
                 <textarea name="qa" rows="10"></textarea>
             </div>
@@ -83,5 +94,7 @@
     </form>
 </div>
 <script>
-
+    $('#question-header-logout').on('touchstart', function(e) {
+        window.location="logout.php";
+    });
 </script>
