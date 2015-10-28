@@ -46,7 +46,7 @@
     }
 
     #question-next-button {
-        display: none;
+        /*display: none;*/
     }
 
     #question-header-text {
@@ -58,10 +58,11 @@
     }
 </style>
 <div id="question-frame">
+    <form method="post">
     <div id="question-header-frame">
 
         <div id="topbar">
-            <div id="question-header-group"><?=$group?></div>
+            <div id="question-header-group"><?=$username?></div>
             <div id="question-header-level"><?=$level?></div>
             <div style="clear:both"></div>
 
@@ -72,10 +73,21 @@
 
     </div>
     <div id="question-middle-frame">
-
-        <?php foreach($question_text_array as $k=> $question_text):?>
+        <?php foreach($question_text_array as $i=> $question_text):?>
         <div>
-            <div id="question-text-<?=$k?>" class="question-text"><?=$question_text?></div>
+            <fieldset data-role="controlgroup" data-type="horizontal">
+                <legend><?=$question_text?></legend>
+                <input type="radio" name="answer-rating-<?=$i?>" id="id-answer-rating-<?=$i?>-1" value="1">
+                <label for="id-answer-rating-<?=$i?>-1">1</label>
+                <input type="radio" name="answer-rating-<?=$i?>" id="id-answer-rating-<?=$i?>-2" value="2">
+                <label for="id-answer-rating-<?=$i?>-2">2</label>
+                <input type="radio" name="answer-rating-<?=$i?>" id="id-answer-rating-<?=$i?>-3" value="3">
+                <label for="id-answer-rating-<?=$i?>-3">3</label>
+                <input type="radio" name="answer-rating-<?=$i?>" id="id-answer-rating-<?=$i?>-4" value="4">
+                <label for="id-answer-rating-<?=$i?>-4">4</label>
+                <input type="radio" name="answer-rating-<?=$i?>" id="id-answer-rating-<?=$i?>-5" value="5">
+                <label for="id-answer-rating-<?=$i?>-5">5</label>
+            </fieldset>
         </div>
         <?php endforeach;?>
 
@@ -85,10 +97,11 @@
 
         <div>
             <div id="question-waiting-group"><?=$question_waiting_message?></div>
-            <div id="question-next-button"><button class="ui-btn"><?= $question_submit_button?></button></div>
+            <div id="question-next-button"><button class="ui-btn"><?= $question_rate_submit?></button></div>
         </div>
 
     </div>
+    </form>
 </div>
 <script>
 

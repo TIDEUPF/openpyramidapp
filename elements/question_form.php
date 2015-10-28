@@ -44,6 +44,7 @@
 
 </style>
 <div id="question-frame">
+    <form method="post">
     <div id="question-header-frame">
 
         <div>
@@ -59,7 +60,7 @@
 
             <div><?= $question_text?></div>
             <div id="question-textarea">
-                <textarea rows="10"></textarea>
+                <textarea name="qa" rows="10"></textarea>
             </div>
 
         </div>
@@ -69,12 +70,17 @@
     <div id="question-footer-frame">
 
         <div>
-            <div id="question-submit-button"><button class="ui-btn"><?= $question_submit_button?></button></div>
+            <div id="question-submit-button"><button class="ui-btn"><?=$question_submit_button?></button></div>
             <div id="question-submitted-message"></div>
             <div id="question-rating-ready"></div>
         </div>
 
     </div>
+    </div>
+    <?php foreach($hidden_input_array as $hidden_input_name => $hidden_input_value):?>
+        <input type="hidden" name="<?=$hidden_input_name?>" value="<?=$hidden_input_value?>">
+    <?php endforeach?>
+    </form>
 </div>
 <script>
 

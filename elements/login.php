@@ -48,36 +48,38 @@
 
 </style>
 <div id="activity-frame">
-    <form action="">
-    <div id="activity-header-frame">
+    <form action="" method="post">
+        <div id="activity-header-frame">
 
-        <div>
-            <div id="activity-header-group"><?=$username?></div>
-            <div id="activity-header-level"><?=$level?></div>
-            <div style="clear:both"></div>
-        </div>
-
-    </div>
-    <div id="activity-middle-frame">
-
-        <div>
-            <div id="activity-submitted-message"><?=$question_submitted_message?></div>
-        </div>
-
-    </div>
-
-    <div id="activity-footer-frame">
-
-        <div>
-            <div id="activity-waiting-group"><?=$question_waiting_message?></div>
-            <div id="activity-next-button">
-                <button type="submit" class="ui-btn"><?= $question_submit_button?></button>
+            <div>
+                <div id="activity-header-group"><?=$username?></div>
+                <div id="activity-header-level"><?=$level?></div>
+                <div style="clear:both"></div>
             </div>
+
+        </div>
+        <div id="activity-middle-frame">
+            <h2>Student Login</h2>
+            <h3><b>Login</b></h3>
+            <div>
+                <label for="usr">UserId</label>
+                <input type="text" data-clear-btn="true" name="usr" value="">
+            </div>
+
         </div>
 
-    </div>
+        <div id="activity-footer-frame">
+
+            <div>
+                <div id="activity-waiting-group"><?=$question_waiting_message?></div>
+                <div id="activity-next-button">
+                    <button type="submit" class="ui-btn"><?= $question_submit_button?></button>
+                </div>
+            </div>
+
+        </div>
         <?php foreach($hidden_input_array as $hidden_input_name => $hidden_input_value):?>
-        <input type="hidden" name="<?=$hidden_input_name?>" value="<?=$hidden_input_value?>">
+            <input type="hidden" name="<?=$hidden_input_name?>" value="<?=$hidden_input_value?>"
         <?php endforeach?>
     </form>
 </div>
