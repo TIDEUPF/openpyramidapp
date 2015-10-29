@@ -3,3 +3,4 @@ php_value short_open_tag 1
 RewriteEngine on
 
 RewriteRule ^([A-Za-z_]+)\.php$ index.php?action=$1 [L,QSA]
+RewriteRule ^([A-Za-z_]+)\.php?\(.*\)$ index.php?action=$1&$2 [L,QSA]
