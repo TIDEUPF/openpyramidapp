@@ -102,10 +102,11 @@ for($activity_level = 0; $activity_level<$levels; $activity_level++)
             'question_rate_submit' => 'Rate',
         ));
 
-        \View\page(array(
+        View\page(array(
             'title' => 'Activity rating',
             'body' => $rating_form,
         ));
+        exit;
     }
     else{ //for other levels, need the previously rated information
 

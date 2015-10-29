@@ -5,7 +5,6 @@ $sname = User\get_student_username();
 
 	//get information for a given flow id coming from url
 	$fid = (int) $_GET['fid']; //get the flow id-- retrieved from the url
-	$fid = 7; //get the flow id-- retrieved from the url
 	if(!empty($fid)){
 		
 		$res3 = mysqli_query($link, "select * from flow where fid = '$fid'");
