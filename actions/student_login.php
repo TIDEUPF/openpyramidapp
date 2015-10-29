@@ -19,13 +19,13 @@ if(mysqli_num_rows($res2) > 0){
 //already in table
 $_SESSION['student'] = $uname;
 //header("location: student.php"); exit(0);
-header("location: student.php"); exit(0);
+header("location: student_activity.php"); exit(0);
 }
 else{
 mysqli_query($link,"insert into students values ('$uname', '$sname', NOW() )");
 if(mysqli_affected_rows($link) > 0){
 $_SESSION['student'] = $uname;
-header("location: student.php"); exit(0);
+header("location: student_activity.php"); exit(0);
 }
 else{
 $error = 'Database error!';
@@ -59,6 +59,6 @@ $error = 'UserId incorrect';
 }
 }
 else{
-header("location: student.php");
+header("location: student_activity.php");
 exit(0);
 }

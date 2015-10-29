@@ -48,7 +48,7 @@
 
 </style>
 <div id="activity-frame">
-    <form action="" method="post">
+    <form action="student_login.php" method="post">
 
         <div id="activity-middle-frame">
             <h2>Student Login</h2>
