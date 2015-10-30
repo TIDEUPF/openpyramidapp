@@ -2,7 +2,7 @@
 
 Namespace View;
 
-function element($path, $vars) {
+function element($path, $vars, $filter = true) {
     $current_path = __DIR__;
 
     $element_path = $current_path . '/../elements/' . $path . '.php';
@@ -13,6 +13,12 @@ function element($path, $vars) {
     if(!ob_start())
         throw Exception("Failed to start buffer output");
 
+    if($filter) {
+        foreach ($vars as $k => $v) {
+            if (is_string($v))
+                $vars[$k] = htmlspecialchars($v, ENT_COMPAT, 'UTF-8');
+        }
+    }
     extract($vars);
     include($element_path);
 
@@ -31,7 +37,8 @@ function page($params) {
     $html = element("page",array(
         'title' => $params['title'],
         'body' => $params['body'],
-    ));
+    ), false);
 
+    header('Content-Type: text/html; charset=utf-8');
     echo $html;
 }

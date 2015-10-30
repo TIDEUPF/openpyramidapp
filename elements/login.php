@@ -46,6 +46,14 @@
         display: none;
     }
 
+    #student-login-error {
+        margin-top: 1em;
+        text-align: center;
+        color: red;
+        font-size: 130%;
+        font-weight: bold;
+    }
+
 </style>
 <div id="activity-frame">
     <form action="student_login.php" method="post">
@@ -63,16 +71,19 @@
 
             <div>
                 <div>
-                    <button type="submit" class="ui-btn">Log in</button>
+                    <button type="submit" class="ui-btn" name="loginBtn">Log in</button>
                 </div>
             </div>
 
+            <?php if(isset($error)):?>
+            <div>
+                <div id="student-login-error"><?=$error?></div>
+            </div>
+            <?php endif;?>
+
         </div>
         <?php foreach($hidden_input_array as $hidden_input_name => $hidden_input_value):?>
-            <input type="hidden" name="<?=$hidden_input_name?>" value="<?=$hidden_input_value?>"
+        <input type="hidden" name="<?=$hidden_input_name?>" value="<?=$hidden_input_value?>">
         <?php endforeach?>
     </form>
 </div>
-<script>
-
-</script>

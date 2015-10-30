@@ -2,26 +2,21 @@
 
 User\enforce_student_login();
 $sname = User\get_student_username();
+$sid = $_SESSION['student'];
 
-	//get information for a given flow id coming from url
-	$fid = (int) $_GET['fid']; //get the flow id-- retrieved from the url
-	if(!empty($fid)){
-		
-		$res3 = mysqli_query($link, "select * from flow where fid = '$fid'");
-		if(mysqli_num_rows($res3) > 0){
-			$data3 = mysqli_fetch_assoc($res3);
-			$levels = $data3["levels"];
-			$fname = $data3["fname"];
-			$fdes = $data3["fdes"];
-		}
-		else{
-			header("location: student.php"); exit(0);
-		}		
-	}
-	else{
-		header("location: student.php"); exit(0);
-	}
-	
+//get information the latest flow
+$res3 = mysqli_query($link, "select * from flow order by fid desc limit 1");
+if(mysqli_num_rows($res3) > 0){
+	$data3 = mysqli_fetch_assoc($res3);
+	$levels = $data3["levels"];
+	$fname = $data3["fname"];
+	$fdes = $data3["fdes"];
+	$fid = $data3["fid"];
+}
+else{
+	throw new Exception("There are no flows");
+}
+
 	//submit answer
 	if(isset($_POST['answer'])) {
 		$ans_input =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['qa']))));
@@ -44,6 +39,24 @@ $sname = User\get_student_username();
 		}
 		else{
 			$error = 'Field cannot be empty!';
+		}
+		if(isset($error)) {
+			$body = View\element("question_form", array(
+					'username' => $sname,
+					'level' => 'Level ' . '0/' . $levels,
+					'question_text' => 'Write a question',
+					'question_submit_button' => 'Submit your question',
+					'error' => $error,
+					'hidden_input_array' => array(
+							'a_lvl' => $_POST['a_lvl'],
+							'a_peer_group_id' => $_POST['a_peer_group_id'],
+					),
+			));
+			View\page(array(
+					'title' => 'Question',
+					'body' => $body,
+			));
+			exit;
 		}
 	}//submit answer
 	
@@ -120,7 +133,7 @@ $sname = User\get_student_username();
 	}//submit rating
 
 include('activity_rating.php');
-?>
+/*
 <!DOCTYPE html>
 <html>
   <head>
@@ -156,5 +169,5 @@ function refreshp(){
 }
 </script>  
 </html>
-
+*/
 

@@ -52,6 +52,14 @@
         height: auto !important;
     }
 
+    #student-error {
+        margin-top: 1em;
+        text-align: center;
+        color: red;
+        font-size: 130%;
+        font-weight: bold;
+    }
+
 </style>
 <div id="question-frame">
     <form method="post">
@@ -74,6 +82,12 @@
                 <textarea name="qa" rows="10"></textarea>
             </div>
 
+            <?php if(isset($error)):?>
+                <div>
+                    <div id="student-error"><?=$error?></div>
+                </div>
+            <?php endif;?>
+
         </div>
 
     </div>
@@ -81,15 +95,15 @@
     <div id="question-footer-frame">
 
         <div>
-            <div id="question-submit-button"><button class="ui-btn"><?=$question_submit_button?></button></div>
+            <div id="question-submit-button"><button type="submit" name="answer" class="ui-btn"><?=$question_submit_button?></button></div>
             <div id="question-submitted-message"></div>
             <div id="question-rating-ready"></div>
         </div>
 
     </div>
-    </div>
+
     <?php foreach($hidden_input_array as $hidden_input_name => $hidden_input_value):?>
-        <input type="hidden" name="<?=$hidden_input_name?>" value="<?=$hidden_input_value?>">
+    <input type="hidden" name="<?=$hidden_input_name?>" value="<?=$hidden_input_value?>">
     <?php endforeach?>
     </form>
 </div>

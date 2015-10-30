@@ -3,6 +3,8 @@
 namespace Action;
 
 function execute($action, $params = null) {
+    global $link;
+
     if(strstr($action, '..'))
         throw new Exception("wrong action");
 

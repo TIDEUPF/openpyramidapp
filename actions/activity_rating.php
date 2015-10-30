@@ -18,7 +18,7 @@ for($activity_level = 0; $activity_level<$levels; $activity_level++)
             }
         }
     }
-    $screen_output[$activity_level] = '<h4><span class="label label-info">Level '.$loop_count_group.'</span></h4>';
+    //$screen_output[$activity_level] = '<h4><span class="label label-info">Level '.$loop_count_group.'</span></h4>';
 
     //if first level - here generally 2 by 2 student groups (but there can be groups of 3 also)
     if($activity_level == 0){
@@ -26,7 +26,8 @@ for($activity_level = 0; $activity_level<$levels; $activity_level++)
         $res4 = mysqli_query($link, "select * from flow_student where sid = '$sid' and fid = '$fid'");
         //the user already submitted the question
         if(mysqli_num_rows($res4) > 0){
-            //TODO:proceed to rating
+            /*
+            //TODO:wait?
             $data4 = mysqli_fetch_assoc($res4);
             //$flow_student_id = $data4['fs_id'];
 
@@ -45,17 +46,34 @@ for($activity_level = 0; $activity_level<$levels; $activity_level++)
                     }
                 }
             }
-        }
-        else{
+            */
+        } else {
             //TODO:create form view
-            $screen_output[$activity_level] .= '<script type="text/JavaScript">timeoutPeriod = \'\';</script><form onsubmit="return del_vali();" role="form" action="" method="post"><div class="form-group"><textarea class="form-control" id="qa" name="qa">'.$data4['fs_answer'].'</textarea></div><div class="form-group"><input type="submit" class="btn btn-info" value="Submit" name="answer"></div><input type="hidden" name="a_lvl" value="'.$activity_level.'"><input type="hidden" name="a_peer_group_id" value="'.$peer_group_id.'"></form>';
+            //$screen_output[$activity_level] .= '<script type="text/JavaScript">timeoutPeriod = \'\';</script><form onsubmit="return del_vali();" role="form" action="" method="post"><div class="form-group"><textarea class="form-control" id="qa" name="qa">'.$data4['fs_answer'].'</textarea></div><div class="form-group"><input type="submit" class="btn btn-info" value="Submit" name="answer"></div><input type="hidden" name="a_lvl" value="'.$activity_level.'"><input type="hidden" name="a_peer_group_id" value="'.$peer_group_id.'"></form>';
+            $body = View\element("question_form",array(
+                'username'                  => $sname,
+                'level'                     => 'Level '. ($activity_level) . '/' . $levels,
+                'question_text'             => 'Write a question',
+                'question_submit_button'    => 'Submit your question',
+                'hidden_input_array' => array(
+                    'a_lvl'             => $activity_level,
+                    'a_peer_group_id'   => $peer_group_id,
+                ),
+            ));
+            View\page(array(
+                'title' => 'Rating',
+                'body' => $body,
+            ));
+            exit;
         }
     }
 
     //Peer section	- get peer answers and let rate
     //if first level
     if($activity_level == 0){
-
+        $hidden_input_array = array();
+        $question_text_array = array();
+        $i=1;
         foreach($peer_array as $rate_peer_id){
 
             if($sid != $rate_peer_id){//the other peers
@@ -74,7 +92,15 @@ for($activity_level = 0; $activity_level<$levels; $activity_level++)
                         $screen_output[$activity_level] .= '<span>'.$peer_answer.'</span><br /><span class="text-primary small">You rated: '.$data6['fsr_rating'].'</span>';
                     }
                     else{//rate the peer
-                        //TODO:just reap the peers answers and proceed to the rating view
+                        //just query the peers answers and proceed to the rating view
+                        $question_text_array['optradio'.$i] = $peer_answer;
+                        $hidden_input_array = array_merge(array(
+                            'group_id'.$i          => $peer_group_id,
+                            'to_whom_rated_id'.$i  => $rate_peer_id,
+                            'lvl'.$i               => $activity_level,
+                        ), $hidden_input_array);
+                        $i++;
+
                         $screen_output[$activity_level] .= '<span><b>Peer said:</b></span><br />';
                         $screen_output[$activity_level] .= '<span>'.$peer_answer.'</span><br />';
                         //include('a_rating.php');
@@ -89,24 +115,22 @@ for($activity_level = 0; $activity_level<$levels; $activity_level++)
             }
         }
 
-        ///kalpi TODO
-        $rating_form = View\element("question_rating",array(
-            'username' => 'Pablo',
-            'level' => 'Level 2/5',
+        //Proceed to rate the answers
+        $hidden_input_array['numofqustions'] = $i-1;
+        $body = View\element("question_rating",array(
+            'username'    => $sname,
+            'level'       => 'Level '. ($activity_level+1) . '/' . $levels,
             'header_text' => 'Rate the following questions',
-            'question_text_array' => array(
-                'q1' => 'What is your favourite color?',
-                'q2' => 'Do you like pizza?',
-                'q3' => 'What music do you listen to?',
-            ),
+            'question_text_array' => $question_text_array,
             'question_rate_submit' => 'Rate',
+            'hidden_input_array' => $hidden_input_array,
         ));
-
         View\page(array(
-            'title' => 'Activity rating',
-            'body' => $rating_form,
+            'title' => 'Rating',
+            'body' => $body,
         ));
         exit;
+
     }
     else{ //for other levels, need the previously rated information
 
@@ -175,6 +199,7 @@ for($activity_level = 0; $activity_level<$levels; $activity_level++)
                 $screen_output[$activity_level] .= '<br /><span class=""><b>Rate all according to your preference!</b></span><br />';
                 $screen_output[$activity_level] .= '<form onsubmit="return del_vali2();" role="form" action="" method="post">';
                 $hidden_frm_cnt = 1;
+                $question_text_array = array();
                 foreach($peer_group_combined_ids_temp as $pgcid_group_id_temp){
                     $sa_result_2 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level = '$activity_level_previous' and sa_group_id = '$pgcid_group_id_temp'");
                     if(mysqli_num_rows($sa_result_2) > 0){
@@ -198,9 +223,13 @@ for($activity_level = 0; $activity_level<$levels; $activity_level++)
                             //include('a_rating.php');
                             $screen_output[$activity_level] .= '<div class="form-group"><label>&nbsp; 1 <input type="radio" name="optradio'.$hidden_frm_cnt.'" value="1"></label><label>&nbsp; 2 <input type="radio" name="optradio'.$hidden_frm_cnt.'" value="2"></label><label>&nbsp; 3 <input type="radio" name="optradio'.$hidden_frm_cnt.'" value="3"></label><label>&nbsp; 4 <input type="radio" name="optradio'.$hidden_frm_cnt.'" value="4"></label><label>&nbsp; 5 <input type="radio" name="optradio'.$hidden_frm_cnt.'" value="5"></label></div><input type="hidden" name="lvl'.$hidden_frm_cnt.'" value="'.$activity_level.'"><input type="hidden" name="to_whom_rated_id'.$hidden_frm_cnt.'" value="'.$rate_peer_id.'"><input type="hidden" name="group_id'.$hidden_frm_cnt.'" value="'.$peer_group_id.'">';
                             $hidden_frm_cnt++;
+
+                            //create the question array
+                            $question_text_array['optradio'.$hidden_frm_cnt] = $selected_qa;
+                            //
                         }
                     }
-                    else{
+                    else{//no questions from the other peer, user must wait
                         $screen_output[$activity_level] .= '<br /><b><span class="small text-warning">'.$pgcid_temp_count.'. Has not completed yet.</b></span><br />';
 
                     }
@@ -209,6 +238,24 @@ for($activity_level = 0; $activity_level<$levels; $activity_level++)
 
                 }
 
+                $rating_form = View\element("question_rating",array(
+                    'username'    => $sname,
+                    'level'       => 'Level '. ($activity_level+1) . '/' . $levels,
+                    'header_text' => 'Rate the following questions',
+                    'question_text_array' => $question_text_array,
+                    'question_rate_submit' => 'Rate',
+                    'hidden_input_array' => array(
+                        'group_id'.$hidden_frm_cnt          => $peer_group_id,
+                        'to_whom_rated_id'.$hidden_frm_cnt  => $rate_peer_id,
+                        'lvl'.$hidden_frm_cnt               => $activity_level,
+                        'numofqustions'                     => count($peer_group_combined_ids_temp),
+                    ),
+                ));
+                View\page(array(
+                    'title' => 'Rating',
+                    'body' => $body,
+                ));
+                exit;
 
                 $screen_output[$activity_level] .= '<input type="hidden" name="numofqustions" value="'.count($peer_group_combined_ids_temp).'"><br /><div class="form-group"><input type="submit" class="btn btn-info btn-xs" value="Rate" name="rate"></div>';	//to know the no of submitted ratings
                 $screen_output[$activity_level] .= '</form>';
@@ -232,7 +279,7 @@ for($activity_level = 0; $activity_level<$levels; $activity_level++)
 
     $result_2= mysqli_query($link, "select * from flow_student_rating where fsr_fid = '$fid' and fsr_level = '$activity_level' and fsr_group_id = '$peer_group_id'");
     if(mysqli_num_rows($result_2) != $needed_results){
-        break;
+        continue;
     }
     else{ //to sum the ratings
         $result_3= mysqli_query($link, "SELECT fsr_to_whom_rated_id, SUM(fsr_rating) as sum FROM `flow_student_rating` where fsr_fid = '$fid' and fsr_level = '$activity_level' and fsr_group_id = '$peer_group_id' group by fsr_to_whom_rated_id order by SUM(fsr_rating) desc limit 1");
