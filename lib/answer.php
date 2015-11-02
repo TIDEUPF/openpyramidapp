@@ -180,42 +180,35 @@ function submit_rate() {
             }
             else{
                 //insert new
-                if($rate_lvl == 0)
+                $numofqustions =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['numofqustions']))));
+
+                if($numofqustions == 1)
                 {
                     mysqli_query($link,"insert into flow_student_rating values ('', '$fid', '$sid', '$rate_lvl', '$rgroup_id', '$rate_input', '$to_whom_rated_id', NOW() )");
                 }
-                else{
-
-                    $numofqustions =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['numofqustions']))));
-
-                    if($numofqustions == 1)
+                elseif($numofqustions == 2)
+                {
+                    if(empty($rate_input2) || empty($rate_input))
+                    {
+                        $error = 'Please Rate All!';
+                    }
+                    else
                     {
                         mysqli_query($link,"insert into flow_student_rating values ('', '$fid', '$sid', '$rate_lvl', '$rgroup_id', '$rate_input', '$to_whom_rated_id', NOW() )");
+                        mysqli_query($link,"insert into flow_student_rating values ('', '$fid', '$sid', '$rate_lvl2', '$rgroup_id2', '$rate_input2', '$to_whom_rated_id2', NOW() )");
                     }
-                    elseif($numofqustions == 2)
+                }
+                elseif($numofqustions == 3)
+                {
+                    if(empty($rate_input2) || empty($rate_input) || empty($rate_input3))
                     {
-                        if(empty($rate_input2) || empty($rate_input))
-                        {
-                            $error = 'Please Rate All!';
-                        }
-                        else
-                        {
-                            mysqli_query($link,"insert into flow_student_rating values ('', '$fid', '$sid', '$rate_lvl', '$rgroup_id', '$rate_input', '$to_whom_rated_id', NOW() )");
-                            mysqli_query($link,"insert into flow_student_rating values ('', '$fid', '$sid', '$rate_lvl2', '$rgroup_id2', '$rate_input2', '$to_whom_rated_id2', NOW() )");
-                        }
+                        $error = 'Please Rate All!';
                     }
-                    elseif($numofqustions == 3)
+                    else
                     {
-                        if(empty($rate_input2) || empty($rate_input) || empty($rate_input3))
-                        {
-                            $error = 'Please Rate All!';
-                        }
-                        else
-                        {
-                            mysqli_query($link,"insert into flow_student_rating values ('', '$fid', '$sid', '$rate_lvl', '$rgroup_id', '$rate_input', '$to_whom_rated_id', NOW() )");
-                            mysqli_query($link,"insert into flow_student_rating values ('', '$fid', '$sid', '$rate_lvl2', '$rgroup_id2', '$rate_input2', '$to_whom_rated_id2', NOW() )");
-                            mysqli_query($link,"insert into flow_student_rating values ('', '$fid', '$sid', '$rate_lvl3', '$rgroup_id3', '$rate_input3', '$to_whom_rated_id3', NOW() )");
-                        }
+                        mysqli_query($link,"insert into flow_student_rating values ('', '$fid', '$sid', '$rate_lvl', '$rgroup_id', '$rate_input', '$to_whom_rated_id', NOW() )");
+                        mysqli_query($link,"insert into flow_student_rating values ('', '$fid', '$sid', '$rate_lvl2', '$rgroup_id2', '$rate_input2', '$to_whom_rated_id2', NOW() )");
+                        mysqli_query($link,"insert into flow_student_rating values ('', '$fid', '$sid', '$rate_lvl3', '$rgroup_id3', '$rate_input3', '$to_whom_rated_id3', NOW() )");
                     }
                 }
 
@@ -269,13 +262,11 @@ function get_selected_ids($params) {
     $activity_level_previous = $activity_level-1;
     if($activity_level == 0) {
         foreach ($peer_array as $rate_peer_id) {
-            if ($sid != $rate_peer_id) {//the other peers
-                $res5 = mysqli_query($link, "select * from flow_student where sid = '$rate_peer_id' and fid = '$fid'");// to get peer answer
-                if (mysqli_num_rows($res5) > 0) {//the peer already submitted the answer
-                    $result[] = $rate_peer_id;
-                } else {//the peer did not submit the answer
-                    throw new Exception("peer answer not submitted");
-                }
+            $res5 = mysqli_query($link, "select * from flow_student where sid = '$rate_peer_id' and fid = '$fid'");// to get peer answer
+            if (mysqli_num_rows($res5) > 0) {//the peer already submitted the answer
+                $result[] = $rate_peer_id;
+            } else {//the peer did not submit the answer
+                throw new Exception("peer answer not submitted");
             }
         }
     } else {
@@ -293,3 +284,28 @@ function get_selected_ids($params) {
     return $result;
 }
 
+function view_final_answer($params) {
+    global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_group_id;
+
+    $vars = array(
+        'username' 					=> $sname,
+        'level' 					=> 'Level ' . $activity_level . '/' . $levels,
+        'header_text' 			=> 'The winning question is',
+        'final_answer_array' 			=> $params['final_answer_array'],
+        'hidden_input_array' 		=> array(
+            'a_lvl' 			=> $activity_level,
+            'a_peer_group_id'	=> $peer_group_id,
+        ),
+    );
+
+    if(isset($params['error']))
+        $vars['error'] = $params['error'];
+
+    $body = \View\element("final_answer", $vars);
+
+    \View\page(array(
+        'title' => 'Question',
+        'body' => $body,
+    ));
+    exit;
+}

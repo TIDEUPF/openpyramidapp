@@ -27,11 +27,12 @@ function get_current_activity_level() {
             //check if need to set selected answer
             get_level_info();
 
-            $cgfl_temp = \Group\check_if_group_finished_level($fid, $activity_level, $peer_group_id, $needed_results, $link);
+            //here decide the criteria to allow to proceed to the next level
+            $cgfl_temp = \Group\check_if_group_finished_level();
 
-            if($cgfl_temp['status'])
+            if($cgfl_temp)
             {
-                set_selected_answers($fid, $activity_level, $peer_group_id, $link);
+                set_selected_answers();
                 $activity_level++;
             }
 
@@ -48,6 +49,18 @@ function get_current_activity_level() {
     \Group\get_members();
 
     return $activity_level;
+}
+
+function set_selected_answers() {
+    global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids;
+
+    //to sum the ratings
+    $ssa_result_1= mysqli_query($link, "SELECT fsr_to_whom_rated_id, SUM(fsr_rating) as sum FROM `flow_student_rating` where fsr_fid = '$fid' and fsr_level = '$activity_level' and fsr_group_id = '$peer_group_id' group by fsr_to_whom_rated_id order by SUM(fsr_rating) desc limit 1");
+    $ssa_data_1 = mysqli_fetch_assoc($ssa_result_1);
+
+    $selected_id = $ssa_data_1['fsr_to_whom_rated_id'];
+    $selected_id_rating_sum = $ssa_data_1['sum'];
+    mysqli_query($link,"insert into selected_answers values ('$fid', '$activity_level', '$peer_group_id', '$selected_id', '$selected_id_rating_sum')");
 }
 
 function get_level_info() {
@@ -104,36 +117,6 @@ function is_level_completed() {
     return false;
 }
 
-function is_group_peers_completed_level() {
-    global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
-
-    $lvl = $activity_level;
-    $peer_group_combined_ids_array = explode(",",$peer_group_combined_ids);
-    $array_size = count($peer_group_combined_ids_array);
-    foreach($peer_group_combined_ids_array as $temp_id)
-    {
-        $sql1_ids[] = "sa_group_id = ".$temp_id;
-    }
-
-    $sql1 = implode(" or ", $sql1_ids);
-    $cipgct_result_1 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level = '$lvl' and ($sql1) ");
-    $cipgct_result_1_count = mysqli_num_rows($cipgct_result_1);
-
-    if($array_size == $cipgct_result_1_count)
-    {
-        $result['status'] = true;
-        $result['pending_groups'] = 0;
-
-    }
-    else
-    {
-        $result['status'] = false;
-        $result['pending_groups'] = $array_size - $cipgct_result_1_count;
-    }
-
-    return $result;
-}
-
 function get_needed_results_to_end_level() {
     global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
@@ -165,7 +148,7 @@ function is_complete() {
     global $link, $sid, $fid, $levels, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
     //last level-- to show selected answers
-    if($activity_level == $levels-1) {
+    if($activity_level == $levels) {
         //all users answered so proceed to show the final results
         if( mysqli_num_rows(mysqli_query($link, "select * from pyramid_groups where pg_fid = '$fid'")) == mysqli_num_rows(mysqli_query($link, "select * from selected_answers where sa_fid = '$fid'")) ) {
             return true;
@@ -177,11 +160,13 @@ function is_complete() {
 function show_final_answer() {
     global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
-    $result_11 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level = '$activity_level'");
+    $activity_level_previous = $activity_level-1;
+    $result_11 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level = '$activity_level_previous'");
     while ($data_t_11 = mysqli_fetch_assoc($result_11)) {
         $qa_last_selected_id = $data_t_11['sa_selected_id'];
         $result_12 = mysqli_query($link, "select * from flow_student where fid = '$fid' and sid = '$qa_last_selected_id'");
         $data_t_12 = mysqli_fetch_assoc($result_12);
+        \Answer\view_final_answer(array('final_answer_array' => array($data_t_12['fs_answer'])));
  //       $screen_output[$levels] .= '<br /><span class=""><B>' . $data_t_12['fs_answer'] . '</B></span><br />';
         //TODO: got to final answer view
     }

@@ -70,6 +70,14 @@ if(!isset($_SESSION['student'])) {
         'body' => $login_form,
     ));
 } else {
-    header("location: student.php");
+    //show activity explanation
+    $activity_explanation_view = View\element("activity_explanation", $vars);
+
+    \View\page(array(
+        'title' => 'Activity explanation',
+        'body' => $activity_explanation_view,
+    ));
+
+    //header("location: student.php");
     exit;
 }

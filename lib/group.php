@@ -24,23 +24,22 @@ function get_needed_results_to_end_level() {
     global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
     $group_size = count($peer_array); //no of peers in the branch
-    if($activity_level == 1)
+    if($activity_level == 0)
     {
-        $needed_results = $group_size * ($group_size-1); //in the first level, it's no. of choices * student count
+        $needed_results = $group_size * ($group_size); //in the first level, it's no. of choices * student count
     }
     else{
         $st_count = count($peer_group_combined_ids_temp);
         $needed_results = $group_size * $st_count; //because now every student is rating two answers, need to occupy all answers
     }
-
     return $needed_results;
 }
 
-function check_if_group_finished_level($fid, $lvl, $peer_group_id, $needed_results, $mysql_link)
+function check_if_group_finished_level()
 {
     global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
-    $cgfl_result_1= mysqli_query($link, "select * from flow_student_rating where fsr_fid = '$fid' and fsr_level = '$lvl' and fsr_group_id = '$peer_group_id'");
+    $cgfl_result_1= mysqli_query($link, "select * from flow_student_rating where fsr_fid = '$fid' and fsr_level = '$activity_level' and fsr_group_id = '$peer_group_id'");
     $cgfl_result_1_count = mysqli_num_rows($cgfl_result_1);
 
     $needed_results = get_needed_results_to_end_level();
@@ -53,5 +52,36 @@ function check_if_group_finished_level($fid, $lvl, $peer_group_id, $needed_resul
     {
         return true;
     }
+}
 
+function check_if_previous_groups_completed_task()
+{
+    global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+
+    $activity_level_previous = $activity_level-1;
+
+    if($activity_level_previous == -1)
+        return true;
+
+    $peer_group_combined_ids_array = explode(",",$peer_group_combined_ids);
+    $array_size = count($peer_group_combined_ids_array);
+    foreach($peer_group_combined_ids_array as $temp_id)
+    {
+        $sql1_ids[] = "sa_group_id = ".$temp_id;
+    }
+
+    $sql1 = implode(" or ", $sql1_ids);
+    $cipgct_result_1 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level = '$activity_level_previous' and ($sql1) ");
+    $cipgct_result_1_count = mysqli_num_rows($cipgct_result_1);
+
+    if($array_size == $cipgct_result_1_count)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+
+    return $result;
 }

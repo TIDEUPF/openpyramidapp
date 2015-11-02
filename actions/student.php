@@ -28,7 +28,8 @@ if(!\Answer\is_submitted()) {
     exit;
 }
 
-if(!\Student\level_is_rated()) {
+//we need the answers for other groups too
+if(\Group\check_if_previous_groups_completed_task() and !\Student\level_is_rated()) {
     \Answer\request_rate();
     exit;
 }
