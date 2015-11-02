@@ -5,65 +5,65 @@
         color: #696969 !important;
     }
 
-    body > .ui-page, #question-frame {
+    body > .ui-page, #answer-frame {
         height: 100%;
     }
 
-    #question-middle-frame,
-    #question-footer-frame > div{
+    #answer-middle-frame,
+    #answer-footer-frame > div{
         padding: 0 1em 0 1em;
     }
 
-    #question-header-frame > #topbar {
+    #answer-header-frame > #topbar {
         background-color: #DFE5EC;
     }
 
-    #question-header-frame > div {
+    #answer-header-frame > div {
         padding: 0.5em 1em 0.25em 1em;
     }
 
-    #question-middle-frame {
+    #answer-middle-frame {
         height: 60%;
         overflow: hidden;
     }
 
-    #question-header-frame,
-    #question-footer-frame {
+    #answer-header-frame,
+    #answer-footer-frame {
         height: 20%;
         overflow: hidden;
     }
 
-    #question-header-level {
+    #answer-header-level {
         float: right;
     }
 
-    #question-header-group {
+    #answer-header-group {
         float: left;
     }
 
-    #question-textarea > textarea {
+    #answer-textarea > textarea {
         height: auto !important;
     }
 
-    #question-next-button {
+    #answer-next-button {
         margin-top: 1.5em;
     }
 
-    #question-header-text {
+    #answer-header-text {
         font-size: 1.35em;
         margin-top: 0.5em;
     }
 
-    #question-header-level {
+    #answer-header-level {
         float: left;
         text-align: center;
     }
 
-    #question-header-user {
+    #answer-header-user {
         float: left;
     }
 
-    #question-header-logout {
+    #answer-header-logout {
         float: left;
         text-align: right;
     }
@@ -72,34 +72,34 @@
         width: 33%;
     }
 
-    .question-rating-widget {
+    .answer-rating-widget {
         margin-top: 1.0em;
     }
 
-    .question-text {
+    .answer-text {
         font-size: 1.15em;
     }
 </style>
-<div id="question-frame">
-    <form method="post">
-    <div id="question-header-frame">
+<div id="answer-frame">
+    <form method="post" action="student.php">
+    <div id="answer-header-frame">
 
         <div id="topbar">
-            <div id="question-header-user" class="topbar_item"><?=$username?></div>
-            <div id="question-header-level" class="topbar_item"><?=$level?></div>
-            <div id="question-header-logout" class="topbar_item">Logout</div>
+            <div id="answer-header-user" class="topbar_item"><?=$username?></div>
+            <div id="answer-header-level" class="topbar_item"><?=$level?></div>
+            <div id="answer-header-logout" class="topbar_item">Logout</div>
             <div style="clear:both"></div>
         </div>
         <div>
-            <div id="question-header-text"><?=$header_text?></div>
+            <div id="answer-header-text"><?=$header_text?></div>
         </div>
 
     </div>
-    <div id="question-middle-frame">
-        <?php foreach($question_text_array as $i=> $question_text):?>
-        <div class="question-rating-widget">
+    <div id="answer-middle-frame">
+        <?php foreach($answer_text_array as $i=> $answer_text):?>
+        <div class="answer-rating-widget">
             <fieldset data-role="controlgroup" data-type="horizontal">
-                <legend><?=$question_text?></legend>
+                <legend><?=$answer_text?></legend>
                 <input type="radio" name="<?=$i?>" id="id-answer-rating-<?=$i?>-1" value="1">
                 <label for="id-answer-rating-<?=$i?>-1">1</label>
                 <input type="radio" name="<?=$i?>" id="id-answer-rating-<?=$i?>-2" value="2">
@@ -116,11 +116,11 @@
 
     </div>
 
-    <div id="question-footer-frame">
+    <div id="answer-footer-frame">
 
         <div>
-            <div id="question-waiting-group"><?=$question_waiting_message?></div>
-            <div id="question-next-button"><button class="ui-btn" name="rate"><?= $question_rate_submit?></button></div>
+            <div id="answer-waiting-group"><?=$answer_waiting_message?></div>
+            <div id="answer-next-button"><button class="ui-btn" name="rate"><?= $answer_rate_submit?></button></div>
         </div>
 
     </div>
@@ -132,7 +132,7 @@
     </form>
 </div>
 <script>
-    $('#question-header-logout').on('touchstart', function(e) {
+    $('#answer-header-logout').on('touchstart', function(e) {
         window.location="logout.php";
     });
 </script>

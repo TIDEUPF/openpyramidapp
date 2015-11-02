@@ -56,23 +56,20 @@ if(!isset($_SESSION['student'])) {
 
     }
 
-    if(isset($_SESSION['student'])) {
-        header("location: student_activity.php");
-    } else {
-        $vars = array();
-        if(!empty($error))
-            $vars['error'] = $error;
-
-        $login_form = View\element("login", $vars);
-
-        \View\page(array(
-            'title' => 'Student Login',
-            'body' => $login_form,
-        ));
-    }
-
 }
-else{
-    header("location: student_activity.php");
-    exit(0);
+
+if(!isset($_SESSION['student'])) {
+    $vars = array();
+    if(!empty($error))
+        $vars['error'] = $error;
+
+    $login_form = View\element("login", $vars);
+
+    \View\page(array(
+        'title' => 'Student Login',
+        'body' => $login_form,
+    ));
+} else {
+    header("location: student.php");
+    exit;
 }

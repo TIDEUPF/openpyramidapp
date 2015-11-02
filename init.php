@@ -7,7 +7,11 @@ session_start();
 include_once('./actions/dbvar.php');
 include_once('./lib/view.php');
 include_once('./lib/action.php');
-include_once('./lib/user.php');
+
+include_once('./lib/group.php');
+include_once('./lib/pyramid.php');
+include_once('./lib/answer.php');
+include_once('./lib/student.php');
 
 $action = 'student_login';
 if(isset($_REQUEST)) {

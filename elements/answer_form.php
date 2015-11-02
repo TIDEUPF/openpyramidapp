@@ -5,41 +5,41 @@
         color: #696969 !important;
     }
 
-    body > .ui-page, #question-frame {
+    body > .ui-page, #answer-frame {
         height: 100%;
     }
 
-    #question-middle-frame,
-    #question-footer-frame > div{
+    #answer-middle-frame,
+    #answer-footer-frame > div{
         padding: 0 1em 0 1em;
     }
 
-    #question-header-frame > div {
+    #answer-header-frame > div {
         padding: 0.5em 1em 0.25em 1em;
         background-color: #DFE5EC;
     }
 
-    #question-middle-frame {
+    #answer-middle-frame {
         height: 60%;
         overflow: hidden;
     }
 
-    #question-header-frame,
-    #question-footer-frame {
+    #answer-header-frame,
+    #answer-footer-frame {
         height: 20%;
         overflow: hidden;
     }
 
-    #question-header-level {
+    #answer-header-level {
         float: left;
         text-align: center;
     }
 
-    #question-header-user {
+    #answer-header-user {
         float: left;
     }
 
-    #question-header-logout {
+    #answer-header-logout {
         float: left;
         text-align: right;
     }
@@ -48,7 +48,7 @@
         width: 33%;
     }
 
-    #question-textarea > textarea {
+    #answer-textarea > textarea {
         height: auto !important;
     }
 
@@ -61,24 +61,24 @@
     }
 
 </style>
-<div id="question-frame">
-    <form method="post">
-    <div id="question-header-frame">
+<div id="answer-frame">
+    <form method="post" action="student.php">
+    <div id="answer-header-frame">
 
         <div>
-            <div id="question-header-user" class="topbar_item"><?=$username?></div>
-            <div id="question-header-level" class="topbar_item"><?=$level?></div>
-            <div id="question-header-logout" class="topbar_item">Logout</div>
+            <div id="answer-header-user" class="topbar_item"><?=$username?></div>
+            <div id="answer-header-level" class="topbar_item"><?=$level?></div>
+            <div id="answer-header-logout" class="topbar_item">Logout</div>
             <div style="clear:both"></div>
         </div>
 
     </div>
-    <div id="question-middle-frame">
+    <div id="answer-middle-frame">
 
         <div>
 
-            <div><h2><?= $question_text?></h2></div>
-            <div id="question-textarea">
+            <div><h2><?= $answer_text?></h2></div>
+            <div id="answer-textarea">
                 <textarea name="qa" rows="10"></textarea>
             </div>
 
@@ -92,12 +92,12 @@
 
     </div>
 
-    <div id="question-footer-frame">
+    <div id="answer-footer-frame">
 
         <div>
-            <div id="question-submit-button"><button type="submit" name="answer" class="ui-btn"><?=$question_submit_button?></button></div>
-            <div id="question-submitted-message"></div>
-            <div id="question-rating-ready"></div>
+            <div id="answer-submit-button"><button type="submit" name="answer" class="ui-btn"><?=$answer_submit_button?></button></div>
+            <div id="answer-submitted-message"></div>
+            <div id="answer-rating-ready"></div>
         </div>
 
     </div>
@@ -108,7 +108,7 @@
     </form>
 </div>
 <script>
-    $('#question-header-logout').on('touchstart', function(e) {
+    $('#answer-header-logout').on('touchstart', function(e) {
         window.location="logout.php";
     });
 </script>

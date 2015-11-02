@@ -1,7 +1,7 @@
 <?php
 
-User\enforce_student_login();
-$sname = User\get_student_username();
+Student\enforce_student_login();
+$sname = Student\get_student_username();
 $sid = $_SESSION['student'];
 
 //get information the latest flow
@@ -42,14 +42,14 @@ else{
 		}
 		if(isset($error)) {
 			$body = View\element("question_form", array(
-					'username' => $sname,
-					'level' => 'Level ' . '0/' . $levels,
-					'question_text' => 'Write a question',
-					'question_submit_button' => 'Submit your question',
-					'error' => $error,
-					'hidden_input_array' => array(
-							'a_lvl' => $_POST['a_lvl'],
-							'a_peer_group_id' => $_POST['a_peer_group_id'],
+					'username' 					=> $sname,
+					'level' 					=> 'Level ' . '0/' . $levels,
+					'question_text' 			=> 'Write a question',
+					'question_submit_button' 	=> 'Submit your question',
+					'error' 					=> $error,
+					'hidden_input_array' 		=> array(
+							'a_lvl' 			=> $_POST['a_lvl'],
+							'a_peer_group_id'	=> $_POST['a_peer_group_id'],
 					),
 			));
 			View\page(array(

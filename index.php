@@ -3,7 +3,7 @@ include_once('init.php');
 
 \Action\execute($action);
 
-$question_form = View\element("question_form",array(
+/*$question_form = View\element("question_form",array(
     'username' => 'Pablo',
     'level' => 'Level 1/5',
     'question_text' => 'Write a question',
@@ -12,8 +12,9 @@ $question_form = View\element("question_form",array(
         'a_lvl' => '2',
         'a_peer_group_id' => '3',
     ),
-));
+));*/
 
+/*
 $rating_form = View\element("question_rating",array(
     'username' => 'Pablo',
     'level' => 'Level 2/5',
@@ -26,6 +27,7 @@ $rating_form = View\element("question_rating",array(
     ),
     'question_rate_submit' => 'Rate',
 ));
+*/
 /*
 $html = View\element("page",array(
     'title' => 'title1',
