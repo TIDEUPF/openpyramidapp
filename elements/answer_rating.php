@@ -135,4 +135,8 @@
     $('#answer-header-logout').on('touchstart', function(e) {
         window.location="logout.php";
     });
+
+    $('#answer-header-logout').on('click', function(e) {
+        window.location="logout.php";
+    });
 </script>

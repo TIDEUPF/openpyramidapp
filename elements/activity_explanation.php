@@ -60,6 +60,11 @@
         font-weight: bold;
     }
 
+    #answer-header-text {
+        font-size: 1.35em;
+        margin-top: 0.5em;
+    }
+
 </style>
 <div id="answer-frame">
     <form method="post" action="student.php">
@@ -71,13 +76,17 @@
                 <div id="answer-header-logout" class="topbar_item">Logout</div>
                 <div style="clear:both"></div>
             </div>
+            <div>
+                <div id="answer-header-text">Activity description</div>
+            </div>
 
         </div>
         <div id="answer-middle-frame">
 
             <div>
 
-                activity explanation
+                In this activity, you have to propose a question to ask from the teacher individually. Then you rate questions suggested by your peers in every level. Finally you all will be selecting the highest rated question/s to be submitted for the teacher to answer. When all members finish rating at one level, the next level options will appear.
+
 
             </div>
 
@@ -100,6 +109,10 @@
 </div>
 <script>
     $('#answer-header-logout').on('touchstart', function(e) {
+        window.location="logout.php";
+    });
+
+    $('#answer-header-logout').on('click', function(e) {
         window.location="logout.php";
     });
 </script>

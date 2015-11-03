@@ -24,13 +24,14 @@ function get_needed_results_to_end_level() {
     global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp, $answer_required_percentage;
 
     $group_size = count($peer_array); //no of peers in the branch
-    if($activity_level == 0)
+    if($activity_level == 0 and \Answer\is_submitted())
     {
         $needed_results = $group_size * ($group_size); //in the first level, it's no. of choices * student count
     }
     else{
         $st_count = count($peer_group_combined_ids_temp);
         $needed_results = $group_size * $st_count; //because now every student is rating two answers, need to occupy all answers
+        //$needed_results = floor($needed_results * $answer_required_percentage / 100.0);
     }
     $needed_results = floor($needed_results * $answer_required_percentage / 100.0);
     return $needed_results;
@@ -45,14 +46,17 @@ function check_if_group_finished_level()
 
     $needed_results = get_needed_results_to_end_level();
 
-    if($cgfl_result_1_count != $needed_results)
+    if($cgfl_result_1_count < $needed_results)
     {
         return false;
     }
     else
     {
-        return true;
+        if(\Group\is_level_timeout())
+            return true;
     }
+
+    return false;
 }
 
 function check_if_previous_groups_completed_task()
@@ -61,7 +65,16 @@ function check_if_previous_groups_completed_task()
 
     $activity_level_previous = $activity_level-1;
 
-    if($activity_level_previous == -1)
+    if($activity_level_previous == -1 and \Answer\is_submitted()) {
+        $peer_array_sql = implode("','", $peer_array);
+        $n_answers_query = mysqli_query($link, "select * from flow_student where fid = '{$fid}' and sid  in ('{$peer_array_sql}')");
+        $n_answers = mysqli_num_rows($n_answers_query);
+        $needed_results = count($peer_array);
+        if($n_answers >= $needed_results)
+            return true;
+        else
+            return false;
+    } elseif($activity_level_previous == -1)
         return true;
 
     $peer_group_combined_ids_array = explode(",",$peer_group_combined_ids);
@@ -88,7 +101,7 @@ function check_if_previous_groups_completed_task()
 function is_level_timeout() {
     global $timeout;
 
-    if(is_level_minimun_required_answers_reached()) {
+    if(is_level_minimun_required_answers_to_set_timestamps_reached()) {
         if(!$timestamp = get_level_timeout_timestamp()) {
             $timestamp = set_level_timeout_timestamp();
         }
@@ -100,7 +113,7 @@ function is_level_timeout() {
     return false;
 }
 
-function is_level_minimun_required_answers_reached() {
+function is_level_minimun_required_answers_to_set_timestamps_reached() {
     global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_group_id;
 
     $submitted_group_answers_query = mysqli_query($link, "select * from flow_student_rating where fsr_fid='{$fid}' and fsr_level='{$activity_level}' and fsr_group_id='{$peer_group_id}'");
@@ -117,11 +130,13 @@ function set_level_timeout_timestamp()
     global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_group_id;
 
     $timestamp = time();
-    mysqli_query("update pyramid_groups set pg_timestamp='{$timestamp}' where pg_fid='{$fid}' and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}'");
+    mysqli_query($link, "update pyramid_groups set pg_timestamp='{$timestamp}' where pg_fid='{$fid}' and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}'");
+
+    return $timestamp;
 }
 
 function get_level_timeout_timestamp($fid, $activity_level, $peer_group_id) {
-    global $link;
+    global $link, $peer_group_id, $activity_level, $fid;
 
     $submitted_group_answers_timestamp_query = mysqli_query($link, "select * from pyramid_groups where pg_timestamp > 0 and pg_fid='{$fid}' and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}' order by pg_timestamp asc limit 1");
     if(mysqli_num_rows($submitted_group_answers_timestamp_query)) {

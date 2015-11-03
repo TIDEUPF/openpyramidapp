@@ -47,7 +47,7 @@ if(isset($_POST['cflow'])){
 					for($tin=0; $tin<count($t_group_items); $tin++){
 						
 						$group_comma = implode(",",$t_group_items[$tin]);
-						mysqli_query($link,"insert into pyramid_groups values ($mysql_last_id, '$group_comma', '$tl', '$tin', '0')");
+						mysqli_query($link,"insert into pyramid_groups values ($mysql_last_id, '$group_comma', '$tl', '$tin', '0', 0)");
 					}	
 				}
 				else{
@@ -56,7 +56,7 @@ if(isset($_POST['cflow'])){
 					for($tin=0; $tin<count($t_group_items); $tin++){
 						$group_comma = implode(",", $t_group_items[$tin]);
 						$group_comma_relations = implode(",", $t_group_items_relation[$tin]);
-						mysqli_query($link,"insert into pyramid_groups values ($mysql_last_id, '$group_comma', '$tl', '$tin', '$group_comma_relations')");
+						mysqli_query($link,"insert into pyramid_groups values ($mysql_last_id, '$group_comma', '$tl', '$tin', '$group_comma_relations', 0)");
 					}
 				}
 			}

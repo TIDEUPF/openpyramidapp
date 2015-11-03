@@ -15,6 +15,8 @@ include_once('./lib/pyramid.php');
 include_once('./lib/answer.php');
 include_once('./lib/student.php');
 
+init_cfg();
+
 $action = 'student_login';
 if(isset($_REQUEST)) {
     $action = $_REQUEST['action'];

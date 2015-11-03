@@ -111,7 +111,8 @@ function is_level_completed() {
     $actual_result= mysqli_query($link, "select * from flow_student_rating where fsr_fid = '$fid' and fsr_level = '$activity_level' and fsr_group_id = '$peer_group_id'");
 
     if(mysqli_num_rows($actual_result) >= $needed_results) {
-        return true;
+        if(\Group\is_level_timeout())
+            return true;
     }
 
     return false;
@@ -216,24 +217,34 @@ function wait($params) {
 }
 
 function set_previous_level_peer_active_group_ids() {
-    global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_group_id, $peer_group_combined_ids;
+    global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
-    if(!\Group\check_if_previous_groups_completed_task())
+    if(\Group\is_level_timeout())
         return false;
 
     $previous_activity_level = $activity_level-1;
 
-    $submitted_group_answers_query = mysqli_query($link, "select * from flow_student_rating where fsr_fid='{$fid}' and fsr_level='{$previous_activity_level}' and fsr_group_id IN({$peer_group_combined_ids})");
+    if(!\Group\check_if_previous_groups_completed_task() or !\Answer\is_submitted())
+        return false;
+
+    $peer_group_combined_ids_array = explode(',',$peer_group_combined_ids);
+    $peer_group_combined_ids_sql = implode("','",$peer_group_combined_ids_array);
+    $peer_array_sql = implode("','", $peer_array);
+
+    if($previous_activity_level == -1)
+        $submitted_group_answers_query = mysqli_query($link, "select distinct sid as active_sid from flow_student where fid = '{$fid}' and sid  in ('{$peer_array_sql}')");
+    else
+        $submitted_group_answers_query = mysqli_query($link, "select distinct fsr_sid as active_sid from flow_student_rating where fsr_fid='{$fid}' and fsr_level='{$previous_activity_level}' and fsr_group_id IN('{$peer_group_combined_ids_sql}')");
 
     $active_ids = array();
     while ($rating = mysqli_fetch_assoc($submitted_group_answers_query)) {
-        $active_ids[] = $rating['fsr_sid'];
+        $active_ids[] = $rating['active_sid'];
     }
 
     $active_ids_string = implode(',', $active_ids);
-    mysqli_query("update pyramid_groups set pg_groups='{$active_ids_string}' where pg_fid='{$fid}' and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}'");
+    mysqli_query($link, "update pyramid_groups set pg_group='{$active_ids_string}' where pg_fid='{$fid}' and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}'");
 
-    \Group\get_members();
+    $peer_array = $active_ids;
 
     return $active_ids;
 }

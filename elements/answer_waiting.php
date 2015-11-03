@@ -60,6 +60,10 @@
         font-weight: bold;
     }
 
+    #answer-header-text {
+        font-size: 1.35em;
+        margin-top: 0.5em;
+    }
 </style>
 <div id="answer-frame">
     <form method="post">
@@ -72,12 +76,15 @@
                 <div style="clear:both"></div>
             </div>
 
+            <div>
+                <div id="answer-header-text">Waiting for your peers to continue...</div>
+            </div>
+
         </div>
         <div id="answer-middle-frame">
 
             <div>
 
-wait
 
             </div>
 
@@ -86,7 +93,6 @@ wait
         <div id="answer-footer-frame">
 
             <div>
-                <div id="answer-submit-button"><button type="submit" name="answer" class="ui-btn"><?=$answer_submit_button?></button></div>
                 <div id="answer-submitted-message"></div>
                 <div id="answer-rating-ready"></div>
             </div>
@@ -102,4 +108,14 @@ wait
     $('#answer-header-logout').on('touchstart', function(e) {
         window.location="logout.php";
     });
+
+    $('#answer-header-logout').on('click', function(e) {
+        window.location="logout.php";
+    });
+
+    timeoutPeriod = 10000;
+    setTimeout("refreshp();",timeoutPeriod);
+    function refreshp(){
+        window.location.href = window.location.href;
+    }
 </script>

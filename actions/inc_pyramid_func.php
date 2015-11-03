@@ -123,5 +123,3 @@ function noSc_pyramid($levels, $student_arr, $student_amount){
 	return $final_result;
 	
 }	
-
-?>

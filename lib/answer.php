@@ -176,7 +176,7 @@ function submit_rate() {
             if($timestamp = \Group\get_level_timeout_timestamp($fid, $rate_lvl, $rgroup_id)) {
                 if(time() > $timestamp + $timeout) {
                     $error = "You are out of time";
-                    request_rate(array('error' => $error));
+                    \Answer\request_rate(array('error' => $error));
                     exit;
                 }
             }
