@@ -214,3 +214,20 @@ function wait($params) {
     ));
     exit;
 }
+
+function set_previous_level_peer_active_group_ids() {
+    global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_group_id, $peer_group_combined_ids;
+
+    $previous_activity_level = $activity_level-1;
+    $submitted_group_answers_query = mysqli_query($link, "select * from flow_student_rating where fsr_fid='{$fid}' and fsr_level='{$previous_activity_level}' and fsr_group_id IN({$peer_group_combined_ids})");
+
+    $active_ids = array();
+    while ($answer = mysqli_fetch_assoc($submitted_group_answers_query)) {
+        $active_ids[] = $answer['fsr_sid'];
+    }
+
+    $active_ids_string = implode(',', $active_ids);
+    mysqli_query("update pyramid_groups set pg_groups='{$active_ids_string}' where pg_fid='{$fid}' and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}'");
+
+    return $active_ids;
+}

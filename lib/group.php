@@ -85,3 +85,51 @@ function check_if_previous_groups_completed_task()
 
     return $result;
 }
+
+function is_level_timeout() {
+    global $timeout;
+
+    if(is_level_minimun_required_answers_reached()) {
+        if(!$timestamp = get_level_timeout_timestamp()) {
+            $timestamp = set_level_timeout_timestamp();
+        }
+
+        if(time() > $timestamp + $timeout)
+            return true;
+    }
+
+    return false;
+}
+
+function is_level_minimun_required_answers_reached() {
+    global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_group_id;
+
+    $submitted_group_answers_query = mysqli_query($link, "select * from flow_student_rating where fsr_fid='{$fid}' and fsr_level='{$activity_level}' and fsr_group_id='{$peer_group_id}'");
+    $submitted_group_answers_count = mysqli_num_rows($submitted_group_answers_query);
+
+    if($submitted_group_answers_count >= get_needed_results_to_end_level())
+        return true;
+
+    return false;
+}
+
+function set_level_timeout_timestamp()
+{
+    global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_group_id;
+
+    $timestamp = time();
+    mysqli_query("update pyramid_groups set pg_timestamp='{$timestamp}' where pg_fid='{$fid}' and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}'");
+}
+
+function get_level_timeout_timestamp() {
+    global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_group_id;
+
+    $submitted_group_answers_timestamp_query = mysqli_query($link, "select * from pyramid_groups where pg_timestamp > 0 and pg_fid='{$fid}' and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}' order by pg_timestamp asc limit 1");
+    if(mysqli_num_rows($submitted_group_answers_timestamp_query)) {
+        $submitted_group_answers_timestamp_row_array = mysqli_fetch_assoc($submitted_group_answers_timestamp_query);
+        return $submitted_group_answers_timestamp_row_array['pg_timestamp'];
+    } else {
+        return FALSE;
+    }
+}
+
