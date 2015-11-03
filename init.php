@@ -4,6 +4,8 @@ ini_set("display_errors", 1);
 ini_set('html_errors', true);
 
 session_start();
+
+include_once('./config.php');
 include_once('./actions/dbvar.php');
 include_once('./lib/view.php');
 include_once('./lib/action.php');

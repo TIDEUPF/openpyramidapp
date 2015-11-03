@@ -21,7 +21,7 @@ function get_members($params) {
 }
 
 function get_needed_results_to_end_level() {
-    global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+    global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp, $answer_required_percentage;
 
     $group_size = count($peer_array); //no of peers in the branch
     if($activity_level == 0)
@@ -32,6 +32,7 @@ function get_needed_results_to_end_level() {
         $st_count = count($peer_group_combined_ids_temp);
         $needed_results = $group_size * $st_count; //because now every student is rating two answers, need to occupy all answers
     }
+    $needed_results = floor($needed_results * $answer_required_percentage / 100.0);
     return $needed_results;
 }
 
@@ -74,12 +75,10 @@ function check_if_previous_groups_completed_task()
     $cipgct_result_1 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level = '$activity_level_previous' and ($sql1) ");
     $cipgct_result_1_count = mysqli_num_rows($cipgct_result_1);
 
-    if($array_size == $cipgct_result_1_count)
-    {
+    if($array_size == $cipgct_result_1_count) {
         return true;
     }
-    else
-    {
+    else {
         return false;
     }
 
@@ -121,8 +120,8 @@ function set_level_timeout_timestamp()
     mysqli_query("update pyramid_groups set pg_timestamp='{$timestamp}' where pg_fid='{$fid}' and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}'");
 }
 
-function get_level_timeout_timestamp() {
-    global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_group_id;
+function get_level_timeout_timestamp($fid, $activity_level, $peer_group_id) {
+    global $link;
 
     $submitted_group_answers_timestamp_query = mysqli_query($link, "select * from pyramid_groups where pg_timestamp > 0 and pg_fid='{$fid}' and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}' order by pg_timestamp asc limit 1");
     if(mysqli_num_rows($submitted_group_answers_timestamp_query)) {

@@ -154,7 +154,7 @@ function request_rate($params) {
 }
 
 function submit_rate() {
-    global $link, $sid, $fid;
+    global $link, $sid, $fid, $timeout;
 
     if(isset($_POST['rate'])) { //3 set of post values since there can be 3ratings sometimes
         $rate_input =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['optradio1']))));
@@ -172,8 +172,14 @@ function submit_rate() {
         $to_whom_rated_id3 =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['to_whom_rated_id3']))));
         $rgroup_id3 =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['group_id3']))));
 
-        if($rate_input != ''){
-
+        if($rate_input != '') {
+            if($timestamp = \Group\get_level_timeout_timestamp($fid, $rate_lvl, $rgroup_id)) {
+                if(time() > $timestamp + $timeout) {
+                    $error = "You are out of time";
+                    request_rate(array('error' => $error));
+                    exit;
+                }
+            }
 
             if(mysqli_num_rows(mysqli_query($link, "select * from flow_student_rating where fsr_sid = '$sid' and fsr_fid = '$fid' and fsr_level = '$rate_lvl' and fsr_group_id = '$rgroup_id' and fsr_to_whom_rated_id = '$to_whom_rated_id' ")) > 0){
                 //to be filled if editing of submitted rating is providing

@@ -18,6 +18,9 @@ $sid = $_SESSION['student'];
 //$peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp
 \Group\get_members();
 
+//delete inactive students from the current level
+\Pyramid\set_previous_level_peer_active_group_ids();
+
 if(\Pyramid\is_complete()) {
     \Pyramid\show_final_answer();
     exit;
