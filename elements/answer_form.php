@@ -62,7 +62,7 @@
 
 </style>
 <div id="answer-frame">
-    <form method="post" action="student.php">
+    <form method="post" action="student.php" data-ajax="false">
     <div id="answer-header-frame">
 
         <div>

@@ -20,7 +20,7 @@ $sid = $_SESSION['student'];
 
 //TODO:improve the timeout thing
 if(\Group\is_level_timeout()) {
-    header("location: logout.php");
+    \Student\timeout_view();
     exit;
 }
 

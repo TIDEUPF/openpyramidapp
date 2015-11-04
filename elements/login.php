@@ -56,7 +56,7 @@
 
 </style>
 <div id="activity-frame">
-    <form action="student_login.php" method="post">
+    <form action="student_login.php" method="post" data-ajax="false">
 
         <div id="activity-middle-frame">
             <h2>Student Login</h2>

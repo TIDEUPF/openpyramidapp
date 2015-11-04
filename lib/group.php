@@ -20,7 +20,7 @@ function get_members($params) {
     $peer_group_combined_ids_temp = explode(",",$peer_group_combined_ids);
 }
 
-function get_needed_results_to_end_level() {
+function get_needed_results_to_end_level($full_requirements = false) {
     global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp, $answer_required_percentage;
 
     $group_size = count($peer_array); //no of peers in the branch
@@ -33,7 +33,10 @@ function get_needed_results_to_end_level() {
         $needed_results = $group_size * $st_count; //because now every student is rating two answers, need to occupy all answers
         //$needed_results = floor($needed_results * $answer_required_percentage / 100.0);
     }
-    $needed_results = floor($needed_results * $answer_required_percentage / 100.0);
+
+    if(!$full_requirements)
+        $needed_results = floor($needed_results * $answer_required_percentage / 100.0);
+
     return $needed_results;
 }
 
@@ -45,14 +48,12 @@ function check_if_group_finished_level()
     $cgfl_result_1_count = mysqli_num_rows($cgfl_result_1);
 
     $needed_results = get_needed_results_to_end_level();
+    $full_needed_results = get_needed_results_to_end_level(true);
 
-    if($cgfl_result_1_count < $needed_results)
-    {
+    if($cgfl_result_1_count < $needed_results) {
         return false;
-    }
-    else
-    {
-        if(\Group\is_level_timeout())
+    } else {
+        if(\Group\is_level_timeout() or $full_needed_results <= $cgfl_result_1_count)
             return true;
     }
 

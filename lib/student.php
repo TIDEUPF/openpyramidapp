@@ -31,3 +31,29 @@ function level_is_rated() {
 
     return false;
 }
+
+function timeout_view($params) {
+    global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_group_id;
+
+    $vars = array(
+        'username' 					=> $sname,
+        'level' 					=> 'Level ' . $activity_level . '/' . $levels,
+        'answer_text' 			=> 'Write a question',
+        'answer_submit_button' 	=> 'Submit your question',
+        'hidden_input_array' 		=> array(
+            'a_lvl' 			=> $activity_level,
+            'a_peer_group_id'	=> $peer_group_id,
+        ),
+    );
+
+    if(isset($params['error']))
+        $vars['error'] = $params['error'];
+
+    $body = \View\element("timeout_view", $vars);
+
+    \View\page(array(
+        'title' => 'Question',
+        'body' => $body,
+    ));
+    exit;
+}

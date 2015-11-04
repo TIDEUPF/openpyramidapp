@@ -103,6 +103,7 @@ function is_level_computed($params) {
     return false;
 }
 
+/*
 function is_level_completed() {
     global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
@@ -117,6 +118,7 @@ function is_level_completed() {
 
     return false;
 }
+*/
 
 function get_needed_results_to_end_level() {
     global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;

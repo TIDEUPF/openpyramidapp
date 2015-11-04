@@ -225,10 +225,11 @@ function submit_rate() {
             $error = 'Rating cannot be empty!';
         }
 
+        /*
         if(isset($error)) {
             request_rate(array('error' => $error));
             exit;
-        }
+        }*/
         return true;
     }
 

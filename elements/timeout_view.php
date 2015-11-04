@@ -40,7 +40,7 @@
     }
 
     #answer-header-logout {
-        float: left;
+        float: right;
         text-align: right;
     }
 
@@ -72,13 +72,13 @@
 
             <div id="topbar">
                 <div id="answer-header-user" class="topbar_item"><?=$username?></div>
-                <div id="answer-header-level" class="topbar_item"><?=$level?></div>
+
                 <div id="answer-header-logout" class="topbar_item">Logout</div>
                 <div style="clear:both"></div>
             </div>
 
             <div>
-                <div id="answer-header-text">Waiting for your peers to continue...</div>
+                <div id="answer-header-text">You have run out of time to submit your rating</div>
             </div>
 
         </div>
@@ -114,9 +114,4 @@
         window.location="logout.php";
     });
 
-    timeoutPeriod = 10000;
-    setTimeout("refreshp();",timeoutPeriod);
-    function refreshp(){
-        window.location.href = window.location.href;
-    }
 </script>

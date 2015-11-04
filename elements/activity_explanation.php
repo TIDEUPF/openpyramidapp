@@ -12,11 +12,7 @@
     #answer-middle-frame,
     #answer-footer-frame > div{
         padding: 0 1em 0 1em;
-    }
-
-    #answer-header-frame > div {
-        padding: 0.5em 1em 0.25em 1em;
-        background-color: #DFE5EC;
+        margin-top: 0.5em;
     }
 
     #answer-middle-frame {
@@ -40,7 +36,7 @@
     }
 
     #answer-header-logout {
-        float: left;
+        float: right;
         text-align: right;
     }
 
@@ -63,20 +59,30 @@
     #answer-header-text {
         font-size: 1.35em;
         margin-top: 0.5em;
+        /*padding-left: 1.0em;*/
+    }
+
+    #pre-header {
+        padding-left: 1.0em;
+    }
+
+    #answer-header-frame > #topbar {
+        padding: 0.5em 1em 0.25em 1em;
+        background-color: #DFE5EC;
     }
 
 </style>
 <div id="answer-frame">
-    <form method="post" action="student.php">
+    <form method="post" action="student.php" data-ajax="false">
         <div id="answer-header-frame">
 
-            <div>
+            <div id="topbar">
                 <div id="answer-header-user" class="topbar_item"><?=$username?></div>
                 <div id="answer-header-level" class="topbar_item"><?=$level?></div>
                 <div id="answer-header-logout" class="topbar_item">Logout</div>
                 <div style="clear:both"></div>
             </div>
-            <div>
+            <div id="pre-header">
                 <div id="answer-header-text">Activity description</div>
             </div>
 
@@ -86,6 +92,10 @@
             <div>
 
                 In this activity, you have to propose a question to ask from the teacher individually. Then you rate questions suggested by your peers in every level. Finally you all will be selecting the highest rated question/s to be submitted for the teacher to answer. When all members finish rating at one level, the next level options will appear.
+
+                <br><br>
+                <i>En aquesta activitat has de proposar una pregunta per al professor, després haurás de puntuar les preguntes del teu grup. Quan tots hagueu puntuat les preguntes apareixerà el següent nivell.</i>
+
 
 
             </div>
