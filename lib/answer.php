@@ -74,6 +74,10 @@ function submit($params) {
             request(array('error' => $error));
         } else {
             //follow the next step in the flow
+            if(!isset($error)) {
+                \Pyramid\wait();
+                exit;
+            }
             return true;
         }
     }
@@ -219,6 +223,11 @@ function submit_rate() {
                 }
 
                 if(mysqli_affected_rows($link) > 0){ $success = 'Rating Submitted.'; }else{	/*$error = 'Database error!';*/	}
+            }
+
+            if(!isset($error)) {
+                \Pyramid\wait();
+                exit;
             }
         }
         else{

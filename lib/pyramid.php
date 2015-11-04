@@ -197,7 +197,7 @@ function wait($params) {
 
     $vars = array(
         'username' 					=> $sname,
-        'level' 					=> 'Level ' . $activity_level . '/' . $levels,
+        'level' 					=> '',//'Level ' . $activity_level . '/' . $levels,
         'answer_text' 			=> 'Write a question',
         'answer_submit_button' 	=> 'Submit your question',
         'hidden_input_array' 		=> array(

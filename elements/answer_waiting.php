@@ -40,7 +40,7 @@
     }
 
     #answer-header-logout {
-        float: left;
+        float: right;
         text-align: right;
     }
 
