@@ -99,7 +99,7 @@
         <?php foreach($answer_text_array as $i=> $answer_text):?>
         <div class="answer-rating-widget">
             <fieldset data-role="controlgroup" data-type="horizontal">
-                <legend><?=$answer_text?></legend>
+                <legend><?=htmlspecialchars($answer_text)?></legend>
                 <input type="radio" name="<?=$i?>" id="id-answer-rating-<?=$i?>-1" value="1">
                 <label for="id-answer-rating-<?=$i?>-1">1</label>
                 <input type="radio" name="<?=$i?>" id="id-answer-rating-<?=$i?>-2" value="2">

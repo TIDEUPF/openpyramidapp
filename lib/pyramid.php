@@ -188,7 +188,17 @@ function get_current_flow() {
         return $data3;
     }
     else{
-        throw new Exception("There are no flows");
+        //throw new Exception("There are no flows");
+        //show activity explanation
+        $activity_explanation_view = \View\element("activity_explanation", array());
+
+        \View\page(array(
+            'title' => 'Activity explanation',
+            'body' => $activity_explanation_view,
+        ));
+
+        //header("location: student.php");
+        exit;
     }
 }
 

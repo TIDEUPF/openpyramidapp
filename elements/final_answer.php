@@ -99,7 +99,7 @@
             <?php foreach($final_answer_array as $i=> $answer_text):?>
                 <div class="answer-rating-widget">
                     <fieldset data-role="controlgroup" data-type="horizontal">
-                        <legend><?=$answer_text?></legend>
+                        <legend><?=htmlspecialchars($answer_text)?></legend>
                     </fieldset>
                 </div>
             <?php endforeach;?>
