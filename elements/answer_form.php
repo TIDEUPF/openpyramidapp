@@ -96,6 +96,7 @@
 
         <div>
             <div id="answer-submit-button"><button type="submit" name="answer" class="ui-btn"><?=$answer_submit_button?></button></div>
+            <div id="answer-submit-skip-button"><button type="button" name="skip_button" class="ui-btn"><?=$answer_submit_skip_button?></button></div>
             <div id="answer-submitted-message"></div>
             <div id="answer-rating-ready"></div>
         </div>
@@ -108,6 +109,31 @@
     </form>
 </div>
 <script>
+    answer = new Object();
+    answer.timeout = <?=$answer_timeout?>;
+    answer.skip_timeout = <?=$answer_skip_timeout?>;
+
+    var insert_skip_flag = function(e) {
+        if(e.preventDefault)
+            e.preventDefault();
+
+        $skip = $('<input name="skip" vañue="true" />');
+        $('form').append($skip);
+        $('form').submit();
+    };
+
+    if(answer.timeout) {
+        setTimeout(insert_skip_flag, answer.timeout*1000);
+    }
+
+    if(answer.skip_timeout) {
+        setTimeout(function() {
+            $('button[name=skip_button]').show();
+            $('button[name=skip_button]').on('touchstart', insert_skip_flag);
+            $('button[name=skip_button]').on('click', insert_skip_flag);
+        }, answer.skip_timeout*1000);
+    }
+
     $('#answer-header-logout').on('touchstart', function(e) {
         window.location="logout.php";
     });
@@ -115,4 +141,5 @@
     $('#answer-header-logout').on('click', function(e) {
         window.location="logout.php";
     });
+
 </script>

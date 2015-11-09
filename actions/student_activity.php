@@ -48,8 +48,8 @@ else{
 					'question_submit_button' 	=> 'Submit your question',
 					'error' 					=> $error,
 					'hidden_input_array' 		=> array(
-							'a_lvl' 			=> $_POST['a_lvl'],
-							'a_peer_group_id'	=> $_POST['a_peer_group_id'],
+						'a_lvl' 			=> $_POST['a_lvl'],
+						'a_peer_group_id'	=> $_POST['a_peer_group_id'],
 					),
 			));
 			View\page(array(

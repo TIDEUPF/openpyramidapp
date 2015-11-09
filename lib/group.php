@@ -67,10 +67,13 @@ function check_if_previous_groups_completed_task()
     $activity_level_previous = $activity_level-1;
 
     if($activity_level_previous == -1 and \Answer\is_submitted()) {
+        if(\Answer\is_timeout())
+            return true;
+
         $peer_array_sql = implode("','", $peer_array);
-        $n_answers_query = mysqli_query($link, "select * from flow_student where fid = '{$fid}' and sid  in ('{$peer_array_sql}')");
+        $n_answers_query = mysqli_query($link, "select * from flow_student where fid = '{$fid}' and sid in ('{$peer_array_sql}')");
         $n_answers = mysqli_num_rows($n_answers_query);
-        $needed_results = count($peer_array);
+        $needed_results = \Answer\needed_number();//count($peer_array);
         if($n_answers >= $needed_results)
             return true;
         else
@@ -96,7 +99,6 @@ function check_if_previous_groups_completed_task()
         return false;
     }
 
-    return $result;
 }
 
 function is_level_timeout() {

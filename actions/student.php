@@ -5,22 +5,36 @@ Student\enforce_login();
 $sname = Student\get_username();
 $sid = $_SESSION['student'];
 
-// $levels, $fname, $fdes, $fid
+// $levels, $fname, $fdes, $fid, $fid_timestamp
 \Pyramid\get_current_flow();
+
+//$activity_level
+\Pyramid\get_current_activity_level();
+
+//$peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp
+\Group\get_members();
 
 //enter submitted information
 \Answer\submit();
 \Answer\submit_rate();
 
-//$activity_level
-//$peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp
-\Pyramid\get_current_activity_level();
-//$peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp
-\Group\get_members();
-
 //TODO:improve the timeout thing
 if(\Group\is_level_timeout()) {
     \Student\timeout_view();
+    exit;
+}
+
+//new data entered
+if(\Answer\new_data()) {
+    //wait
+    \Pyramid\wait();
+    exit;
+}
+
+//wrong answer
+if(\Answer\submit_error()) {
+    //retry
+    \Answer\retry();
     exit;
 }
 

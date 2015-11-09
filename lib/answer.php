@@ -7,9 +7,12 @@ function is_submitted($params) {
 
     $res4 = mysqli_query($link, "select * from flow_student where sid = '$sid' and fid = '$fid'");
     //the user already submitted the answer
-    if(mysqli_num_rows($res4) > 0) {
+    if(mysqli_num_rows($res4) > 0)
         return true;
-    }
+
+    //in case of timeout allow the user to rate the answers
+    if(is_timeout())
+        return true;
 
     return false;
 }
@@ -45,54 +48,79 @@ function get_user_answer($sid, $fid) {
 }
 
 function submit($params) {
-    global $link, $sid, $fid;
+    global $link, $sid, $fid, $input_result, $answer_submit_required_percentage, $peer_array;
 
-    if(isset($_POST['answer'])) {
-        $ans_input = mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['qa']))));
-        if ($ans_input != '') {
-            //why can't edit the answer once submitted? because should not rate while editing. wrong answer will be rated
-            if (mysqli_num_rows(mysqli_query($link, "select * from flow_student where sid = '$sid' and fid = '$fid'")) > 0) {
-                return true;
-                //edit if already answered
-                //mysqli_query($link,"update flow_student set fs_answer = '$ans_input' where sid = '$sid' and fid_ = '$fid'");
-                //if(mysqli_affected_rows($link) > 0){ $success = 'Submitted.'; }
-            } else {
-                //insert new
-                mysqli_query($link, "insert into flow_student values ('', '$fid', '$sid', '$ans_input')");
-                if (mysqli_affected_rows($link) > 0) {
-                    $success = 'Submitted.';
-                } else {
-                    $error = 'Database error!';
-                }
-            }
-        } else {
-            $error = 'Field cannot be empty!';
-        }
+    if(!isset($_POST['answer']))
+        return false;
 
-        if (isset($error)) {
-            //ask the answer again
-            request(array('error' => $error));
-        } else {
-            //follow the next step in the flow
-            if(!isset($error)) {
-                \Pyramid\wait();
-                exit;
-            }
-            return true;
-        }
+    $input_result['op'] = 'submit';
+
+    //check for the minimum participants for timeout start
+    $answertimestamp = 0;
+    if(mysqli_num_rows(mysqli_query($link, "select * from flow_student where `timeout` > 0 and fid = '$fid'") == 0)) {
+        $required_peers = floor(count($peer_array) * $answer_submit_required_percentage / 100);
+
+        if(mysqli_num_rows(mysqli_query($link, "select * from flow_student where fid = '$fid'")) >= $required_peers)
+            $answertimestamp = time();
     }
+
+    if(isset($_POST['skip'])) {
+        mysqli_query($link, "insert into flow_student values ('', '$fid', '$sid', '', 1, $answertimestamp)");
+        $input_result['updated'] = 'true';
+        return true;
+    }
+
+    $ans_input = mysqli_real_escape_string($link, \Request\param('qa'));//stripslashes(strip_tags(trim($_POST['qa']))));
+
+    if(is_timeout())
+        return false;
+
+    if ($ans_input != '') {
+        //why can't edit the answer once submitted? because should not rate while editing. wrong answer will be rated
+        if (mysqli_num_rows(mysqli_query($link, "select * from flow_student where sid = '$sid' and fid = '$fid'")) > 0) {
+            return true;
+            //edit if already answered
+            //mysqli_query($link,"update flow_student set fs_answer = '$ans_input' where sid = '$sid' and fid_ = '$fid'");
+            //if(mysqli_affected_rows($link) > 0){ $success = 'Submitted.'; }
+        } else {
+            //insert new
+            mysqli_query($link, "insert into flow_student values ('', '$fid', '$sid', '$ans_input', 0, $answertimestamp)");
+            if (mysqli_affected_rows($link) > 0) {
+                $success = 'Submitted.';
+            } else {
+                $error = 'Database error!';
+            }
+        }
+    } else {
+        $error = 'Field cannot be empty!';
+    }
+
+    if (isset($error)) {
+        //ask the answer again
+        $input_result['error'] = "You are out of time";
+        return false;
+    } else {
+        //follow the next step in the flow
+        $input_result['updated'] = true;
+        return true;
+    }
+
     return false;
 }
 
 function request($params) {
     global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_group_id;
 
+    $timeout = get_answer_timeout();
+
     $vars = array(
-        'username' 					=> $sname,
-        'level' 					=> 'Level ' . '0/' . $levels,
+        'username' 				=> $sname,
+        'level' 				=> 'Level ' . '0/' . $levels,
         'answer_text' 			=> 'Write a question',
         'answer_submit_button' 	=> 'Submit your question',
-        'hidden_input_array' 		=> array(
+        'answer_timeout'        => $timeout['time_left'],
+        'answer_skip_timeout'   => $timeout['time_left_skip'],
+        'hidden_input_array' 	=> array(
             'a_lvl' 			=> $activity_level,
             'a_peer_group_id'	=> $peer_group_id,
         ),
@@ -158,91 +186,59 @@ function request_rate($params) {
 }
 
 function submit_rate() {
-    global $link, $sid, $fid, $timeout;
+    global $link, $sid, $fid, $timeout, $input_result;
 
-    if(isset($_POST['rate'])) { //3 set of post values since there can be 3ratings sometimes
-        $rate_input =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['optradio1']))));
-        $rate_lvl =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['lvl1']))));
-        $to_whom_rated_id =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['to_whom_rated_id1']))));
-        $rgroup_id =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['group_id1']))));
+    if(!isset($_POST['rate']))
+        return false;
 
-        $rate_input2 =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['optradio2']))));
-        $rate_lvl2 =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['lvl2']))));
-        $to_whom_rated_id2 =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['to_whom_rated_id2']))));
-        $rgroup_id2 =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['group_id2']))));
+    $input_result['op'] = 'submit_rate';
+    $numofqustions = \Request\param('numofqustions');
+    $rating_array = array();
 
-        $rate_input3 =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['optradio3']))));
-        $rate_lvl3 =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['lvl3']))));
-        $to_whom_rated_id3 =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['to_whom_rated_id3']))));
-        $rgroup_id3 =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['group_id3']))));
+    $rating_vars_identifiers = array(
+        'optradio',
+        'lvl',
+        'to_whom_rated_id',
+        'group_id',
+    );
 
-        if($rate_input != '') {
-            if($timestamp = \Group\get_level_timeout_timestamp($fid, $rate_lvl, $rgroup_id)) {
-                if(time() > $timestamp + $timeout) {
-                    $error = "You are out of time";
-                    \Answer\request_rate(array('error' => $error));
-                    exit;
-                }
-            }
+    //verify the integrity of the whole post
+    for($i=1;$i<=$numofqustions;$i++) {
+        $question_rating_values = array();
+        foreach ($rating_vars_identifiers as $rating_var) {
+            $value = \Request\param($rating_var . $i);
 
-            if(mysqli_num_rows(mysqli_query($link, "select * from flow_student_rating where fsr_sid = '$sid' and fsr_fid = '$fid' and fsr_level = '$rate_lvl' and fsr_group_id = '$rgroup_id' and fsr_to_whom_rated_id = '$to_whom_rated_id' ")) > 0){
-                //to be filled if editing of submitted rating is providing
-            }
-            else{
-                //insert new
-                $numofqustions =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['numofqustions']))));
+            if (empty($value))
+                $error = 'Please Rate All!';
 
-                if($numofqustions == 1)
-                {
-                    mysqli_query($link,"insert into flow_student_rating values ('', '$fid', '$sid', '$rate_lvl', '$rgroup_id', '$rate_input', '$to_whom_rated_id', NOW() )");
-                }
-                elseif($numofqustions == 2)
-                {
-                    if(empty($rate_input2) || empty($rate_input))
-                    {
-                        $error = 'Please Rate All!';
-                    }
-                    else
-                    {
-                        mysqli_query($link,"insert into flow_student_rating values ('', '$fid', '$sid', '$rate_lvl', '$rgroup_id', '$rate_input', '$to_whom_rated_id', NOW() )");
-                        mysqli_query($link,"insert into flow_student_rating values ('', '$fid', '$sid', '$rate_lvl2', '$rgroup_id2', '$rate_input2', '$to_whom_rated_id2', NOW() )");
-                    }
-                }
-                elseif($numofqustions == 3)
-                {
-                    if(empty($rate_input2) || empty($rate_input) || empty($rate_input3))
-                    {
-                        $error = 'Please Rate All!';
-                    }
-                    else
-                    {
-                        mysqli_query($link,"insert into flow_student_rating values ('', '$fid', '$sid', '$rate_lvl', '$rgroup_id', '$rate_input', '$to_whom_rated_id', NOW() )");
-                        mysqli_query($link,"insert into flow_student_rating values ('', '$fid', '$sid', '$rate_lvl2', '$rgroup_id2', '$rate_input2', '$to_whom_rated_id2', NOW() )");
-                        mysqli_query($link,"insert into flow_student_rating values ('', '$fid', '$sid', '$rate_lvl3', '$rgroup_id3', '$rate_input3', '$to_whom_rated_id3', NOW() )");
-                    }
-                }
-
-                if(mysqli_affected_rows($link) > 0){ $success = 'Rating Submitted.'; }else{	/*$error = 'Database error!';*/	}
-            }
-
-            if(!isset($error)) {
-                \Pyramid\wait();
-                exit;
-            }
+            $question_rating_values[$rating_var] = mysqli_real_escape_string($link, $value);
         }
-        else{
-            $error = 'Rating cannot be empty!';
-        }
-
-        /*
-        if(isset($error)) {
-            request_rate(array('error' => $error));
-            exit;
-        }*/
-        return true;
+        $rating_array[] = $question_rating_values;
     }
 
-    return false;
+    if(isset($error)) {
+        $input_result['error'] = $error;
+        return false;
+    }
+
+    if($timestamp = \Group\get_level_timeout_timestamp($fid, $rating_array[0]['rate_lvl'], $rating_array[0]['rgroup_id'])) {
+        if(time() > $timestamp + $timeout) {
+            $input_result['error'] = "You are out of time";
+            return false;
+        }
+    }
+
+    foreach($rating_array as $rating) {
+        mysqli_query($link,"insert into flow_student_rating values ('', '$fid', '$sid', '{$rating['rate_lvl']}', '{$rating['rgroup_id']}', '{$rating['rate_input']}', '{$rating['to_whom_rated_id']}', NOW() )");
+
+        if(mysqli_affected_rows($link) <= 0) {
+            //TODO: database inconsistency
+        }
+    }
+
+    $input_result['updated'] = true;
+
+    return true;
 }
 
 function get_user_rating($fid, $who_rated, $to_whom_rated, $lvl) {
@@ -278,10 +274,10 @@ function get_selected_ids($params) {
     $activity_level_previous = $activity_level-1;
     if($activity_level == 0) {
         foreach ($peer_array as $rate_peer_id) {
-            $res5 = mysqli_query($link, "select * from flow_student where sid = '$rate_peer_id' and fid = '$fid'");// to get peer answer
+            $res5 = mysqli_query($link, "select * from flow_student where sid = '$rate_peer_id' and fid = '$fid' and skip = '0'");// to get peer answer
             if (mysqli_num_rows($res5) > 0) {//the peer already submitted the answer
                 $result[] = $rate_peer_id;
-            } else {//the peer did not submit the answer
+            } else {//TODO: the peer did not submit the answer
                 throw new Exception("peer answer not submitted");
             }
         }
@@ -306,8 +302,8 @@ function view_final_answer($params) {
     $vars = array(
         'username' 					=> $sname,
         'level' 					=> 'Level ' . $activity_level . '/' . $levels,
-        'header_text' 			=> 'The winning question is',
-        'final_answer_array' 			=> $params['final_answer_array'],
+        'header_text' 			    => 'The winning question is',
+        'final_answer_array' 		=> $params['final_answer_array'],
         'hidden_input_array' 		=> array(
             'a_lvl' 			=> $activity_level,
             'a_peer_group_id'	=> $peer_group_id,
@@ -325,3 +321,44 @@ function view_final_answer($params) {
     ));
     exit;
 }
+
+function get_answer_timeout() {
+    global $link, $sid, $fid, $ftimestamp, $answer_timeout, $answer_skip_timeout;
+
+    //$time_left = $answer_timeout - (time() - $ftimestamp);
+    $time_left = 0;
+    $time_left_skip = $answer_skip_timeout - (time() - $ftimestamp);
+
+    return array(
+        'time_left' => $time_left,
+        'time_left_skip' => $time_left_skip,
+    );
+}
+
+function is_timeout() {
+    global $link, $sid, $fid, $ftimestamp, $answer_timeout;
+    //check for the minimum participants for timeout
+    $answertimestamp = 0;
+    if(!(mysqli_num_rows(mysqli_query($link, "select * from flow_student where `timeout` > 0 and fid = '$fid'") > 0)))
+        return false;
+
+    $query_result = mysqli_query($link, "select * from flow_student where `timeout` > 0 and fid = '$fid' order by timeout desc limit 1");
+    $result = mysqli_fetch_assoc($query_result);
+
+    if(time() > $result['timeout'] + $answer_timeout)
+        return true;
+
+    return false;
+}
+
+/*
+function needed_number() {
+    if(is_timeout())
+        $required_peers = floor(count($peer_array) * $answer_submit_required_percentage / 100);
+    else
+
+
+    if(mysqli_num_rows(mysqli_query($link, "select * from flow_student where fid = '$fid'")) >= $required_peers)
+        $answertimestamp = time();
+}
+*/

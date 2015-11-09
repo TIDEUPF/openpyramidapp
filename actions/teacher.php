@@ -33,8 +33,8 @@ if(isset($_POST['cflow'])){
 		//var_dump($pyramid_list);
 		//var_dump($pyramid_json);
 		
-		
-		mysqli_query($link,"insert into flow values ('', '$teacher_id', '$fname', '$fdes', '$fcname', '$fesname', '$fsg', '$fl', '$rps')");
+		$datestamp = time();
+		mysqli_query($link,"insert into flow values ('', '$teacher_id', '$fname', '$fdes', '$fcname', '$fesname', '$fsg', '$fl', '$rps', '$datestamp')");
 		if(mysqli_affected_rows($link) > 0){
 			
 			$mysql_last_id = mysqli_insert_id($link);

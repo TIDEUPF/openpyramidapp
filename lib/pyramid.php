@@ -41,6 +41,7 @@ function get_current_activity_level() {
     else
     {
         $activity_level = 0;
+
         //load the group assuming the current level
         \Group\get_members();
     }
@@ -176,7 +177,7 @@ function show_final_answer() {
 }
 
 function get_current_flow() {
-    global $levels, $fname, $fdes, $fid, $link;
+    global $levels, $fname, $fdes, $fid, $link, $ftimestamp;
     //get information the latest flow
     $res3 = mysqli_query($link, "select * from flow order by fid desc limit 1");
     if(mysqli_num_rows($res3) > 0){
@@ -185,6 +186,7 @@ function get_current_flow() {
         $fname = $data3["fname"];
         $fdes = $data3["fdes"];
         $fid = $data3["fid"];
+        $ftimestamp = (int)$data3["timestamp"];
         return $data3;
     }
     else{
@@ -234,19 +236,18 @@ function set_previous_level_peer_active_group_ids() {
     if(\Group\is_level_timeout())
         return false;
 
-    $previous_activity_level = $activity_level-1;
-
     if(!\Group\check_if_previous_groups_completed_task() or !\Answer\is_submitted())
         return false;
 
+    $previous_activity_level = $activity_level-1;
     $peer_group_combined_ids_array = explode(',',$peer_group_combined_ids);
     $peer_group_combined_ids_sql = implode("','",$peer_group_combined_ids_array);
     $peer_array_sql = implode("','", $peer_array);
 
     if($previous_activity_level == -1)
-        $submitted_group_answers_query = mysqli_query($link, "select distinct sid as active_sid from flow_student where fid = '{$fid}' and sid  in ('{$peer_array_sql}')");
+        $submitted_group_answers_query = mysqli_query($link, "select distinct sid as active_sid from flow_student where fid = '{$fid}' and sid in ('{$peer_array_sql}')");
     else
-        $submitted_group_answers_query = mysqli_query($link, "select distinct fsr_sid as active_sid from flow_student_rating where fsr_fid='{$fid}' and fsr_level='{$previous_activity_level}' and fsr_group_id IN('{$peer_group_combined_ids_sql}')");
+        $submitted_group_answers_query = mysqli_query($link, "select distinct fsr_sid as active_sid from flow_student_rating where fsr_fid='{$fid}' and fsr_level='{$previous_activity_level}' and fsr_group_id in ('{$peer_group_combined_ids_sql}')");
 
     $active_ids = array();
     while ($rating = mysqli_fetch_assoc($submitted_group_answers_query)) {
@@ -259,4 +260,24 @@ function set_previous_level_peer_active_group_ids() {
     $peer_array = $active_ids;
 
     return $active_ids;
+}
+
+function get_inactive_level_group_peers() {
+    global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+
+    $peer_group_combined_ids_array = explode(',',$peer_group_combined_ids);
+    $peer_group_combined_ids_sql = implode("','",$peer_group_combined_ids_array);
+    $peer_array_sql = implode("','", $peer_array);
+
+    if($activity_level == 0)
+        $inactive_peers_result = mysqli_query($link, "select * from students where sid not in (select distinct sid as active_sid from flow_student where fid = '{$fid}' and sid  in ('{$peer_array_sql}'))");
+    else
+        $inactive_peers_result = mysqli_query($link, "select * from students where sid not in (select distinct fsr_sid as active_sid from flow_student_rating where fsr_fid='{$fid}' and fsr_level='{$activity_level}' and fsr_group_id IN('{$peer_group_combined_ids_sql}'))");
+
+    $inactive_peers = array();
+    while ($row = mysqli_fetch_assoc($inactive_peers_result)) {
+        $inactive_peers[] = $row;
+    }
+
+    return $inactive_peers;
 }
