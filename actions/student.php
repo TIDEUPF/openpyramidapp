@@ -25,7 +25,7 @@ if(\Group\is_level_timeout()) {
 }
 
 //new data entered
-if(\Answer\new_data()) {
+if(\Answer\is_new_data()) {
     //wait
     \Pyramid\wait();
     exit;

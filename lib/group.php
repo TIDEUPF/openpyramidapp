@@ -21,21 +21,27 @@ function get_members($params) {
 }
 
 function get_needed_results_to_end_level($full_requirements = false) {
-    global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp, $answer_required_percentage;
+    global $link, $sid, $fid, $activity_level, $peer_array, $answer_submit_required_percentage, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp, $answer_required_percentage;
 
     $group_size = count($peer_array); //no of peers in the branch
-    if($activity_level == 0 and \Answer\is_submitted())
-    {
-        $needed_results = $group_size * ($group_size); //in the first level, it's no. of choices * student count
-    }
-    else{
+    if($activity_level == 0 and !\Student\level_is_rated()) {
+        $needed_results = count($peer_array);
+        $status_percentage = $answer_submit_required_percentage;
+    } elseif($activity_level == 0) {
+        $needed_results = $group_size * $group_size; //in the first level, it's no. of choices * student count
+        $status_percentage = $answer_submit_required_percentage;
+    } else{
         $st_count = count($peer_group_combined_ids_temp);
         $needed_results = $group_size * $st_count; //because now every student is rating two answers, need to occupy all answers
-        //$needed_results = floor($needed_results * $answer_required_percentage / 100.0);
+        $status_percentage = $answer_required_percentage;
     }
 
-    if(!$full_requirements)
-        $needed_results = floor($needed_results * $answer_required_percentage / 100.0);
+    if(!$full_requirements) {
+        $needed_results = floor($needed_results * $status_percentage / 100.0);
+    }
+
+    if(empty($needed_results))
+        $needed_results = 1;
 
     return $needed_results;
 }
@@ -73,7 +79,7 @@ function check_if_previous_groups_completed_task()
         $peer_array_sql = implode("','", $peer_array);
         $n_answers_query = mysqli_query($link, "select * from flow_student where fid = '{$fid}' and sid in ('{$peer_array_sql}')");
         $n_answers = mysqli_num_rows($n_answers_query);
-        $needed_results = \Answer\needed_number();//count($peer_array);
+        $needed_results = count($peer_array);
         if($n_answers >= $needed_results)
             return true;
         else

@@ -14,6 +14,7 @@ include_once('./lib/group.php');
 include_once('./lib/pyramid.php');
 include_once('./lib/answer.php');
 include_once('./lib/student.php');
+include_once('./lib/request.php');
 
 init_cfg();
 

@@ -50,25 +50,24 @@ function get_user_answer($sid, $fid) {
 function submit($params) {
     global $link, $sid, $fid, $input_result, $answer_submit_required_percentage, $peer_array;
 
-    if(!isset($_POST['answer']))
-        return false;
-
-    $input_result['op'] = 'submit';
-
     //check for the minimum participants for timeout start
     $answertimestamp = 0;
-    if(mysqli_num_rows(mysqli_query($link, "select * from flow_student where `timeout` > 0 and fid = '$fid'") == 0)) {
-        $required_peers = floor(count($peer_array) * $answer_submit_required_percentage / 100);
+    $required_peers = \Group\get_needed_results_to_end_level();
+    $n_submitted_answers = mysqli_num_rows(mysqli_query($link, "select * from flow_student where fid = '$fid'"));
 
-        if(mysqli_num_rows(mysqli_query($link, "select * from flow_student where fid = '$fid'")) >= $required_peers)
-            $answertimestamp = time();
-    }
+    if($n_submitted_answers + 1 >= $required_peers)
+        $answertimestamp = time();
 
     if(isset($_POST['skip'])) {
         mysqli_query($link, "insert into flow_student values ('', '$fid', '$sid', '', 1, $answertimestamp)");
         $input_result['updated'] = 'true';
         return true;
     }
+
+    if(!isset($_POST['answer']))
+        return false;
+
+    $input_result['op'] = 'submit';
 
     $ans_input = mysqli_real_escape_string($link, \Request\param('qa'));//stripslashes(strip_tags(trim($_POST['qa']))));
 
@@ -114,13 +113,14 @@ function request($params) {
     $timeout = get_answer_timeout();
 
     $vars = array(
-        'username' 				=> $sname,
-        'level' 				=> 'Level ' . '0/' . $levels,
-        'answer_text' 			=> 'Write a question',
-        'answer_submit_button' 	=> 'Submit your question',
-        'answer_timeout'        => $timeout['time_left'],
-        'answer_skip_timeout'   => $timeout['time_left_skip'],
-        'hidden_input_array' 	=> array(
+        'username' 				    => $sname,
+        'level' 				    => 'Level ' . '0/' . $levels,
+        'answer_text' 			    => 'Write a question',
+        'answer_submit_button' 	    => 'Submit your question',
+        'answer_submit_skip_button' => 'Skip the question',
+        'answer_timeout'            => $timeout['time_left'],
+        'answer_skip_timeout'       => $timeout['time_left_skip'],
+        'hidden_input_array' 	    => array(
             'a_lvl' 			=> $activity_level,
             'a_peer_group_id'	=> $peer_group_id,
         ),
@@ -342,7 +342,7 @@ function is_timeout() {
     if(!(mysqli_num_rows(mysqli_query($link, "select * from flow_student where `timeout` > 0 and fid = '$fid'") > 0)))
         return false;
 
-    $query_result = mysqli_query($link, "select * from flow_student where `timeout` > 0 and fid = '$fid' order by timeout desc limit 1");
+    $query_result = mysqli_query($link, "select * from flow_student where `timeout` > 0 and fid = '$fid' order by timeout asc limit 1");
     $result = mysqli_fetch_assoc($query_result);
 
     if(time() > $result['timeout'] + $answer_timeout)
@@ -351,14 +351,14 @@ function is_timeout() {
     return false;
 }
 
-/*
-function needed_number() {
-    if(is_timeout())
-        $required_peers = floor(count($peer_array) * $answer_submit_required_percentage / 100);
-    else
+function is_new_data() {
+    global $input_result;
 
-
-    if(mysqli_num_rows(mysqli_query($link, "select * from flow_student where fid = '$fid'")) >= $required_peers)
-        $answertimestamp = time();
+    return !empty($input_result['updated']);
 }
-*/
+
+function submit_error() {
+    global $input_result;
+
+    return !empty($input_result['error']);
+}
