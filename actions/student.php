@@ -14,6 +14,8 @@ $sid = $_SESSION['student'];
 //$peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp
 \Group\get_members();
 
+\Pyramid\upgrade_level();
+
 //enter submitted information
 \Answer\submit();
 \Answer\submit_rate();
@@ -53,8 +55,10 @@ if(!\Answer\is_submitted()) {
 
 //we need the answers for other groups too
 if(\Group\check_if_previous_groups_completed_task() and !\Student\level_is_rated()) {
-    \Answer\request_rate();
-    exit;
+    if(\Answer\is_available_answers())
+        \Answer\request_rate();
+    else
+        \Answer\skip_rating();
 }
 
 //wait

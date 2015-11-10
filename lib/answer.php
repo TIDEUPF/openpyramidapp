@@ -11,8 +11,8 @@ function is_submitted($params) {
         return true;
 
     //in case of timeout allow the user to rate the answers
-    if(is_timeout())
-        return true;
+ //   if(is_timeout())
+ //       return true;
 
     return false;
 }
@@ -147,7 +147,7 @@ function request_rate($params) {
 
     $answer_ids = get_selected_ids();
     foreach($answer_ids as $answer_id){
-        $res5 = mysqli_query($link, "select * from flow_student where sid = '$answer_id' and fid = '$fid'");// to get peer answer
+        $res5 = mysqli_query($link, "select * from flow_student where sid = '$answer_id' and fid = '$fid' and skip = 0");// to get peer answer
         if(mysqli_num_rows($res5) > 0) {//the peer already submitted the answer
             $data5 = mysqli_fetch_assoc($res5);
             $peer_answer = $data5['fs_answer'];
@@ -181,8 +181,6 @@ function request_rate($params) {
         'body' => $body,
     ));
     exit;
-
-    return true;
 }
 
 function submit_rate() {
@@ -221,6 +219,7 @@ function submit_rate() {
         return false;
     }
 
+    //TODO: Now we could retrieve the values from the current status
     if($timestamp = \Group\get_level_timeout_timestamp($fid, $rating_array[0]['rate_lvl'], $rating_array[0]['rgroup_id'])) {
         if(time() > $timestamp + $timeout) {
             $input_result['error'] = "You are out of time";
@@ -229,7 +228,7 @@ function submit_rate() {
     }
 
     foreach($rating_array as $rating) {
-        mysqli_query($link,"insert into flow_student_rating values ('', '$fid', '$sid', '{$rating['rate_lvl']}', '{$rating['rgroup_id']}', '{$rating['rate_input']}', '{$rating['to_whom_rated_id']}', NOW() )");
+        mysqli_query($link,"insert into flow_student_rating values ('', '$fid', '$sid', '{$rating['rate_lvl']}', '{$rating['rgroup_id']}', '{$rating['rate_input']}', '{$rating['to_whom_rated_id']}', NOW(), 0 )");
 
         if(mysqli_affected_rows($link) <= 0) {
             //TODO: database inconsistency
@@ -241,6 +240,29 @@ function submit_rate() {
     return true;
 }
 
+function skip_rating() {
+    global $link, $sid, $fid, $levels, $sname, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+
+    mysqli_query($link,"insert into flow_student_rating values ('', '$fid', '$sid', '0', '{$activity_level}', '0', '0', NOW(), 1 )");
+    if(mysqli_affected_rows($link) <= 0) {
+        //TODO: database inconsistency
+    }
+}
+
+function is_available_answers() {
+    global $link, $sid, $fid, $levels, $sname, $activity_level;
+
+    try {
+        get_selected_ids();
+    } catch(Exception $e) {
+        //all group skipped answers
+        return false;
+    }
+
+    return true;
+}
+
+/*
 function get_user_rating($fid, $who_rated, $to_whom_rated, $lvl) {
     global $link;
 
@@ -258,14 +280,7 @@ function get_user_rating($fid, $who_rated, $to_whom_rated, $lvl) {
 
     return $result;
 }
-
-function get_group_rating($params) {
-    return 2;
-}
-
-function get_user_group($params) {
-    return 1;
-}
+*/
 
 function get_selected_ids($params) {
     global $link, $sid, $fid, $levels, $sname, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
@@ -283,7 +298,7 @@ function get_selected_ids($params) {
         }
     } else {
         foreach ($peer_group_combined_ids_temp as $pgcid_group_id_temp) {
-            $sa_result_2 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level = '$activity_level_previous' and sa_group_id = '$pgcid_group_id_temp'");
+            $sa_result_2 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level = '$activity_level_previous' and sa_group_id = '$pgcid_group_id_temp' and skip = '0'");
             if (mysqli_num_rows($sa_result_2) > 0) {
                 $sa_data_2 = mysqli_fetch_assoc($sa_result_2);
                 $result[] = $sa_data_2['sa_selected_id'];
@@ -328,6 +343,7 @@ function get_answer_timeout() {
     //$time_left = $answer_timeout - (time() - $ftimestamp);
     $time_left = 0;
     $time_left_skip = $answer_skip_timeout - (time() - $ftimestamp);
+    $time_left_skip = $answer_skip_timeout;
 
     return array(
         'time_left' => $time_left,
@@ -336,13 +352,20 @@ function get_answer_timeout() {
 }
 
 function is_timeout() {
-    global $link, $sid, $fid, $ftimestamp, $answer_timeout;
+    global $link, $sid, $fid, $ftimestamp, $answer_timeout, $peer_array;
     //check for the minimum participants for timeout
     $answertimestamp = 0;
-    if(!(mysqli_num_rows(mysqli_query($link, "select * from flow_student where `timeout` > 0 and fid = '$fid'") > 0)))
+
+    //if the user is not present on any group in the current level it has been eliminated
+    if(empty($peer_array))
+        return true;
+
+    $peer_array_sql = implode("','", $peer_array);
+
+    if(!(mysqli_num_rows(mysqli_query($link, "select * from flow_student where `timeout` > 0 and fid = '$fid' and sid in ('$peer_array_sql')")) > 0))
         return false;
 
-    $query_result = mysqli_query($link, "select * from flow_student where `timeout` > 0 and fid = '$fid' order by timeout asc limit 1");
+    $query_result = mysqli_query($link, "select * from flow_student where `timeout` > 0 and fid = '$fid' and sid in ('$peer_array_sql') order by timeout asc limit 1");
     $result = mysqli_fetch_assoc($query_result);
 
     if(time() > $result['timeout'] + $answer_timeout)

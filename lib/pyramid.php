@@ -10,46 +10,42 @@ function get_current_activity_level() {
     if(mysqli_num_rows($gcal_result_1) > 0)
     {
         $gcal_data_1 = mysqli_fetch_assoc($gcal_result_1);
-        $sid_groupid = $gcal_data_1['fsr_group_id'];
         $activity_level = $gcal_data_1['fsr_level'];
-
-        //load the group assuming the current level
-        \Group\get_members();
-
-        //check if the highest rated level has a selected answer
-        $gcal_result_2 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level = '$activity_level' and sa_group_id = '$sid_groupid'");
-        if(mysqli_num_rows($gcal_result_2) > 0)
-        {
-            $activity_level++;
-        }
-        else
-        {
-            //check if need to set selected answer
-            get_level_info();
-
-            //here decide the criteria to allow to proceed to the next level
-            $cgfl_temp = \Group\check_if_group_finished_level();
-
-            if($cgfl_temp)
-            {
-                set_selected_answers();
-                $activity_level++;
-            }
-
-        }
     }
     else
     {
         $activity_level = 0;
-
-        //load the group assuming the current level
-        \Group\get_members();
     }
 
-    //load the definitive level group data
-    \Group\get_members();
-
     return $activity_level;
+}
+
+function upgrade_level() {
+    global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids;
+
+    $upgrade = false;
+    //check if the highest rated level has a selected answer
+    $gcal_result_2 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level = '$activity_level' and sa_group_id = '$sid_groupid'");
+    if(mysqli_num_rows($gcal_result_2) > 0)
+    {
+        $upgrade = true;
+    }
+    else
+    {
+        //here decide the criteria to allow to proceed to the next level
+        $cgfl_temp = \Group\check_if_group_finished_level();
+
+        if($cgfl_temp and !($activity_level == 0 and !\Student\level_is_rated()))
+        {
+            set_selected_answers();
+            $upgrade = true;
+        }
+    }
+
+    if($upgrade) {
+        $activity_level++;
+        \Group\get_members();
+    }
 }
 
 function set_selected_answers() {
@@ -61,9 +57,11 @@ function set_selected_answers() {
 
     $selected_id = $ssa_data_1['fsr_to_whom_rated_id'];
     $selected_id_rating_sum = $ssa_data_1['sum'];
-    mysqli_query($link,"insert into selected_answers values ('$fid', '$activity_level', '$peer_group_id', '$selected_id', '$selected_id_rating_sum')");
+    $skip = $ssa_data_1['skip'];
+    mysqli_query($link,"insert into selected_answers values ('$fid', '$activity_level', '$peer_group_id', '$selected_id', '$selected_id_rating_sum', '$skip')");
 }
 
+/*
 function get_level_info() {
     global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids;
     $sa_result_1 = mysqli_query($link, "select * from pyramid_groups where pg_fid = '$fid' and pg_level = '$activity_level'");
@@ -79,6 +77,7 @@ function get_level_info() {
         }
     }
 }
+*/
 
 function get_groups($params) {
 
