@@ -107,6 +107,18 @@ function submit($params) {
     return false;
 }
 
+function retry() {
+    global $input_result;
+
+    $error = $input_result['error'];
+    if($input_result['op'] == 'submit_rate') {
+        request_rate(array('error' => $error));
+    } else {
+        request(array('error' => $error));
+    }
+    exit;
+}
+
 function request($params) {
     global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_group_id;
 
@@ -206,7 +218,7 @@ function submit_rate() {
         foreach ($rating_vars_identifiers as $rating_var) {
             $value = \Request\param($rating_var . $i);
 
-            if (empty($value))
+            if (empty($value) and $value !== "0")
                 $error = 'Please Rate All!';
 
             $question_rating_values[$rating_var] = mysqli_real_escape_string($link, $value);
@@ -228,12 +240,15 @@ function submit_rate() {
     }
 
     foreach($rating_array as $rating) {
-        mysqli_query($link,"insert into flow_student_rating values ('', '$fid', '$sid', '{$rating['rate_lvl']}', '{$rating['rgroup_id']}', '{$rating['rate_input']}', '{$rating['to_whom_rated_id']}', NOW(), 0 )");
+        mysqli_query($link,"insert into flow_student_rating values ('', '$fid', '$sid', '{$rating['lvl']}', '{$rating['group_id']}', '{$rating['optradio']}', '{$rating['to_whom_rated_id']}', NOW(), 0 )");
 
         if(mysqli_affected_rows($link) <= 0) {
             //TODO: database inconsistency
         }
     }
+
+    //insert dummy rating for each possible skipped group answer
+    skip_rating();
 
     $input_result['updated'] = true;
 
@@ -243,9 +258,24 @@ function submit_rate() {
 function skip_rating() {
     global $link, $sid, $fid, $levels, $sname, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
-    mysqli_query($link,"insert into flow_student_rating values ('', '$fid', '$sid', '0', '{$activity_level}', '0', '0', NOW(), 1 )");
-    if(mysqli_affected_rows($link) <= 0) {
-        //TODO: database inconsistency
+    //number of supposed to be rated
+    if($activity_level == 0)
+        $st_count = count($peer_array);
+    else
+        $st_count = count($peer_group_combined_ids_temp);
+
+    //sids of students with real answers
+    $available_answers = is_available_answers();
+    if(empty($available_answers))
+        $available_answers = array();
+
+    $remaining_answers = $st_count - count($available_answers);
+    //foreach($peer_group_combined_ids_temp as $previuos_group_id) {
+    for($i=0;$i<$remaining_answers;$i++) {
+        mysqli_query($link, "insert into flow_student_rating values ('', '$fid', '$sid', '{$activity_level}', '$peer_group_id', '0', '-1', NOW(), 1 )");
+        if (mysqli_affected_rows($link) <= 0) {
+            //TODO: database inconsistency
+        }
     }
 }
 
@@ -253,13 +283,13 @@ function is_available_answers() {
     global $link, $sid, $fid, $levels, $sname, $activity_level;
 
     try {
-        get_selected_ids();
-    } catch(Exception $e) {
+        $result = get_selected_ids();
+    } catch(\Exception $e) {
         //all group skipped answers
-        return false;
+        return null;
     }
 
-    return true;
+    return $result;
 }
 
 /*
@@ -292,9 +322,10 @@ function get_selected_ids($params) {
             $res5 = mysqli_query($link, "select * from flow_student where sid = '$rate_peer_id' and fid = '$fid' and skip = '0'");// to get peer answer
             if (mysqli_num_rows($res5) > 0) {//the peer already submitted the answer
                 $result[] = $rate_peer_id;
-            } else {//TODO: the peer did not submit the answer
-                throw new Exception("peer answer not submitted");
             }
+        }
+        if(empty($result)) {//TODO: the peer did not submit the answer
+            throw new \Exception ("peer answer not submitted");
         }
     } else {
         foreach ($peer_group_combined_ids_temp as $pgcid_group_id_temp) {
@@ -302,9 +333,10 @@ function get_selected_ids($params) {
             if (mysqli_num_rows($sa_result_2) > 0) {
                 $sa_data_2 = mysqli_fetch_assoc($sa_result_2);
                 $result[] = $sa_data_2['sa_selected_id'];
-            } else {//no answers from the other peer, user must wait
-                throw new Exception("group answer not rated");
             }
+        }
+        if(empty($result)) {//no answers from the other peer, user must wait
+            throw new \Exception("group answer not rated");
         }
     }
 

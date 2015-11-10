@@ -25,7 +25,7 @@ function upgrade_level() {
 
     $upgrade = false;
     //check if the highest rated level has a selected answer
-    $gcal_result_2 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level = '$activity_level' and sa_group_id = '$sid_groupid'");
+    $gcal_result_2 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level = '$activity_level' and sa_group_id = '$peer_group_id'");
     if(mysqli_num_rows($gcal_result_2) > 0)
     {
         $upgrade = true;
@@ -52,7 +52,7 @@ function set_selected_answers() {
     global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids;
 
     //to sum the ratings
-    $ssa_result_1= mysqli_query($link, "SELECT fsr_to_whom_rated_id, SUM(fsr_rating) as sum FROM `flow_student_rating` where fsr_fid = '$fid' and fsr_level = '$activity_level' and fsr_group_id = '$peer_group_id' group by fsr_to_whom_rated_id order by SUM(fsr_rating) desc limit 1");
+    $ssa_result_1= mysqli_query($link, "SELECT fsr_to_whom_rated_id, skip, SUM(fsr_rating) as sum FROM `flow_student_rating` where fsr_fid = '$fid' and fsr_level = '$activity_level' and fsr_group_id = '$peer_group_id' group by fsr_to_whom_rated_id order by SUM(fsr_rating) desc limit 1");
     $ssa_data_1 = mysqli_fetch_assoc($ssa_result_1);
 
     $selected_id = $ssa_data_1['fsr_to_whom_rated_id'];

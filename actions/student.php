@@ -35,7 +35,7 @@ if(\Answer\is_new_data()) {
 
 //wrong answer
 if(\Answer\submit_error()) {
-    //retry
+    //TODO: implement retry
     \Answer\retry();
     exit;
 }

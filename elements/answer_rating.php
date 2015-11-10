@@ -79,6 +79,14 @@
     .answer-text {
         font-size: 1.15em;
     }
+
+    #student-error {
+        margin-top: 1em;
+        text-align: center;
+        color: red;
+        font-size: 130%;
+        font-weight: bold;
+    }
 </style>
 <div id="answer-frame">
     <form method="post" action="student.php" data-ajax="false">
@@ -113,6 +121,12 @@
             </fieldset>
         </div>
         <?php endforeach;?>
+
+        <?php if(isset($error)):?>
+            <div>
+                <div id="student-error"><?=$error?></div>
+            </div>
+        <?php endif;?>
 
     </div>
 
