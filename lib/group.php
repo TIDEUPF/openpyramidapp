@@ -99,6 +99,7 @@ function check_if_previous_groups_completed_task()
 
     $activity_level_previous = $activity_level-1;
 
+    //check if every group member has submitted the answer or the timeout is expired
     if($activity_level_previous == -1 and \Answer\is_submitted()) {
         if(\Answer\is_timeout())
             return true;
@@ -113,7 +114,6 @@ function check_if_previous_groups_completed_task()
             return false;
     } elseif($activity_level_previous == -1)
         return true;
-
 
     $peer_group_combined_ids_array = explode(",",$peer_group_combined_ids);
     $array_size = count($peer_group_combined_ids_array);
@@ -235,6 +235,22 @@ function get_status_bar_peers() {
     if(empty($peer_array) and $activity_level == $levels) {
         $top_level = $levels-1;
         $result = mysqli_query($link, "select * from pyramid_groups where pg_fid='{$fid}' and pg_level='{$top_level}'");
+        $sid_string_array = array();
+        while($result_array = mysqli_fetch_assoc($result)) {
+            $sid_string_array[] = $result_array['pg_group'];
+        }
+        $full_sid_string = implode(',', $sid_string_array);
+        return explode(',', $full_sid_string);
+    }
+
+    if($activity_level == 0)
+        return $peer_array;
+
+    if(\Group\check_if_previous_groups_completed_task())
+        return $peer_array;
+    else {
+        $top_level = $activity_level-1;
+        $result = mysqli_query($link, "select * from pyramid_groups where pg_fid='{$fid}' and pg_level='{$top_level}' and pg_group_id in ({$peer_group_combined_ids})");
         $sid_string_array = array();
         while($result_array = mysqli_fetch_assoc($result)) {
             $sid_string_array[] = $result_array['pg_group'];

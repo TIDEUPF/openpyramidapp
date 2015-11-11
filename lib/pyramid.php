@@ -23,6 +23,9 @@ function get_current_activity_level() {
 function upgrade_level() {
     global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids;
 
+    if(!\Student\level_is_rated())
+        return false;
+
     $upgrade = false;
     //check if the highest rated level has a selected answer
     $gcal_result_2 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level = '$activity_level' and sa_group_id = '$peer_group_id'");
@@ -163,10 +166,10 @@ function is_complete() {
 function get_current_level() {
     global $levels, $activity_level;
 
-    $current_level = $activity_level;
+    $current_level = $activity_level+1;
 
-    if($current_level == 0)
-        $current_level = 1;
+    if($current_level > $levels)
+        $current_level = $levels;
 
     return $current_level;
 }
@@ -231,15 +234,10 @@ function wait($params) {
         ),
     );
 
-    //if($initial_level == $activity_level and
-    //    (\Group\check_if_previous_groups_completed_task() or ($activity_level == 0 and !\Student\level_is_rated()))) {
     if(count($peer_array) != count(get_inactive_level_group_peers())) {
         $vars['inactive_peers_count'] = max(count(get_inactive_level_group_peers()), 1);
     } else {
-        //$peer_group_combined_ids_array = explode(",",$peer_group_combined_ids);
-        //$array_size = count($peer_group_combined_ids_array);
         $array_size = \Group\get_status_bar_groups_count();
-        //TODO: in the last level the array_size value is incorrect
         $rated_count = \Group\get_previous_groups_rated_count();
         $vars['inactive_groups_count'] = max($array_size - $rated_count, 1);
     }
@@ -256,6 +254,7 @@ function wait($params) {
     exit;
 }
 
+//remove users that didn't submit due the timeout in the previous level
 function set_previous_level_peer_active_group_ids() {
     global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
@@ -280,8 +279,10 @@ function set_previous_level_peer_active_group_ids() {
         $active_ids[] = $rating['active_sid'];
     }
 
-    $active_ids_string = implode(',', $active_ids);
-    mysqli_query($link, "update pyramid_groups set pg_group='{$active_ids_string}' where pg_fid='{$fid}' and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}'");
+    if(count($active_ids)) {
+        $active_ids_string = implode(',', $active_ids);
+        mysqli_query($link, "update pyramid_groups set pg_group='{$active_ids_string}' where pg_fid='{$fid}' and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}'");
+    }
 
     $peer_array = $active_ids;
 
@@ -292,7 +293,6 @@ function get_inactive_level_group_peers() {
     global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
     $peer_group_combined_ids_array = explode(',',$peer_group_combined_ids);
-    $peer_group_combined_ids_sql = implode("','",$peer_group_combined_ids_array);
     $peer_array_sql = implode("','", $peer_array);
 
     if($activity_level == 0 and !\Student\level_is_rated())

@@ -14,10 +14,10 @@
   color: #dddddd;
 }
 .br-theme-fontawesome-stars .br-widget a.br-active:after {
-  color: #4A4AFF;
+  color: #46b8da;
 }
 .br-theme-fontawesome-stars .br-widget a.br-selected:after {
-  color: #4A4AFF;
+  color: #46b8da;
 }
 .br-theme-fontawesome-stars .br-widget .br-current-rating {
   display: inline-block;

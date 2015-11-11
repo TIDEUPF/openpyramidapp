@@ -11,7 +11,7 @@
 	<div class="container">        
 	<div id="navbar">
 	  <ul class="nav navbar-nav">
-		<li><a href="index.php">Home</a></li>
+		<li><a href="teacher.php">Home</a></li>
 		<?php
 		if(!isset($_SESSION['user'])){		
 			echo '<li><a href="login.php">Login</a></li>';
