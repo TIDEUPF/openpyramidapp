@@ -94,8 +94,11 @@ function check_if_previous_groups_completed_task()
     } elseif($activity_level_previous == -1)
         return true;
 
+
     $peer_group_combined_ids_array = explode(",",$peer_group_combined_ids);
     $array_size = count($peer_group_combined_ids_array);
+
+    //TODO: replace with get_previous_groups_rated_count()
     foreach($peer_group_combined_ids_array as $temp_id)
     {
         $sql1_ids[] = "sa_group_id = ".$temp_id;
@@ -114,10 +117,27 @@ function check_if_previous_groups_completed_task()
 
 }
 
+function get_previous_groups_rated_count() {
+    global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+
+    $peer_group_combined_ids_array = explode(",",$peer_group_combined_ids);
+    foreach($peer_group_combined_ids_array as $temp_id)
+    {
+        $sql1_ids[] = "sa_group_id = ".$temp_id;
+    }
+
+    $activity_level_previous = $activity_level-1;
+    $sql1 = implode(" or ", $sql1_ids);
+    $cipgct_result_1 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level = '$activity_level_previous' and ($sql1) ");
+    $cipgct_result_1_count = mysqli_num_rows($cipgct_result_1);
+
+    return $cipgct_result_1_count;
+}
+
 function is_level_timeout() {
     global $timeout, $activity_level;
 
-    if($activity_level == 0 and !\Answer\is_submitted()) {
+    if($activity_level == 0 and !\Answer\is_submitted() and !\Student\level_is_rated()) {
         return \Answer\is_timeout();
     }
 

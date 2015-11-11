@@ -78,7 +78,13 @@
             </div>
 
             <div>
-                <div id="answer-header-text">Waiting for your peers to continue...</div>
+                <?php if(isset($inactive_peers_count)):?>
+                <div id="answer-header-text">Waiting for <?=$inactive_peers_count?> peers to continue...</div>
+                <?php endif;?>
+
+                <?php if(isset($inactive_groups_count)):?>
+                <div id="answer-header-text">Waiting for <?=$inactive_groups_count?> groups to continue...</div>
+                <?php endif;?>
             </div>
 
         </div>

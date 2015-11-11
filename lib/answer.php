@@ -120,13 +120,13 @@ function retry() {
 }
 
 function request($params) {
-    global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_group_id;
+    global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_group_id, $peer_array;
 
     $timeout = get_answer_timeout();
 
     $vars = array(
-        'username' 				    => $sname,
-        'level' 				    => 'Level ' . '0/' . $levels,
+        'username' 				    => $sname . ' + ' . (count($peer_array)-1),
+        'level' 				    => 'Level ' . \Pyramid\get_current_level() .'/' . $levels,
         'answer_text' 			    => 'Write a question',
         'answer_submit_button' 	    => 'Submit your question',
         'answer_submit_skip_button' => 'Skip the question',
@@ -151,7 +151,7 @@ function request($params) {
 }
 
 function request_rate($params) {
-    global $link, $fid, $levels, $sname, $activity_level, $peer_group_id;
+    global $link, $fid, $levels, $sname, $activity_level, $peer_group_id, $peer_array;
 
     $answer_text_array = array();
     $hidden_input_array = array();
@@ -176,11 +176,12 @@ function request_rate($params) {
 
     $hidden_input_array['numofqustions'] = $i-1;
     $vars = array(
-        'username'              => $sname,
-        'level'                 => 'Level '. $activity_level . '/' . $levels,
+        'username'              => $sname . ' + ' . (count($peer_array)-1),
+        'level'                 => 'Level '. \Pyramid\get_current_level() .'/' . $levels,
         'header_text'           => 'Rate the following answers',
-        'answer_text_array'   => $answer_text_array,
-        'answer_rate_submit'  => 'Rate',
+        'answer_text_array'     => $answer_text_array,
+        'answer_rate_submit'    => 'Rate',
+        'rating_labels'         => array('Not rated', 'Awful', 'Bad', 'Good', 'Great', 'Awesome'),
         'hidden_input_array'    => $hidden_input_array,
     );
 
@@ -223,6 +224,9 @@ function submit_rate() {
 
             $question_rating_values[$rating_var] = mysqli_real_escape_string($link, $value);
         }
+        if(empty($question_rating_values['optradio']))
+            $error = 'Please Rate All!';
+
         $rating_array[] = $question_rating_values;
     }
 
@@ -270,7 +274,6 @@ function skip_rating() {
         $available_answers = array();
 
     $remaining_answers = $st_count - count($available_answers);
-    //foreach($peer_group_combined_ids_temp as $previuos_group_id) {
     for($i=0;$i<$remaining_answers;$i++) {
         mysqli_query($link, "insert into flow_student_rating values ('', '$fid', '$sid', '{$activity_level}', '$peer_group_id', '0', '-1', NOW(), 1 )");
         if (mysqli_affected_rows($link) <= 0) {
@@ -348,7 +351,7 @@ function view_final_answer($params) {
 
     $vars = array(
         'username' 					=> $sname,
-        'level' 					=> 'Level ' . $activity_level . '/' . $levels,
+        'level' 					=> 'Level ' . \Pyramid\get_current_level() .'/' . $levels,
         'header_text' 			    => 'The winning question is',
         'final_answer_array' 		=> $params['final_answer_array'],
         'hidden_input_array' 		=> array(
@@ -394,13 +397,13 @@ function is_timeout() {
 
     $peer_array_sql = implode("','", $peer_array);
 
-    if(!(mysqli_num_rows(mysqli_query($link, "select * from flow_student where `timeout` > 0 and fid = '$fid' and sid in ('$peer_array_sql')")) > 0))
+    if(!(mysqli_num_rows(mysqli_query($link, "select * from flow_student where `timestamp` > 0 and fid = '$fid' and sid in ('$peer_array_sql')")) > 0))
         return false;
 
-    $query_result = mysqli_query($link, "select * from flow_student where `timeout` > 0 and fid = '$fid' and sid in ('$peer_array_sql') order by timeout asc limit 1");
+    $query_result = mysqli_query($link, "select * from flow_student where `timestamp` > 0 and fid = '$fid' and sid in ('$peer_array_sql') order by timestamp asc limit 1");
     $result = mysqli_fetch_assoc($query_result);
 
-    if(time() > $result['timeout'] + $answer_timeout)
+    if(time() > $result['timestamp'] + $answer_timeout)
         return true;
 
     return false;

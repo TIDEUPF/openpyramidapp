@@ -14,6 +14,7 @@ $sid = $_SESSION['student'];
 //$peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp
 \Group\get_members();
 
+//check if the group has completed the level and upgrade the level
 \Pyramid\upgrade_level();
 
 //enter submitted information

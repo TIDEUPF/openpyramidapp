@@ -96,7 +96,7 @@
 
         </div>
         <div id="answer-middle-frame">
-            <?php foreach($final_answer_array as $i=> $answer_text):?>
+            <?php foreach($final_answer_array as $i=>$answer_text):?>
                 <div class="answer-rating-widget">
                     <fieldset data-role="controlgroup" data-type="horizontal">
                         <legend><?=htmlspecialchars($answer_text)?></legend>

@@ -6,7 +6,9 @@
         <link rel="stylesheet" href="vendors/jquerymobile/jquery.mobile-1.4.5.css"/>
         <script src="vendors/jquery/jquery-2.1.4.min.js"></script>
         <script src="vendors/jquerymobile/jquery.mobile.custom.js"></script>
-
+        <link rel="stylesheet" href="vendors/jquery-bar-rating/themes/font-awesome.min.css">
+        <link rel="stylesheet" href="vendors/jquery-bar-rating/themes/fontawesome-stars.css">
+        <script src="vendors/jquery-bar-rating/jquery.barrating.min.js"></script>
         <script>
             var timeoutPeriod = 10000;
             function del_vali(){ if(confirm('Submit Answer?')) { return true; }else{ return false; } }
