@@ -20,6 +20,26 @@ function get_members($params) {
     $peer_group_combined_ids_temp = explode(",",$peer_group_combined_ids);
 }
 
+function get_next_level_groups($params) {
+    global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+
+    $next_activity_level = $activity_level + 1;
+    $sa_result_1 = mysqli_query($link, "select * from pyramid_groups where pg_fid = '$fid' and pg_level = '$next_activity_level'");
+    if(mysqli_num_rows($sa_result_1) > 0){ //get current level pyramid group info
+        while($sa_data_1 = mysqli_fetch_assoc($sa_result_1))
+        {
+            $peer_array_temp = explode(",",$sa_data_1['pg_group']);
+            if(in_array($sid,$peer_array_temp)){
+                $result['peer_array']                   = $peer_array_temp;
+                $result['peer_group_id']                = $sa_data_1['pg_group_id'];
+                $result['peer_group_combined_ids']      = $sa_data_1['pg_combined_group_ids'];
+                $result['peer_group_combined_ids_temp'] = explode(",",$result['peer_group_combined_ids']);
+            }
+        }
+    }
+    return $result;
+}
+
 function get_needed_results_to_end_level($full_requirements = false) {
     global $link, $sid, $fid, $activity_level, $peer_array, $answer_submit_required_percentage, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp, $answer_required_percentage;
 
@@ -114,11 +134,16 @@ function check_if_previous_groups_completed_task()
     else {
         return false;
     }
-
 }
 
 function get_previous_groups_rated_count() {
-    global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+    global $link, $sid, $levels, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+
+    if($levels == $activity_level) {
+        $final_level = $levels - 1;
+        $cipgct_result_1 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level = '$final_level'");
+        return mysqli_num_rows($cipgct_result_1);
+    }
 
     $peer_group_combined_ids_array = explode(",",$peer_group_combined_ids);
     foreach($peer_group_combined_ids_array as $temp_id)
@@ -129,6 +154,23 @@ function get_previous_groups_rated_count() {
     $activity_level_previous = $activity_level-1;
     $sql1 = implode(" or ", $sql1_ids);
     $cipgct_result_1 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level = '$activity_level_previous' and ($sql1) ");
+    $cipgct_result_1_count = mysqli_num_rows($cipgct_result_1);
+
+    return $cipgct_result_1_count;
+}
+
+function get_next_groups_rated_count() {
+    global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+
+    $n_groups = get_next_level_groups();
+
+    foreach($n_groups['peer_group_combined_ids_temp'] as $temp_id)
+    {
+        $sql1_ids[] = "sa_group_id = ".$temp_id;
+    }
+
+    $sql1 = implode(" or ", $sql1_ids);
+    $cipgct_result_1 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level = '$activity_level' and ($sql1) ");
     $cipgct_result_1_count = mysqli_num_rows($cipgct_result_1);
 
     return $cipgct_result_1_count;
@@ -187,3 +229,38 @@ function get_level_timeout_timestamp($fid, $activity_level, $peer_group_id) {
     }
 }
 
+function get_status_bar_peers() {
+    global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_group_id, $peer_array, $peer_group_combined_ids;
+
+    if(empty($peer_array) and $activity_level == $levels) {
+        $top_level = $levels-1;
+        $result = mysqli_query($link, "select * from pyramid_groups where pg_fid='{$fid}' and pg_level='{$top_level}'");
+        $sid_string_array = array();
+        while($result_array = mysqli_fetch_assoc($result)) {
+            $sid_string_array[] = $result_array['pg_group'];
+        }
+        $full_sid_string = implode(',', $sid_string_array);
+        return explode(',', $full_sid_string);
+    }
+
+    return $peer_array;
+}
+
+function get_status_bar_groups_count() {
+    global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_group_id, $peer_array, $peer_group_combined_ids;
+
+    if($activity_level == $levels) {
+        $top_level = $levels-1;
+        $result = mysqli_query($link, "select * from pyramid_groups where pg_fid='{$fid}' and pg_level='{$top_level}'");
+        $i=0;
+        while($result_array = mysqli_fetch_assoc($result)) {
+            $i++;
+        }
+        return $i;
+    }
+
+    $peer_group_combined_ids_array = explode(",",$peer_group_combined_ids);
+    $array_size = count($peer_group_combined_ids_array);
+
+    return $array_size;
+}

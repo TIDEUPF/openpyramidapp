@@ -221,7 +221,7 @@ function wait($params) {
     upgrade_level();
 
     $vars = array(
-        'username' 					=> $sname . ' + ' . (count($peer_array)-1),
+        'username' 					=> $sname . ' + ' . (count(\Group\get_status_bar_peers())-1),
         'level' 				    => 'Level ' . \Pyramid\get_current_level() .'/' . $levels,
         'answer_text' 			=> 'Write a question',
         'answer_submit_button' 	=> 'Submit your question',
@@ -231,12 +231,17 @@ function wait($params) {
         ),
     );
 
-    if($initial_level == $activity_level and \Group\check_if_previous_groups_completed_task()) {
+    //if($initial_level == $activity_level and
+    //    (\Group\check_if_previous_groups_completed_task() or ($activity_level == 0 and !\Student\level_is_rated()))) {
+    if(count($peer_array) != count(get_inactive_level_group_peers())) {
         $vars['inactive_peers_count'] = max(count(get_inactive_level_group_peers()), 1);
     } else {
-        $peer_group_combined_ids_array = explode(",",$peer_group_combined_ids);
-        $array_size = count($peer_group_combined_ids_array);
-        $vars['inactive_groups_count'] = max($array_size - \Group\get_previous_groups_rated_count(), 1);
+        //$peer_group_combined_ids_array = explode(",",$peer_group_combined_ids);
+        //$array_size = count($peer_group_combined_ids_array);
+        $array_size = \Group\get_status_bar_groups_count();
+        //TODO: in the last level the array_size value is incorrect
+        $rated_count = \Group\get_previous_groups_rated_count();
+        $vars['inactive_groups_count'] = max($array_size - $rated_count, 1);
     }
 
     if(isset($params['error']))
@@ -293,7 +298,7 @@ function get_inactive_level_group_peers() {
     if($activity_level == 0 and !\Student\level_is_rated())
         $inactive_peers_result = mysqli_query($link, "select distinct sid from students where sid in ('{$peer_array_sql}') and sid not in (select distinct sid as active_sid from flow_student where fid = '{$fid}' and sid  in ('{$peer_array_sql}'))");
     else
-        $inactive_peers_result = mysqli_query($link, "select distinct sid from students where sid in ('{$peer_array_sql}') and sid not in (select distinct fsr_sid as active_sid from flow_student_rating where fsr_fid='{$fid}' and fsr_level='{$activity_level}' and fsr_group_id IN('{$peer_group_combined_ids_sql}'))");
+        $inactive_peers_result = mysqli_query($link, "select distinct sid from students where sid in ('{$peer_array_sql}') and sid not in (select distinct fsr_sid as active_sid from flow_student_rating where fsr_fid='{$fid}' and fsr_level='{$activity_level}' and fsr_group_id = '$peer_group_id')");
 
     $inactive_peers = array();
     while ($row = mysqli_fetch_assoc($inactive_peers_result)) {

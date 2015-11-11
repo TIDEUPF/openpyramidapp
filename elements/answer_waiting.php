@@ -79,11 +79,11 @@
 
             <div>
                 <?php if(isset($inactive_peers_count)):?>
-                <div id="answer-header-text">Waiting for <?=$inactive_peers_count?> peers to continue...</div>
+                <div id="answer-header-text">Waiting for <?=$inactive_peers_count?> peer(s) to continue...</div>
                 <?php endif;?>
 
                 <?php if(isset($inactive_groups_count)):?>
-                <div id="answer-header-text">Waiting for <?=$inactive_groups_count?> groups to continue...</div>
+                <div id="answer-header-text">Waiting for <?=$inactive_groups_count?> group(s) to continue...</div>
                 <?php endif;?>
             </div>
 

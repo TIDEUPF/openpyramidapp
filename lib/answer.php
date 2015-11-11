@@ -125,7 +125,7 @@ function request($params) {
     $timeout = get_answer_timeout();
 
     $vars = array(
-        'username' 				    => $sname . ' + ' . (count($peer_array)-1),
+        'username' 				    => $sname . ' + ' . (count(\Group\get_status_bar_peers())-1),
         'level' 				    => 'Level ' . \Pyramid\get_current_level() .'/' . $levels,
         'answer_text' 			    => 'Write a question',
         'answer_submit_button' 	    => 'Submit your question',
@@ -176,7 +176,7 @@ function request_rate($params) {
 
     $hidden_input_array['numofqustions'] = $i-1;
     $vars = array(
-        'username'              => $sname . ' + ' . (count($peer_array)-1),
+        'username'              => $sname . ' + ' . (count(\Group\get_status_bar_peers())-1),
         'level'                 => 'Level '. \Pyramid\get_current_level() .'/' . $levels,
         'header_text'           => 'Rate the following answers',
         'answer_text_array'     => $answer_text_array,
@@ -350,7 +350,7 @@ function view_final_answer($params) {
     global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_group_id;
 
     $vars = array(
-        'username' 					=> $sname,
+        'username' 					=> $sname . ' + ' . (count(\Group\get_status_bar_peers())-1),
         'level' 					=> 'Level ' . \Pyramid\get_current_level() .'/' . $levels,
         'header_text' 			    => 'The winning question is',
         'final_answer_array' 		=> $params['final_answer_array'],

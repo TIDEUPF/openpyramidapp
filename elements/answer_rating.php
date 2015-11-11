@@ -125,7 +125,7 @@
                 <input type="radio" name="<?=$i?>" id="id-answer-rating-<?=$i?>-5" value="5">
                 <label for="id-answer-rating-<?=$i?>-5">5</label>-->
 
-                <select id="id-answer-rating" name="<?=$i?>" data-role="none">
+                <select id="id-answer-rating-<?=$i?>" class="rating-widget" name="<?=$i?>" data-role="none">
                 <?php for($i=0;$i<=5;$i++):?>
                 <option value="<?=$i?>"><?=$rating_labels[$i]?></option>
                 <?endfor;?>
@@ -166,7 +166,7 @@
         window.location="logout.php";
     });
 
-    $('#id-answer-rating').barrating({
+    $('.rating-widget').barrating({
         theme: 'fontawesome-stars',
         showSelectedRating: true,
         fastClicks: true
