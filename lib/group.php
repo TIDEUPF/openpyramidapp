@@ -74,7 +74,7 @@ function check_if_group_finished_level()
         $cgfl_result_1 = mysqli_query($link, "select * from flow_student_rating where fsr_fid = '$fid' and fsr_level = '$activity_level' and fsr_group_id = '$peer_group_id'");
         $cgfl_result_1_count = mysqli_num_rows($cgfl_result_1);
     } else {
-        $peer_array_sql = implode("','", $peer_array);
+        $peer_array_sql = implode("','", \Util\sanitize_array($peer_array));
 
         $cgfl_result_1 = mysqli_query($link, "select * from flow_student where fid = '{$fid}' and sid in ('{$peer_array_sql}')");
         $cgfl_result_1_count = mysqli_num_rows($cgfl_result_1);
@@ -104,7 +104,7 @@ function check_if_previous_groups_completed_task()
         if(\Answer\is_timeout())
             return true;
 
-        $peer_array_sql = implode("','", $peer_array);
+        $peer_array_sql = implode("','", \Util\sanitize_array($peer_array));
         $n_answers_query = mysqli_query($link, "select * from flow_student where fid = '{$fid}' and sid in ('{$peer_array_sql}')");
         $n_answers = mysqli_num_rows($n_answers_query);
         $needed_results = count($peer_array);

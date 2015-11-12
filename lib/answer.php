@@ -53,7 +53,7 @@ function submit($params) {
     //check for the minimum participants for timeout start
     $answertimestamp = 0;
     $required_peers = \Group\get_needed_results_to_end_level();
-    $peer_array_sql = implode("','", $peer_array);
+    $peer_array_sql = implode("','", \Util\sanitize_array($peer_array));
     $n_submitted_answers = mysqli_num_rows(mysqli_query($link, "select * from flow_student where fid = '$fid' and sid in ('{$peer_array_sql}')"));
 
     if($n_submitted_answers + 1 >= $required_peers)
@@ -396,7 +396,7 @@ function is_timeout() {
     if(empty($peer_array))
         return true;
 
-    $peer_array_sql = implode("','", $peer_array);
+    $peer_array_sql = implode("','", \Util\sanitize_array($peer_array));
 
     if(!(mysqli_num_rows(mysqli_query($link, "select * from flow_student where `timestamp` > 0 and fid = '$fid' and sid in ('$peer_array_sql')")) > 0))
         return false;

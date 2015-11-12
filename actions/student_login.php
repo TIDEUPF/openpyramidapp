@@ -26,6 +26,8 @@ if(!isset($_SESSION['student'])) {
                 //else{
                     $sname = strtolower($uname);
                     $sname[0] = strtoupper($sname[0]);
+                    $sname = str_replace(array('*', "'", ',', ' ', '"', '(', ')', '<', '>', '=', ';', '-', '#', '/', '@', '$', '%', '\\', '`'), '', $sname);
+                    $uname = str_replace(array('*', "'", ',', ' ', '"', '(', ')', '<', '>', '=', ';', '-', '#', '/', '@', '$', '%', '\\', '`'), '', $uname);
                     mysqli_query($link,"insert into students values ('$uname', '$sname', NOW() )");
                     if(mysqli_affected_rows($link) > 0) {
                         $_SESSION['student'] = $uname;

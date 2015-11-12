@@ -94,7 +94,7 @@
                 In this activity, you have to propose a question to ask from the teacher individually. Then you rate questions suggested by your peers in every level. Finally you all will be selecting the highest rated question/s to be submitted for the teacher to answer. When all members finish rating at one level, the next level options will appear.
 
                 <br><br>
-                <i>En aquesta activitat has de proposar una pregunta per al professor, després haurás de puntuar les preguntes del teu grup. Quan tots hagueu puntuat les preguntes apareixerà el següent nivell.</i>
+                <i>En aquesta activitat has de proposar una pregunta per al professor, després hauràs de puntuar les preguntes del teu grup. Quan tots hagueu puntuat les preguntes apareixerà el següent nivell.</i>
 
 
 

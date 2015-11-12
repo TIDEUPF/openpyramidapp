@@ -266,8 +266,8 @@ function set_previous_level_peer_active_group_ids() {
 
     $previous_activity_level = $activity_level-1;
     $peer_group_combined_ids_array = explode(',',$peer_group_combined_ids);
-    $peer_group_combined_ids_sql = implode("','",$peer_group_combined_ids_array);
-    $peer_array_sql = implode("','", $peer_array);
+    $peer_group_combined_ids_sql = implode("','",\Util\sanitize_array($peer_group_combined_ids_array));
+    $peer_array_sql = implode("','", \Util\sanitize_array($peer_array));
 
     if($previous_activity_level == -1)
         $submitted_group_answers_query = mysqli_query($link, "select distinct sid as active_sid from flow_student where fid = '{$fid}' and sid in ('{$peer_array_sql}')");
@@ -293,7 +293,7 @@ function get_inactive_level_group_peers() {
     global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
     $peer_group_combined_ids_array = explode(',',$peer_group_combined_ids);
-    $peer_array_sql = implode("','", $peer_array);
+    $peer_array_sql = implode("','", \Util\sanitize_array($peer_array));
 
     if($activity_level == 0 and !\Student\level_is_rated())
         $inactive_peers_result = mysqli_query($link, "select distinct sid from students where sid in ('{$peer_array_sql}') and sid not in (select distinct sid as active_sid from flow_student where fid = '{$fid}' and sid  in ('{$peer_array_sql}'))");

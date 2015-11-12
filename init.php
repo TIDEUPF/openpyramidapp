@@ -7,6 +7,7 @@ session_start();
 
 include_once('./config.php');
 include_once('./actions/dbvar.php');
+include_once('./lib/util.php');
 include_once('./lib/view.php');
 include_once('./lib/action.php');
 
