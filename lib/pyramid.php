@@ -261,7 +261,10 @@ function set_previous_level_peer_active_group_ids() {
     if(\Group\is_level_timeout())
         return false;
 
-    if(!\Group\check_if_previous_groups_completed_task() or !\Answer\is_submitted())
+    if(!\Answer\is_submitted())
+        return false;
+
+    if(!\Group\check_if_previous_groups_completed_task())
         return false;
 
     $previous_activity_level = $activity_level-1;

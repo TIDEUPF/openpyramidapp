@@ -8,7 +8,9 @@ if(!isset($_SESSION['student'])) {
         }
         //the following is the correct student login that cross-refer with the student excel table
         else{
-            $uname = mysqli_real_escape_string($link, stripslashes(strtoupper(trim(strip_tags($_POST['usr'])))));
+            $uname = str_replace(array('*', "'", ',', ' ', '"', '(', ')', '<', '>', '=', ';', '-', '#', '/', '@', '$', '%', '\\', '`'), '', $_POST['usr']);
+
+            $uname = mysqli_real_escape_string($link, stripslashes(strtoupper(trim(strip_tags($uname)))));
 
             //$res1 = mysqli_query($link, "select * from studentexcel where se_sid = '$uname'");
             //if(mysqli_num_rows($res1) > 0) {
@@ -24,10 +26,9 @@ if(!isset($_SESSION['student'])) {
                     //header("location: student_activity.php"); exit(0);
                 //}
                 //else{
+
                     $sname = strtolower($uname);
                     $sname[0] = strtoupper($sname[0]);
-                    $sname = str_replace(array('*', "'", ',', ' ', '"', '(', ')', '<', '>', '=', ';', '-', '#', '/', '@', '$', '%', '\\', '`'), '', $sname);
-                    $uname = str_replace(array('*', "'", ',', ' ', '"', '(', ')', '<', '>', '=', ';', '-', '#', '/', '@', '$', '%', '\\', '`'), '', $uname);
                     mysqli_query($link,"insert into students values ('$uname', '$sname', NOW() )");
                     if(mysqli_affected_rows($link) > 0) {
                         $_SESSION['student'] = $uname;

@@ -113,22 +113,12 @@
         <div class="answer-rating-widget">
             <fieldset data-role="controlgroup" data-type="horizontal">
                 <legend><?=htmlspecialchars($answer_text)?></legend>
-
-                <!--<input type="radio" name="<?=$i?>" id="id-answer-rating-<?=$i?>-1" value="1">
-                <label for="id-answer-rating-<?=$i?>-1">1</label>
-                <input type="radio" name="<?=$i?>" id="id-answer-rating-<?=$i?>-2" value="2">
-                <label for="id-answer-rating-<?=$i?>-2">2</label>
-                <input type="radio" name="<?=$i?>" id="id-answer-rating-<?=$i?>-3" value="3">
-                <label for="id-answer-rating-<?=$i?>-3">3</label>
-                <input type="radio" name="<?=$i?>" id="id-answer-rating-<?=$i?>-4" value="4">
-                <label for="id-answer-rating-<?=$i?>-4">4</label>
-                <input type="radio" name="<?=$i?>" id="id-answer-rating-<?=$i?>-5" value="5">
-                <label for="id-answer-rating-<?=$i?>-5">5</label>-->
-
                 <select id="id-answer-rating-<?=$i?>" class="rating-widget" name="<?=$i?>" data-role="none">
+
                 <?php for($i=0;$i<=5;$i++):?>
                 <option value="<?=$i?>"><?=$rating_labels[$i]?></option>
                 <?endfor;?>
+
                 </select>
             </fieldset>
         </div>

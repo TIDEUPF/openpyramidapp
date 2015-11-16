@@ -5,6 +5,11 @@ namespace Group;
 function get_members($params) {
     global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
+    $peer_array = null;
+    $peer_group_id = null;
+    $peer_group_combined_ids = null;
+    $peer_group_combined_ids_temp = null;
+
     $sa_result_1 = mysqli_query($link, "select * from pyramid_groups where pg_fid = '$fid' and pg_level = '$activity_level'");
     if(mysqli_num_rows($sa_result_1) > 0){ //get current level pyramid group info
         while($sa_data_1 = mysqli_fetch_assoc($sa_result_1))
@@ -97,80 +102,52 @@ function check_if_previous_groups_completed_task()
 {
     global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
+    if(!\Answer\is_submitted())
+        return true;
+
     $activity_level_previous = $activity_level-1;
 
     //check if every group member has submitted the answer or the timeout is expired
-    if($activity_level_previous == -1 and \Answer\is_submitted()) {
+    if($activity_level_previous == -1) {
         if(\Answer\is_timeout())
             return true;
 
+        //if every member already submitted the answer the proceed immediatly
         $peer_array_sql = implode("','", \Util\sanitize_array($peer_array));
         $n_answers_query = mysqli_query($link, "select * from flow_student where fid = '{$fid}' and sid in ('{$peer_array_sql}')");
         $n_answers = mysqli_num_rows($n_answers_query);
         $needed_results = count($peer_array);
+
         if($n_answers >= $needed_results)
             return true;
-        else
-            return false;
-    } elseif($activity_level_previous == -1)
-        return true;
 
-    $peer_group_combined_ids_array = explode(",",$peer_group_combined_ids);
-    $array_size = count($peer_group_combined_ids_array);
-
-    //TODO: replace with get_previous_groups_rated_count()
-    foreach($peer_group_combined_ids_array as $temp_id)
-    {
-        $sql1_ids[] = "sa_group_id = ".$temp_id;
-    }
-
-    $sql1 = implode(" or ", $sql1_ids);
-    $cipgct_result_1 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level = '$activity_level_previous' and ($sql1) ");
-    $cipgct_result_1_count = mysqli_num_rows($cipgct_result_1);
-
-    if($array_size == $cipgct_result_1_count) {
-        return true;
-    }
-    else {
         return false;
     }
+
+    //the student is at least at level 1
+    $required_groups = count(explode(",",$peer_group_combined_ids));
+    $cipgct_result_1_count = get_previous_groups_rated_count();
+
+    if($required_groups <= $cipgct_result_1_count)
+        return true;
+
+    return false;
 }
 
 function get_previous_groups_rated_count() {
     global $link, $sid, $levels, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
-    if($levels == $activity_level) {
+    if($levels <= $activity_level) {
         $final_level = $levels - 1;
         $cipgct_result_1 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level = '$final_level'");
         return mysqli_num_rows($cipgct_result_1);
     }
 
-    $peer_group_combined_ids_array = explode(",",$peer_group_combined_ids);
-    foreach($peer_group_combined_ids_array as $temp_id)
-    {
-        $sql1_ids[] = "sa_group_id = ".$temp_id;
-    }
-
     $activity_level_previous = $activity_level-1;
-    $sql1 = implode(" or ", $sql1_ids);
-    $cipgct_result_1 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level = '$activity_level_previous' and ($sql1) ");
-    $cipgct_result_1_count = mysqli_num_rows($cipgct_result_1);
 
-    return $cipgct_result_1_count;
-}
-
-function get_next_groups_rated_count() {
-    global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
-
-    $n_groups = get_next_level_groups();
-
-    foreach($n_groups['peer_group_combined_ids_temp'] as $temp_id)
-    {
-        $sql1_ids[] = "sa_group_id = ".$temp_id;
-    }
-
-    $sql1 = implode(" or ", $sql1_ids);
-    $cipgct_result_1 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level = '$activity_level' and ($sql1) ");
+    $peer_group_combined_ids_array = explode(",",$peer_group_combined_ids);
+    $sql1 = implode("','", \Util\sanitize_array($peer_group_combined_ids_array));
+    $cipgct_result_1 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level = '$activity_level_previous' and sa_group_id in ('{$sql1}')");
     $cipgct_result_1_count = mysqli_num_rows($cipgct_result_1);
 
     return $cipgct_result_1_count;
@@ -179,9 +156,8 @@ function get_next_groups_rated_count() {
 function is_level_timeout() {
     global $timeout, $activity_level;
 
-    if($activity_level == 0 and !\Answer\is_submitted() and !\Student\level_is_rated()) {
+    if(!\Answer\is_submitted())
         return \Answer\is_timeout();
-    }
 
     if(is_level_minimun_required_answers_to_set_timestamps_reached()) {
         if(!$timestamp = get_level_timeout_timestamp()) {

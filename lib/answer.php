@@ -10,10 +10,6 @@ function is_submitted($params) {
     if(mysqli_num_rows($res4) > 0)
         return true;
 
-    //in case of timeout allow the user to rate the answers
- //   if(is_timeout())
- //       return true;
-
     return false;
 }
 
@@ -22,16 +18,10 @@ function is_rated($params) {
     global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_group_id;
 
     $sa_result_4 = mysqli_query($link, "select * from flow_student_rating where fsr_fid = '$fid' and fsr_sid= '$sid' and fsr_level = '$activity_level'");
-    if(mysqli_num_rows($sa_result_4) > 0){
-        while($sa_data_4 = mysqli_fetch_assoc($sa_result_4)){
-            $sa_rated = true;
-        }
-    }
-
-    if(isset($sa_rated))
+    if(mysqli_num_rows($sa_result_4) > 0)
         return true;
-    else
-        return false;
+
+    return false;
 }
 
 function get_user_answer($sid, $fid) {
@@ -50,6 +40,15 @@ function get_user_answer($sid, $fid) {
 function submit($params) {
     global $link, $sid, $fid, $input_result, $answer_submit_required_percentage, $peer_array;
 
+    if( !isset($_POST['answer']) and
+        !isset($_POST['skip']))
+        return false;
+
+    if(is_timeout())
+        return false;
+
+    $input_result['op'] = 'submit';
+
     //check for the minimum participants for timeout start
     $answertimestamp = 0;
     $required_peers = \Group\get_needed_results_to_end_level();
@@ -65,23 +64,12 @@ function submit($params) {
         return true;
     }
 
-    if(!isset($_POST['answer']))
-        return false;
-
-    $input_result['op'] = 'submit';
-
-    $ans_input = mysqli_real_escape_string($link, \Request\param('qa'));//stripslashes(strip_tags(trim($_POST['qa']))));
-
-    if(is_timeout())
-        return false;
+    $ans_input = mysqli_real_escape_string($link, \Request\param('qa'));
 
     if ($ans_input != '') {
         //why can't edit the answer once submitted? because should not rate while editing. wrong answer will be rated
         if (mysqli_num_rows(mysqli_query($link, "select * from flow_student where sid = '$sid' and fid = '$fid'")) > 0) {
             return true;
-            //edit if already answered
-            //mysqli_query($link,"update flow_student set fs_answer = '$ans_input' where sid = '$sid' and fid_ = '$fid'");
-            //if(mysqli_affected_rows($link) > 0){ $success = 'Submitted.'; }
         } else {
             //insert new
             mysqli_query($link, "insert into flow_student values ('', '$fid', '$sid', '$ans_input', 0, $answertimestamp)");
@@ -204,6 +192,12 @@ function submit_rate() {
         return false;
 
     $input_result['op'] = 'submit_rate';
+
+    if(\Group\is_level_timeout()) {
+        $input_result['error'] = "You are out of time";
+        return false;
+    }
+
     $numofqustions = \Request\param('numofqustions');
     $rating_array = array();
 
@@ -234,14 +228,6 @@ function submit_rate() {
     if(isset($error)) {
         $input_result['error'] = $error;
         return false;
-    }
-
-    //TODO: Now we could retrieve the values from the current status
-    if($timestamp = \Group\get_level_timeout_timestamp($fid, $rating_array[0]['rate_lvl'], $rating_array[0]['rgroup_id'])) {
-        if(time() > $timestamp + $timeout) {
-            $input_result['error'] = "You are out of time";
-            return false;
-        }
     }
 
     foreach($rating_array as $rating) {
@@ -295,26 +281,6 @@ function is_available_answers() {
 
     return $result;
 }
-
-/*
-function get_user_rating($fid, $who_rated, $to_whom_rated, $lvl) {
-    global $link;
-
-    $gpr_result_1 = mysqli_query($link, "select * from flow_student_rating where fsr_fid = '$fid' and fsr_sid= '$who_rated' and fsr_to_whom_rated_id = '$to_whom_rated' and fsr_level = '$lvl'");
-    //this is to check whether peer has rated for a particular student, i.e. to_whom_rated = sid
-    if(mysqli_num_rows($gpr_result_1) > 0)
-    {
-        $gpr_data_1 = mysqli_fetch_assoc($gpr_result_1);
-        $result = $gpr_data_1['fsr_rating'];
-    }
-    else
-    {
-        $result = '';
-    }
-
-    return $result;
-}
-*/
 
 function get_selected_ids($params) {
     global $link, $sid, $fid, $levels, $sname, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
@@ -389,15 +355,13 @@ function get_answer_timeout() {
 
 function is_timeout() {
     global $link, $sid, $fid, $ftimestamp, $answer_timeout, $peer_array;
-    //check for the minimum participants for timeout
-    $answertimestamp = 0;
 
     //if the user is not present on any group in the current level it has been eliminated
     if(empty($peer_array))
         return true;
 
+    //TODO: improve answer timeout
     $peer_array_sql = implode("','", \Util\sanitize_array($peer_array));
-
     if(!(mysqli_num_rows(mysqli_query($link, "select * from flow_student where `timestamp` > 0 and fid = '$fid' and sid in ('$peer_array_sql')")) > 0))
         return false;
 
