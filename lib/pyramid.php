@@ -201,6 +201,22 @@ function get_current_flow() {
         $fdes = $data3["fdes"];
         $fid = $data3["fid"];
         $ftimestamp = (int)$data3["timestamp"];
+
+        if(isset($_SESSION['fid'])) {
+            if($_SESSION['fid'] != $fid) {
+                $_SESSION['fid'] = $fid;
+
+                $activity_explanation_view = \View\element("activity_explanation", array());
+
+                \View\page(array(
+                    'title' => 'Activity explanation',
+                    'body' => $activity_explanation_view,
+                ));
+                exit;
+            }
+        } else {
+            $_SESSION['fid'] = $fid;
+        }
         return $data3;
     }
     else{

@@ -47,9 +47,11 @@ function get_needed_results_to_end_level($full_requirements = false) {
     if($activity_level == 0 and !\Student\level_is_rated()) {
         $needed_results = count($peer_array);
         $status_percentage = $answer_submit_required_percentage;
+        $st_count = 1;
     } elseif($activity_level == 0) {
         $needed_results = $group_size * $group_size; //in the first level, it's no. of choices * student count
         $status_percentage = $answer_submit_required_percentage;
+        $st_count = $group_size;
     } else{
         $st_count = count($peer_group_combined_ids_temp);
         $needed_results = $group_size * $st_count; //because now every student is rating two answers, need to occupy all answers
@@ -57,7 +59,7 @@ function get_needed_results_to_end_level($full_requirements = false) {
     }
 
     if(!$full_requirements) {
-        $needed_results = floor($needed_results * $status_percentage / 100.0);
+        $needed_results = floor(floor($needed_results * $status_percentage / 100.0)/$st_count)*$st_count;
     }
 
     if(empty($needed_results))
@@ -70,7 +72,7 @@ function check_if_group_finished_level()
 {
     global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
-    if(!($activity_level == 0 and !\Student\level_is_rated())) {
+    if(!($activity_level == 0 and !\Answer\level_is_rated())) {
         $cgfl_result_1 = mysqli_query($link, "select * from flow_student_rating where fsr_fid = '$fid' and fsr_level = '$activity_level' and fsr_group_id = '$peer_group_id'");
         $cgfl_result_1_count = mysqli_num_rows($cgfl_result_1);
     } else {

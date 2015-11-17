@@ -97,7 +97,7 @@ function submit($params) {
 
     if (isset($error)) {
         //ask the answer again
-        $input_result['error'] = "You are out of time";
+        $input_result['error'] = $error;
         return false;
     } else {
         //follow the next step in the flow
@@ -239,7 +239,7 @@ function submit_rate() {
     //TODO: Now we could retrieve the values from the current status
     if($timestamp = \Group\get_level_timeout_timestamp($fid, $rating_array[0]['rate_lvl'], $rating_array[0]['rgroup_id'])) {
         if(time() > $timestamp + $timeout) {
-            $input_result['error'] = "You are out of time";
+            $input_result['error'] = "You are out of time to rate the questions.";
             return false;
         }
     }

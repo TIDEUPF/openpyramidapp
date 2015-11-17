@@ -128,4 +128,11 @@
     $('#answer-header-logout').on('click', function(e) {
         window.location="logout.php";
     });
+
+    timeoutPeriod = 20000;
+    setTimeout("refreshp();",timeoutPeriod);
+    function refreshp() {
+        window.location.href = window.location.href;
+    }
+
 </script>
