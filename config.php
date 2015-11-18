@@ -7,5 +7,5 @@ function init_cfg() {
     $answer_submit_required_percentage = 80;
     $timeout = 60;
     $answer_skip_timeout = 15;
-    $answer_timeout = 60;
+    $answer_timeout = 6000;
 }

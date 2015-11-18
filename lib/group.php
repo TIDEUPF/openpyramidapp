@@ -195,8 +195,24 @@ function set_level_timeout_timestamp()
     return $timestamp;
 }
 
+function get_time_left() {
+    global $link, $sid, $fid, $ftimestamp, $answer_timeout, $answer_skip_timeout, $peer_array, $timeout;
+
+    $timestamp = get_level_timeout_timestamp();
+
+    if(!\Answer\is_submitted())
+        return time() - ($timestamp + $answer_timeout);
+    else
+        return time() - ($timestamp + $timeout);
+
+}
 function get_level_timeout_timestamp($fid, $activity_level, $peer_group_id) {
     global $link, $peer_group_id, $activity_level, $fid;
+
+    if(!\Answer\is_submitted()) {
+        $answer_user_timeout = \Answer\get_answer_timeout();
+        return $answer_user_timeout['time_left'];
+    }
 
     $submitted_group_answers_timestamp_query = mysqli_query($link, "select * from pyramid_groups where pg_timestamp > 0 and pg_fid='{$fid}' and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}' order by pg_timestamp asc limit 1");
     if(mysqli_num_rows($submitted_group_answers_timestamp_query)) {

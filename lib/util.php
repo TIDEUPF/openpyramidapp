@@ -10,5 +10,7 @@ function sanitize_array($data_array) {
             $sanitized_array[] = mysqli_real_escape_string($link, $entry);
         }
     }
+
+    return $data_array;
     return $sanitized_array;
 }

@@ -339,15 +339,32 @@ function view_final_answer($params) {
 }
 
 function get_answer_timeout() {
-    global $link, $sid, $fid, $ftimestamp, $answer_timeout, $answer_skip_timeout;
+    global $link, $sid, $fid, $ftimestamp, $answer_timeout, $answer_skip_timeout, $peer_array;
 
-    //$time_left = $answer_timeout - (time() - $ftimestamp);
-    $time_left = 0;
-    $time_left_skip = $answer_skip_timeout - (time() - $ftimestamp);
+    $peer_array_sql = implode("','", \Util\sanitize_array($peer_array));
+    $r_submitted_answers = mysqli_query($link, "select * from flow_student where fid = '$fid' and sid in ('{$peer_array_sql}') order by `timestamp` asc");
+    $n_submitted_answers = mysqli_num_rows($r_submitted_answers);
+
+    //all student submitted
+    if($n_submitted_answers >= \Group\get_needed_results_to_end_level(true, 'answer'))
+        $answer_timeout_start = null;
+
+    $required_peers = \Group\get_needed_results_to_end_level(false, 'answer');
+
+    if($n_submitted_answers < $required_peers)
+        $answer_timeout_start = null;
+
+    if($n_submitted_answers >= $required_peers) {
+        for ($i = 0; $i < $required_peers; $i++)
+            $a_submitted_answers = mysqli_fetch_assoc($r_submitted_answers);
+
+        $answer_timeout_start = $a_submitted_answers['timestamp'];
+    }
+
     $time_left_skip = $answer_skip_timeout;
 
     return array(
-        'time_left' => $time_left,
+        'time_left' => $answer_timeout_start,
         'time_left_skip' => $time_left_skip,
     );
 }

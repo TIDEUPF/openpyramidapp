@@ -64,8 +64,22 @@
         display: none;
     }
 
+    #countdown {
+        position: fixed;
+        bottom: 0px;
+        left: 0px;
+        height: 1.5em;
+        text-align: center;
+    }
+
+    #countdown-padding {
+        height: 1.5em;
+        display: none;
+    }
+
 </style>
 <div id="answer-frame">
+    <div id="countdown"></div>
     <form method="post" action="student.php" data-ajax="false">
     <div id="answer-header-frame">
 
@@ -114,8 +128,9 @@
 </div>
 <script>
     answer = new Object();
-    answer.timeout = <?=$answer_timeout?>;
+    //answer.timeout = <?=$answer_timeout?>;
     answer.skip_timeout = <?=$answer_skip_timeout?>;
+    polling_interval = 30;
 
     var insert_skip_flag = function(e) {
         if(e.preventDefault)
@@ -145,5 +160,39 @@
     $('#answer-header-logout').on('click', function(e) {
         window.location="logout.php";
     });
+
+    var level_status_actions = function(data) {
+        console.log(data);
+
+        if(data.expired)
+            refreshp();
+
+        if(data.countdown_started && data.time_left < 5)
+            refreshp();
+
+        if(data.countdown_started)
+            show_countdown(data.time_left);
+    }
+
+    function show_countdown(time_left) {
+        $('#countdown').text(time_left);
+        $('#countdown').show();
+    }
+
+    var poll_level_status = function () {
+        $.ajax({
+            url: 'level_environment.php',
+            method: 'post',
+            dataType: 'json',
+            success: level_status_actions,
+            timeout: polling_interval*1000
+        })
+    }
+
+    var clear_polling = setInterval(poll_level_status, polling_interval*1000);
+
+    function refreshp() {
+        window.location.href = window.location.href;
+    }
 
 </script>
