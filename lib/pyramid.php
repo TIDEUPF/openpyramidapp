@@ -106,39 +106,6 @@ function is_level_computed($params) {
     return false;
 }
 
-/*
-function is_level_completed() {
-    global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
-
-    $needed_results = get_needed_results_to_end_level();
-
-    $actual_result= mysqli_query($link, "select * from flow_student_rating where fsr_fid = '$fid' and fsr_level = '$activity_level' and fsr_group_id = '$peer_group_id'");
-
-    if(mysqli_num_rows($actual_result) >= $needed_results) {
-        if(\Group\is_level_timeout())
-            return true;
-    }
-
-    return false;
-}
-*/
-
-function get_needed_results_to_end_level() {
-    global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
-
-    $group_size = count($peer_array); //no of peers in the branch
-    if($activity_level == 1)
-    {
-        $needed_results = $group_size * ($group_size-1); //in the first level, it's no. of choices * student count
-    }
-    else {
-        $st_count = count($peer_group_combined_ids_temp);
-        $needed_results = $group_size * $st_count; //because now every student is rating two answers, need to occupy all answers
-    }
-
-    return $needed_results;
-}
-
 function compute_level_rating() {
     global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
