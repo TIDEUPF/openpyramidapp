@@ -17,23 +17,6 @@ function is_submitted($params) {
     return false;
 }
 
-function is_rated($params) {
-    //check if rated
-    global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_group_id;
-
-    $sa_result_4 = mysqli_query($link, "select * from flow_student_rating where fsr_fid = '$fid' and fsr_sid= '$sid' and fsr_level = '$activity_level'");
-    if(mysqli_num_rows($sa_result_4) > 0){
-        while($sa_data_4 = mysqli_fetch_assoc($sa_result_4)){
-            $sa_rated = true;
-        }
-    }
-
-    if(isset($sa_rated))
-        return true;
-    else
-        return false;
-}
-
 function get_user_answer($sid, $fid) {
     global $link;
 
@@ -50,14 +33,7 @@ function get_user_answer($sid, $fid) {
 function submit($params) {
     global $link, $sid, $fid, $input_result, $answer_submit_required_percentage, $peer_array;
 
-    //check for the minimum participants for timeout start
-    $answertimestamp = 0;
-    $required_peers = \Group\get_needed_results_to_end_level();
-    $peer_array_sql = implode("','", \Util\sanitize_array($peer_array));
-    $n_submitted_answers = mysqli_num_rows(mysqli_query($link, "select * from flow_student where fid = '$fid' and sid in ('{$peer_array_sql}')"));
-
-    if($n_submitted_answers + 1 >= $required_peers)
-        $answertimestamp = time();
+    $answertimestamp = time();
 
     if(isset($_POST['skip'])) {
         mysqli_query($link, "insert into flow_student values ('', '$fid', '$sid', '', 1, $answertimestamp)");
@@ -70,10 +46,7 @@ function submit($params) {
 
     $input_result['op'] = 'submit';
 
-    $ans_input = mysqli_real_escape_string($link, \Request\param('qa'));//stripslashes(strip_tags(trim($_POST['qa']))));
-
-    if(is_timeout())
-        return false;
+    $ans_input = mysqli_real_escape_string($link, \Request\param('qa'));
 
     if ($ans_input != '') {
         //why can't edit the answer once submitted? because should not rate while editing. wrong answer will be rated
@@ -236,14 +209,6 @@ function submit_rate() {
         return false;
     }
 
-    //TODO: Now we could retrieve the values from the current status
-    if($timestamp = \Group\get_level_timeout_timestamp($fid, $rating_array[0]['rate_lvl'], $rating_array[0]['rgroup_id'])) {
-        if(time() > $timestamp + $timeout) {
-            $input_result['error'] = "You are out of time to rate the questions.";
-            return false;
-        }
-    }
-
     foreach($rating_array as $rating) {
         mysqli_query($link,"insert into flow_student_rating values ('', '$fid', '$sid', '{$rating['lvl']}', '{$rating['group_id']}', '{$rating['optradio']}', '{$rating['to_whom_rated_id']}', NOW(), 0 )");
 
@@ -388,7 +353,7 @@ function get_answer_timeout() {
 }
 
 function is_timeout() {
-    global $link, $sid, $fid, $ftimestamp, $answer_timeout, $peer_array;
+    global $link, $sid, $fid, $ftimestamp, $answer_timeout, $peer_array, $activity_level;
     //check for the minimum participants for timeout
     $answertimestamp = 0;
 
@@ -396,16 +361,32 @@ function is_timeout() {
     if(empty($peer_array))
         return true;
 
-    $peer_array_sql = implode("','", \Util\sanitize_array($peer_array));
+    if($activity_level > 0)
+        return true;
 
-    if(!(mysqli_num_rows(mysqli_query($link, "select * from flow_student where `timestamp` > 0 and fid = '$fid' and sid in ('$peer_array_sql')")) > 0))
+    if(\Student\level_is_rated())
+        return true;
+
+    $peer_array_sql = implode("','", \Util\sanitize_array($peer_array));
+    $r_submitted_answers = mysqli_query($link, "select * from flow_student where fid = '$fid' and sid in ('{$peer_array_sql}') order by `timestamp` asc");
+    $n_submitted_answers = mysqli_num_rows($r_submitted_answers);
+
+    //all student submitted
+    if($n_submitted_answers >= \Group\get_needed_results_to_end_level(true, 'answer'))
+        return true;
+
+    $required_peers = \Group\get_needed_results_to_end_level(false, 'answer');
+
+    if($n_submitted_answers < $required_peers)
         return false;
 
-    $query_result = mysqli_query($link, "select * from flow_student where `timestamp` > 0 and fid = '$fid' and sid in ('$peer_array_sql') order by timestamp asc limit 1");
-    $result = mysqli_fetch_assoc($query_result);
+    if($n_submitted_answers >= $required_peers) {
+        for($i=0;$i<$required_peers;$i++)
+            $a_submitted_answers = mysqli_fetch_assoc($r_submitted_answers);
 
-    if(time() > $result['timestamp'] + $answer_timeout)
-        return true;
+        if(time() > $a_submitted_answers['timestamp'] + $answer_timeout)
+            return true;
+    }
 
     return false;
 }

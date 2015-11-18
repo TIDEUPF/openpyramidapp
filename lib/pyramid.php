@@ -274,7 +274,7 @@ function wait($params) {
 function set_previous_level_peer_active_group_ids() {
     global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
-    if(\Group\is_level_timeout())
+    if(\Group\is_level_timeout())//redundant
         return false;
 
     if(!\Group\check_if_previous_groups_completed_task() or !\Answer\is_submitted())
@@ -298,9 +298,9 @@ function set_previous_level_peer_active_group_ids() {
     if(count($active_ids)) {
         $active_ids_string = implode(',', $active_ids);
         mysqli_query($link, "update pyramid_groups set pg_group='{$active_ids_string}' where pg_fid='{$fid}' and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}'");
-    }
+        $peer_array = $active_ids;
 
-    $peer_array = $active_ids;
+    }
 
     return $active_ids;
 }

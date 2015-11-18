@@ -17,15 +17,14 @@ $sid = $_SESSION['student'];
 //check if the group has completed the level and upgrade the level
 \Pyramid\upgrade_level();
 
-//enter submitted information
-\Answer\submit();
-\Answer\submit_rate();
-
-//TODO:improve the timeout thing
 if(\Group\is_level_timeout()) {
     \Student\timeout_view();
     exit;
 }
+
+//enter submitted information
+\Answer\submit();
+\Answer\submit_rate();
 
 //new data entered
 if(\Answer\is_new_data()) {
