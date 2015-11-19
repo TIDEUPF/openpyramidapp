@@ -209,9 +209,10 @@ function submit_rate() {
         return false;
     }
 
+    $i=0;
     foreach($rating_array as $rating) {
-        mysqli_query($link,"insert into flow_student_rating values ('', '$fid', '$sid', '{$rating['lvl']}', '{$rating['group_id']}', '{$rating['optradio']}', '{$rating['to_whom_rated_id']}', NOW(), 0 )");
-
+        mysqli_query($link,"insert into flow_student_rating values ('', '$fid', '$sid', '{$rating['lvl']}', '{$rating['group_id']}', '{$rating['optradio']}', '{$rating['to_whom_rated_id']}', NOW(), 0, {$i})");
+        $i++;
         if(mysqli_affected_rows($link) <= 0) {
             //TODO: database inconsistency
         }
@@ -241,7 +242,7 @@ function skip_rating() {
 
     $remaining_answers = $st_count - count($available_answers);
     for($i=0;$i<$remaining_answers;$i++) {
-        mysqli_query($link, "insert into flow_student_rating values ('', '$fid', '$sid', '{$activity_level}', '$peer_group_id', '0', '-1', NOW(), 1 )");
+        mysqli_query($link, "insert into flow_student_rating values ('', '$fid', '$sid', '{$activity_level}', '$peer_group_id', '0', '-1', NOW(), 1, {$i})");
         if (mysqli_affected_rows($link) <= 0) {
             //TODO: database inconsistency
         }
@@ -315,10 +316,15 @@ function get_selected_ids($params) {
 function view_final_answer($params) {
     global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_group_id;
 
+    if(count($params['final_answer_array'])>1)
+        $winning_text = 'The winning questions are';
+    else
+        $winning_text = 'The winning question is';
+
     $vars = array(
         'username' 					=> $sname . ' + ' . (count(\Group\get_status_bar_peers())-1),
         'level' 					=> 'Level ' . \Pyramid\get_current_level() .'/' . $levels,
-        'header_text' 			    => 'The winning question is',
+        'header_text' 			    => $winning_text,
         'final_answer_array' 		=> $params['final_answer_array'],
         'hidden_input_array' 		=> array(
             'a_lvl' 			=> $activity_level,
@@ -344,6 +350,8 @@ function get_answer_timeout() {
     $peer_array_sql = implode("','", \Util\sanitize_array($peer_array));
     $r_submitted_answers = mysqli_query($link, "select * from flow_student where fid = '$fid' and sid in ('{$peer_array_sql}') order by `timestamp` asc");
     $n_submitted_answers = mysqli_num_rows($r_submitted_answers);
+
+    $answer_timeout_start = null;
 
     //all student submitted
     if($n_submitted_answers >= \Group\get_needed_results_to_end_level(true, 'answer'))

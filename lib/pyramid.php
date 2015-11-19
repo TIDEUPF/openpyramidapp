@@ -173,30 +173,17 @@ function get_current_flow() {
             if($_SESSION['fid'] != $fid) {
                 $_SESSION['fid'] = $fid;
 
-                $activity_explanation_view = \View\element("activity_explanation", array());
-
-                \View\page(array(
-                    'title' => 'Activity explanation',
-                    'body' => $activity_explanation_view,
-                ));
-                exit;
+                return false;
             }
         } else {
             $_SESSION['fid'] = $fid;
         }
-        return $data3;
+        return $fid;
     }
     else{
         //throw new Exception("There are no flows");
         //show activity explanation
-        $activity_explanation_view = \View\element("activity_explanation", array());
-
-        \View\page(array(
-            'title' => 'Activity explanation',
-            'body' => $activity_explanation_view,
-        ));
-
-        exit;
+        return false;
     }
 }
 

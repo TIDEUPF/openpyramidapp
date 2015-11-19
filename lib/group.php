@@ -200,10 +200,18 @@ function get_time_left() {
 
     $timestamp = get_level_timeout_timestamp();
 
+    if(!is_numeric($timestamp))
+        return null;
+
+    if(!$timestamp)
+        return null;
+
+    if($timestamp)
+
     if(!\Answer\is_submitted())
-        return time() - ($timestamp + $answer_timeout);
+        return ($timestamp + $answer_timeout) - time();
     else
-        return time() - ($timestamp + $timeout);
+        return ($timestamp + $timeout) - time();
 
 }
 function get_level_timeout_timestamp($fid, $activity_level, $peer_group_id) {
@@ -215,7 +223,7 @@ function get_level_timeout_timestamp($fid, $activity_level, $peer_group_id) {
     }
 
     $submitted_group_answers_timestamp_query = mysqli_query($link, "select * from pyramid_groups where pg_timestamp > 0 and pg_fid='{$fid}' and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}' order by pg_timestamp asc limit 1");
-    if(mysqli_num_rows($submitted_group_answers_timestamp_query)) {
+    if(mysqli_num_rows($submitted_group_answers_timestamp_query) > 0) {
         $submitted_group_answers_timestamp_row_array = mysqli_fetch_assoc($submitted_group_answers_timestamp_query);
         return $submitted_group_answers_timestamp_row_array['pg_timestamp'];
     } else {

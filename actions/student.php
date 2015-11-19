@@ -6,7 +6,15 @@ $sname = Student\get_username();
 $sid = $_SESSION['student'];
 
 // $levels, $fname, $fdes, $fid, $fid_timestamp
-\Pyramid\get_current_flow();
+if(!\Pyramid\get_current_flow()) {
+    $activity_explanation_view = \View\element("activity_explanation", array());
+
+    \View\page(array(
+        'title' => 'Activity explanation',
+        'body' => $activity_explanation_view,
+    ));
+    exit;
+}
 
 //$activity_level
 \Pyramid\get_current_activity_level();

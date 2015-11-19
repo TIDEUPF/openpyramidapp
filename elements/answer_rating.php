@@ -92,8 +92,34 @@
         display: none !important;
     }
 
+    #countdown {
+        /*display: none;*/
+        position: fixed;
+        bottom: 0px;
+        left: 0px;
+        height: 0em;
+        text-align: center;
+        right: 0px;
+        background-color: #000000;
+        padding-top: 0px;
+        color: white;
+        text-shadow: 0 /*{a-page-shadow-x}*/ 1px /*{a-page-shadow-y}*/ 0 /*{a-page-shadow-radius}*/ #000000 /*{a-page-shadow-color}*/;
+        font-size: 120%;
+        transition-property: all;
+        transition-duration: 1s;
+        z-index: 1000;
+    }
+
+    #countdown-padding {
+        height: 0em;
+        transition-property: all;
+        transition-duration: 1s;
+        /*display: none;*/
+    }
+
 </style>
 <div id="answer-frame">
+    <div id="countdown"><span id="countdown-text"></span>s left</div>
     <form method="post" action="student.php" data-ajax="false">
     <div id="answer-header-frame">
 
@@ -156,8 +182,15 @@
         <?php endforeach?>
 
     </form>
+    <div id="countdown-padding"></div>
 </div>
 <script>
+    var polling_interval = 30;
+    var time_left = 0;
+    var countdown_started = false;
+    var countdown_interval = null;
+    var polling_interval_d = null;
+
     $('#answer-header-logout').on('touchstart', function(e) {
         window.location="logout.php";
     });
@@ -166,6 +199,83 @@
         window.location="logout.php";
     });
 
+    var level_status_actions = function(data) {
+        console.log(data);
+
+        if(data.reset)
+            newflow();
+
+        if(data.expired)
+            refreshp();
+
+        if(data.countdown_started && data.time_left < 0)
+            refreshp();
+
+        if(data.countdown_started)
+            show_countdown(data.time_left);
+    }
+
+    function show_countdown(time_left) {
+        countdown_started = true;
+        this.time_left = time_left - 5;
+        if(!countdown_interval)
+            countdown_interval = setInterval(update_countdown, 1*1000);
+        update_countdown();
+
+        $('#countdown')
+            .show()
+            .css('height', '1.5em')
+            .css('padding-top', '6px');
+
+        $('#countdown-padding')
+            .show()
+            .css('height', '2em');
+    }
+
+    function update_countdown() {
+        countdown_started = true;
+        time_left--;
+        $('#countdown-text').text(time_left);
+        if(time_left <= 0) {
+            clearInterval(countdown_interval);
+            countdown_finished();
+        }
+    }
+
+    var countdown_finished = function() {
+        if(polling_interval_d)
+            clearInterval(polling_interval_d);
+
+        $('button').prop('disabled', true);
+        setTimeout(function () {
+            window.location.href = window.location.href;
+        }, 10*1000);
+
+        $('#countdown').text('time is up');
+    }
+
+    var poll_level_status = function () {
+        $.ajax({
+            url: 'level_environment.php',
+            method: 'post',
+            dataType: 'json',
+            success: level_status_actions,
+            timeout: polling_interval*1000
+        });
+    }
+
+    poll_level_status();
+    polling_interval_d = setInterval(poll_level_status, polling_interval*1000);
+
+    function refreshp() {
+        window.location.href = window.location.href;
+    }
+
+    function newflow() {
+        window.location.href = "student_login.php";
+    }
+</script>
+<script>
     $('.rating-widget').barrating({
         theme: 'fontawesome-stars',
         showSelectedRating: true,

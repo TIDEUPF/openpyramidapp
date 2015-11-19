@@ -5,7 +5,7 @@ $sname = Student\get_username();
 $sid = $_SESSION['student'];
 
 // $levels, $fname, $fdes, $fid, $fid_timestamp
-\Pyramid\get_current_flow();
+$reset_flow = !\Pyramid\get_current_flow();
 
 //$activity_level
 \Pyramid\get_current_activity_level();
@@ -22,10 +22,12 @@ if(\Group\is_level_timeout())
 $time_left = \Group\get_time_left();
 
 $output = array(
-    'expired' => $expired,
+    'reset' => $reset_flow,
+    'expired' => !empty($expired),
     'countdown_started' => ($time_left > 0),
     'time_left' => (int)$time_left,
 );
 
+header('Connection: close');
 header('Content-type: application/json');
 echo json_encode($output);
