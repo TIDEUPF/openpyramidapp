@@ -135,25 +135,14 @@
 
     </div>
     <div id="answer-middle-frame">
-        <?php foreach($answer_text_array as $i=> $answer_text):?>
+        <?php foreach($answer_text_array as $i=> $answer_data):?>
         <div class="answer-rating-widget">
             <fieldset data-role="controlgroup" data-type="horizontal">
-                <legend><?=htmlspecialchars($answer_text)?></legend>
-
-                <!--<input type="radio" name="<?=$i?>" id="id-answer-rating-<?=$i?>-1" value="1">
-                <label for="id-answer-rating-<?=$i?>-1">1</label>
-                <input type="radio" name="<?=$i?>" id="id-answer-rating-<?=$i?>-2" value="2">
-                <label for="id-answer-rating-<?=$i?>-2">2</label>
-                <input type="radio" name="<?=$i?>" id="id-answer-rating-<?=$i?>-3" value="3">
-                <label for="id-answer-rating-<?=$i?>-3">3</label>
-                <input type="radio" name="<?=$i?>" id="id-answer-rating-<?=$i?>-4" value="4">
-                <label for="id-answer-rating-<?=$i?>-4">4</label>
-                <input type="radio" name="<?=$i?>" id="id-answer-rating-<?=$i?>-5" value="5">
-                <label for="id-answer-rating-<?=$i?>-5">5</label>-->
+                <legend><?=htmlspecialchars($answer_data['answer_text'])?></legend>
 
                 <select id="id-answer-rating-<?=$i?>" class="rating-widget" name="<?=$i?>" data-role="none">
                 <?php for($i=0;$i<=5;$i++):?>
-                <option value="<?=$i?>"><?=$rating_labels[$i]?></option>
+                <option value="<?=$i?>" <?php if($answer_data['selected'] == $i) echo 'selected="selected"';?>><?=$rating_labels[$i]?></option>
                 <?endfor;?>
                 </select>
             </fieldset>

@@ -32,6 +32,18 @@ function level_is_rated() {
     return false;
 }
 
+function get_rating($answer_id) {
+    global $link, $sid, $fid, $activity_level, $peer_group_id;
+
+    $answer_rating_result = mysqli_query($link, "select * from flow_student_rating where fsr_fid = '$fid' and fsr_sid= '$sid' and fsr_level = '$activity_level' and fsr_group_id = '{$peer_group_id}' and fsr_to_whom_rated_id='{$answer_id}'");
+    if(mysqli_num_rows($answer_rating_result) > 0) {
+        $answer_rating_result_array = mysqli_fetch_assoc($link, $answer_rating_result);
+
+        return $answer_rating_result_array['fsr_rating'];
+    }
+    return false;
+}
+
 function timeout_view($params) {
     global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_group_id;
 

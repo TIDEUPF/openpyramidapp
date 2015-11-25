@@ -132,13 +132,16 @@ function request_rate($params) {
     $i = 1;
 
     $answer_ids = get_selected_ids();
-    foreach($answer_ids as $answer_id){
+    foreach($answer_ids as $answer_id) {
         $res5 = mysqli_query($link, "select * from flow_student where sid = '$answer_id' and fid = '$fid' and skip = 0");// to get peer answer
         if(mysqli_num_rows($res5) > 0) {//the peer already submitted the answer
             $data5 = mysqli_fetch_assoc($res5);
             $peer_answer = $data5['fs_answer'];
 
-            $answer_text_array['optradio'.$i] = $peer_answer;
+            $answer_data = array('answer_text' => $peer_answer);
+            $answer_data['selected'] = (int)\Student\get_rating($answer_id);
+
+
             $hidden_input_array = array_merge(array(
                 'group_id'.$i          => $peer_group_id,
                 'to_whom_rated_id'.$i  => $answer_id,
@@ -153,7 +156,7 @@ function request_rate($params) {
         'username'              => $sname . ' + ' . (count(\Group\get_status_bar_peers())-1),
         'level'                 => 'Level '. \Pyramid\get_current_level() .'/' . $levels,
         'header_text'           => 'Rate the following answers',
-        'answer_text_array'     => $answer_text_array,
+        'answer_text_array'     => $answer_data,
         'answer_rate_submit'    => 'Rate',
         'rating_labels'         => array('Not rated', 'Awful', 'Bad', 'Good', 'Great', 'Awesome'),
         'hidden_input_array'    => $hidden_input_array,
