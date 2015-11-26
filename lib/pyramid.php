@@ -20,6 +20,23 @@ function get_current_activity_level() {
     return $activity_level;
 }
 
+function get_available_level() {
+    global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids;
+
+    //get the highest rated level for the user
+    $available_result = mysqli_query($link, "select pg_level, pg_group_id from pyramid_groups where pg_fid = '$fid' and pg_timestamp = 0 order by pg_level desc limit 1");
+
+    if(mysqli_num_rows($available_result) > 0) {
+        $available_data = mysqli_fetch_assoc($available_result);
+        $available_activity_level = $available_data['pg_level'];
+        $available_group_id = $available_data['pg_group_id'];
+    } else {
+        return false;
+    }
+
+    return $activity_level;
+}
+
 function upgrade_level() {
     global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids;
 

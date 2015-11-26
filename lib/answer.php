@@ -214,7 +214,7 @@ function submit_rate() {
 
     $i=0;
     foreach($rating_array as $rating) {
-        mysqli_query($link,"insert into flow_student_rating values ('', '$fid', '$sid', '{$rating['lvl']}', '{$rating['group_id']}', '{$rating['optradio']}', '{$rating['to_whom_rated_id']}', NOW(), 0, {$i})");
+        mysqli_query($link, "insert into flow_student_rating values ('', '$fid', '$sid', '{$rating['lvl']}', '{$rating['group_id']}', '{$rating['optradio']}', '{$rating['to_whom_rated_id']}', NOW(), 0, {$i}) on duplicate key update fsr_rating='{$rating['optradio']}'");
         $i++;
         if(mysqli_affected_rows($link) <= 0) {
             //TODO: database inconsistency
