@@ -23,8 +23,8 @@ function get_current_activity_level() {
 function get_available_level() {
     global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids;
 
-    //get the highest rated level for the user
-    $available_result = mysqli_query($link, "select pg_level, pg_group_id from pyramid_groups where pg_fid = '$fid' and pg_timestamp = 0 order by pg_level desc limit 1");
+    //get the lowest active level providing the timeout is not set
+    $available_result = mysqli_query($link, "select pg_level, pg_group_id from pyramid_groups where pg_fid = '$fid' and pg_timestamp = 0 order by pg_level asc limit 1");
 
     if(mysqli_num_rows($available_result) > 0) {
         $available_data = mysqli_fetch_assoc($available_result);
@@ -34,7 +34,15 @@ function get_available_level() {
         return false;
     }
 
-    return $activity_level;
+    return array('activity_level' => $available_activity_level, 'peer_group_id' => $available_group_id);
+}
+
+function add_latecomer($group) {
+    global $link, $fid;
+
+    $activity_level = $group['activity_level'];
+    $peer_group_id = $group['peer_group_id'];
+    mysqli_query($link, "update pyramid_groups set pg_latecomers = CONCAT(pg_latecomers,',','newuser54'), pg_timestamp='0' where pg_fid='{$fid}' and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}'");
 }
 
 function upgrade_level() {
@@ -268,7 +276,7 @@ function set_previous_level_peer_active_group_ids() {
 
     if(count($active_ids)) {
         $active_ids_string = implode(',', $active_ids);
-        mysqli_query($link, "update pyramid_groups set pg_group='{$active_ids_string}' where pg_fid='{$fid}' and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}'");
+        mysqli_query($link, "update pyramid_groups set pg_group=CONCAT('{$active_ids_string}', pg_latecomers) where pg_fid='{$fid}' and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}'");
         $peer_array = $active_ids;
 
     }
