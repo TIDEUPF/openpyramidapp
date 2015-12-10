@@ -2,6 +2,11 @@
 
 namespace Group;
 
+
+function get_group_name() {
+
+}
+
 function get_members($params) {
     global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
