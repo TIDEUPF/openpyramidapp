@@ -13,7 +13,7 @@ $(function() {
     var $messages = $('.messages'); // Messages area
     var $inputMessage = $('.inputMessage'); // Input message input box
 
-    //var $loginPage = $('.login.page'); // The login page
+    var $loginPage = $('.login.page'); // The login page
     var $chatPage = $('.chat.page'); // The chatroom page
 
     // Prompt for setting a username
@@ -23,12 +23,13 @@ $(function() {
     var lastTypingTime;
     var $currentInput = $inputMessage.focus();
     $chatPage.show();
-    $currentInput =
+    //$currentInput =
+
+    //var socket = io();
+    var socket = io(chat_url);
 
     // Tell the server your username
     socket.emit('add user', username);
-
-    var socket = io();
 
     function addParticipantsMessage (data) {
         var message = '';
