@@ -31,6 +31,9 @@ $(function() {
     // Tell the server your username
     socket.emit('add user', username);
 
+    //join the user to a room
+    joinRoom(room);
+
     function addParticipantsMessage (data) {
         var message = '';
         if (data.numUsers === 1) {
@@ -57,6 +60,11 @@ $(function() {
         }
     }
 
+    //join a room
+    function joinRoom(user_room) {
+        socket.emit('join room', {room: user_room});
+    }
+
     // Sends a chat message
     function sendMessage () {
         var message = $inputMessage.val();
@@ -70,7 +78,7 @@ $(function() {
                 message: message
             });
             // tell server to execute 'new message' and send along one parameter
-            socket.emit('new message', message);
+            socket.emit('new message', { message: message, room: room});
         }
     }
 
