@@ -302,3 +302,36 @@ function get_inactive_level_group_peers() {
 
     return $inactive_peers;
 }
+
+function add_student($fid, $pid, $sid) {
+    global $link;
+
+    $result = mysqli_query($link,"insert into pyramid_students values ('', '$fid', '$pid', '$sid')");
+
+    return !!mysqli_affected_rows($result);
+}
+
+function exists_student_pyramid($fid, $pid, $sid) {
+    global $link;
+
+    $result = mysqli_query($link,"select * from pyramid_students where fid='$fid' and pid='$pid' and sid='$sid'");
+
+    if(mysqli_affected_rows($result))
+        return true;
+
+    return false;
+}
+
+function get_student_pyramid($fid, $pid, $sid) {
+    global $link;
+
+    $result = mysqli_query($link,"select * from pyramid_students where fid='$fid' and pid='$pid' and sid='$sid' limit 1");
+
+    if(!mysqli_affected_rows($result))
+        return false;
+
+    $result_row = mysqli_fetch_assoc($result);
+
+    return (int)$result_row['pid'];
+}
+
