@@ -311,6 +311,14 @@ function add_student($fid, $pid, $sid) {
     return !!mysqli_affected_rows($result);
 }
 
+function flow_add_student($fid, $sid) {
+    global $link;
+
+    $result = mysqli_query($link,"insert into flow_students values ('', '$fid', '$sid')");
+
+    return !!mysqli_affected_rows($result);
+}
+
 function exists_student_pyramid($fid, $pid, $sid) {
     global $link;
 
@@ -335,3 +343,80 @@ function get_student_pyramid($fid, $pid, $sid) {
     return (int)$result_row['pid'];
 }
 
+function create_pyramid($fid, $pid, $sarry, $fl, $fsg)
+{
+    global $link;
+    //find the last pid
+    $pid = null;
+    $result = mysqli_query($link,"select * from pyramid_students where fid='$fid' order by pid desc limit 1");
+
+    if(!mysqli_affected_rows($result))
+        $pid = 0;
+
+    $result_row = mysqli_fetch_assoc($result);
+    $pid = (int)$result_row['pid'] + 1;
+
+    //select available flow students
+    $result = mysqli_query($link, "select * from flow_students where fid='$fid' and sid not in(select sid from pyramid_students where fid = '$fid')");
+
+    if(!mysqli_affected_rows($result))
+        $students = [];
+    else {
+        while($result_row = mysqli_fetch_assoc($result))
+            $students[] =  $result_row['sid'];
+    }
+
+    //create the new pyramid structure
+    create_pyramid_structure($fid, $pid, $students, 4 ,4);
+}
+
+function create_pyramid_structure($fid, $pid, $sarry, $fl, $fsg) {
+    global $link;
+    $rps = 1;//$rps = (int) $_POST['rps'];
+
+    if($fl < 1 || $rps < 1 || $fsg < 1)
+    {
+        $error = 'Levels and Responses cannot be 0';
+    }
+    else{
+        $res = mysqli_query($link, "select * from students");
+        while($data = mysqli_fetch_assoc($res)){
+            $sarry[] = $data["sid"];
+        }
+
+        $pyramid_list = noSc_pyramid($fl, $sarry, $fsg);
+        //$pyramid_json = json_encode($pyramid_list);
+        //var_dump($pyramid_list);
+        //var_dump($pyramid_json);
+
+        $datestamp = time();
+        //mysqli_query($link,"insert into flow values ('', '$sid', '$fname', '$fdes', '$fcname', '$fesname', '$fsg', '$fl', '$rps', '$datestamp')");
+
+        $mysql_last_id = mysqli_insert_id($link);
+        $success = 'Flow Created.';
+        for($tl=0; $tl<$fl; $tl++)
+        {
+            if($tl == 0){
+
+                $t_group_items = $pyramid_list[$tl][0];
+                for($tin=0; $tin<count($t_group_items); $tin++){
+
+                    $group_comma = implode(",",$t_group_items[$tin]);
+                    mysqli_query($link,"insert into pyramid_groups values ($fid, $pid, '$group_comma', '$tl', '$tin', '0', 0, '')");
+                    mysqli_query($link,"insert into pyramid_groups_og values ($fid, $pid, '$group_comma', '$tl', '$tin', '0', 0)");
+                }
+            }
+            else{
+                $t_group_items = $pyramid_list[$tl][0];
+                $t_group_items_relation = $pyramid_list[$tl][1];
+                for($tin=0; $tin<count($t_group_items); $tin++) {
+                    $group_comma = implode(",", $t_group_items[$tin]);
+                    $group_comma_relations = implode(",", $t_group_items_relation[$tin]);
+                    mysqli_query($link,"insert into pyramid_groups values ($fid, $pid, '$group_comma', '$tl', '$tin', '$group_comma_relations', 0, '')");
+                    mysqli_query($link,"insert into pyramid_groups_og values ($fid, $pid, '$group_comma', '$tl', '$tin', '$group_comma_relations', 0)");
+                }
+            }
+        }
+
+    }
+}

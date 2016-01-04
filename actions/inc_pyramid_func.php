@@ -2,10 +2,12 @@
 
 function noSc_pyramid($levels, $student_arr, $student_amount){
 	
-	/*LEVEL 1*/
+
 	for($i=0; $i < $levels; $i++)
 	{
 		unset($spare);
+
+		/*LEVEL 1*/
 		if($i == 0)
 		{			
 			$lev =  $student_amount; //pow(2, $i);
