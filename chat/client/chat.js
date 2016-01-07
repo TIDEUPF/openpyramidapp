@@ -100,7 +100,8 @@ $(function() {
         }
 
         var $usernameDiv = $('<span class="username"/>')
-            .text('[' + data.room + ']' + data.username)
+            /*.text('[' + data.room + ']' + data.username)*/
+            .text(data.username)
             .css('color', getUsernameColor(data.username));
         var $messageBodyDiv = $('<span class="messageBody">')
             .text(data.message);
@@ -212,6 +213,8 @@ $(function() {
         }
         // When the client hits ENTER on their keyboard
         if (event.which === 13) {
+            event.preventDefault();
+
             if (username) {
                 sendMessage();
                 socket.emit('stop typing');

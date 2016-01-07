@@ -140,7 +140,7 @@ function request_rate($params) {
 
             $answer_data = array('answer_text' => $peer_answer);
             $answer_data['selected'] = (int)\Student\get_rating($answer_id);
-
+            $answer_text_array[] = $answer_data;
 
             $hidden_input_array = array_merge(array(
                 'group_id'.$i          => $peer_group_id,
@@ -156,7 +156,7 @@ function request_rate($params) {
         'username'              => $sname . ' + ' . (count(\Group\get_status_bar_peers())-1),
         'level'                 => 'Level '. \Pyramid\get_current_level() .'/' . $levels,
         'header_text'           => 'Rate the following answers',
-        'answer_text_array'     => $answer_data,
+        'answer_text_array'     => $answer_text_array,
         'answer_rate_submit'    => 'Rate',
         'rating_labels'         => array('Not rated', 'Awful', 'Bad', 'Good', 'Great', 'Awesome'),
         'hidden_input_array'    => $hidden_input_array,

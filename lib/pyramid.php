@@ -324,7 +324,7 @@ function exists_student_pyramid($fid, $pid, $sid) {
 
     $result = mysqli_query($link,"select * from pyramid_students where fid='$fid' and pid='$pid' and sid='$sid'");
 
-    if(mysqli_affected_rows($result))
+    if(mysqli_num_rows($result))
         return true;
 
     return false;
@@ -335,7 +335,7 @@ function get_student_pyramid($fid, $pid, $sid) {
 
     $result = mysqli_query($link,"select * from pyramid_students where fid='$fid' and pid='$pid' and sid='$sid' limit 1");
 
-    if(!mysqli_affected_rows($result))
+    if(!mysqli_num_rows($result))
         return false;
 
     $result_row = mysqli_fetch_assoc($result);
@@ -343,14 +343,14 @@ function get_student_pyramid($fid, $pid, $sid) {
     return (int)$result_row['pid'];
 }
 
-function create_pyramid($fid, $pid, $sarry, $fl, $fsg)
-{
+function create_pyramid($fid, $sarry, $fl, $fsg) {
     global $link, $fid;
+
     //find the last pid
     $pid = null;
     $result = mysqli_query($link,"select * from pyramid_students where fid='$fid' order by pid desc limit 1");
 
-    if(!mysqli_affected_rows($result))
+    if(!mysqli_num_rows($result))
         $pid = 0;
 
     $result_row = mysqli_fetch_assoc($result);
@@ -359,7 +359,7 @@ function create_pyramid($fid, $pid, $sarry, $fl, $fsg)
     //select available flow students
     $result = mysqli_query($link, "select * from flow_available_students where fid='$fid' and sid not in(select sid from pyramid_students where fid = '$fid')");
 
-    if(!mysqli_affected_rows($result))
+    if(!mysqli_num_rows($result))
         $students = [];
     else {
         while($result_row = mysqli_fetch_assoc($result)) {
@@ -369,7 +369,7 @@ function create_pyramid($fid, $pid, $sarry, $fl, $fsg)
     }
 
     //create the new pyramid structure
-    create_pyramid_structure($fid, $pid, $students, 4 ,4);
+    create_pyramid_structure($fid, $pid, $students, $fl , $fsg);
 }
 
 function create_pyramid_structure($fid, $pid, $sarry, $fl, $fsg) {
@@ -381,11 +381,9 @@ function create_pyramid_structure($fid, $pid, $sarry, $fl, $fsg) {
     $pyramid_list = noSc_pyramid($fl, $sarry, $fsg);
 
     for($tl=0; $tl<$fl; $tl++) {
-        if($tl == 0){
-
+        if($tl == 0) {
             $t_group_items = $pyramid_list[$tl][0];
-            for($tin=0; $tin<count($t_group_items); $tin++){
-
+            for($tin=0; $tin<count($t_group_items); $tin++) {
                 $group_comma = implode(",",$t_group_items[$tin]);
                 mysqli_query($link,"insert into pyramid_groups values ($fid, $pid, '$group_comma', '$tl', '$tin', '0', 0, '')");
                 mysqli_query($link,"insert into pyramid_groups_og values ($fid, $pid, '$group_comma', '$tl', '$tin', '0', 0)");

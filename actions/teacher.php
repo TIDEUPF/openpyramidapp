@@ -2,75 +2,34 @@
 session_start(); 
 include('dbvar.php');
 
-include('inc_pyramid_func.php');
+//include('inc_pyramid_func.php');
 
-if(isset($_SESSION['user'])){
+if(isset($_SESSION['user'])) {
 	$teacher_id = $_SESSION['user'];
 	
 	$student_count = mysqli_num_rows(mysqli_query($link, "select * from students"));
 	
-if(isset($_POST['cflow'])){
-	$fname = mysqli_real_escape_string($link, stripslashes(trim(strip_tags($_POST['fname']))));
-	$fdes =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['fdes']))));
-	$fcname =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['fcname']))));	
-	$fesname = '';//$fesname =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['fesname']))));
-	$fl = (int) $_POST['fl'];
-	$fsg = (int) $_POST['fsg'];
-	$rps = 1;//$rps = (int) $_POST['rps'];	
-	
-	if($fl < 1 || $rps < 1 || $fsg < 1)
-	{
-		$error = 'Levels and Responses cannot be 0';
-	}
-	else{		
-		$res = mysqli_query($link, "select * from students");
-		while($data = mysqli_fetch_assoc($res)){
-			$sarry[] = $data["sid"];
-		}
-		
-		$pyramid_list = noSc_pyramid($fl, $sarry, $fsg);		
-		//$pyramid_json = json_encode($pyramid_list);
-		//var_dump($pyramid_list);
-		//var_dump($pyramid_json);
-		
-		$datestamp = time();
-		mysqli_query($link,"insert into flow values ('', '$teacher_id', '$fname', '$fdes', '$fcname', '$fesname', '$fsg', '$fl', '$rps', '$datestamp')");
-		if(mysqli_affected_rows($link) > 0){
-			
-			$mysql_last_id = mysqli_insert_id($link);
-			$success = 'Flow Created.';
-			for($tl=0; $tl<$fl; $tl++)
-			{				
-				if($tl == 0){
-					
-					$t_group_items = $pyramid_list[$tl][0];					
-					for($tin=0; $tin<count($t_group_items); $tin++){
-						
-						$group_comma = implode(",",$t_group_items[$tin]);
-						mysqli_query($link,"insert into pyramid_groups values ($mysql_last_id, '$group_comma', '$tl', '$tin', '0', 0, '')");
-						mysqli_query($link,"insert into pyramid_groups_og values ($mysql_last_id, '$group_comma', '$tl', '$tin', '0', 0)");
-					}
-				}
-				else{
-					$t_group_items = $pyramid_list[$tl][0];
-					$t_group_items_relation = $pyramid_list[$tl][1];
-					for($tin=0; $tin<count($t_group_items); $tin++) {
-						$group_comma = implode(",", $t_group_items[$tin]);
-						$group_comma_relations = implode(",", $t_group_items_relation[$tin]);
-						mysqli_query($link,"insert into pyramid_groups values ($mysql_last_id, '$group_comma', '$tl', '$tin', '$group_comma_relations', 0, '')");
-						mysqli_query($link,"insert into pyramid_groups_og values ($mysql_last_id, '$group_comma', '$tl', '$tin', '$group_comma_relations', 0)");
-					}
-				}
-			}
-		}
-		else{
-			$error = 'Database error!';
-		}
-	}	
-}
+	if(isset($_POST['cflow'])){
+		$fname = mysqli_real_escape_string($link, stripslashes(trim(strip_tags($_POST['fname']))));
+		$fdes =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['fdes']))));
+		$fcname =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['fcname']))));
+		$fesname = '';//$fesname =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['fesname']))));
+		$fl = (int) $_POST['fl'];
+		$fsg = (int) $_POST['fsg'];
+		$fl = 1;
+		$fsg = 1;
+		$rps = 1;//$rps = (int) $_POST['rps'];
 
-}
-else{
+		if($fl < 1 || $rps < 1 || $fsg < 1)	{
+			$error = 'Levels and Responses cannot be 0';
+		} else {
+			$datestamp = time();
+			mysqli_query($link,"insert into flow values ('', '$teacher_id', '$fname', '$fdes', '$fcname', '$fesname', '$fsg', '$fl', '$rps', '$datestamp')");
+		}
+	}
+
+
+} else {
 	header("location: login.php");
 	exit(0);
 }	
@@ -160,6 +119,8 @@ else{
         </div>
 		-->
         <h4>Pyramid Details</h4>
+
+			<!--
 		<div class="form-group">
           <label for="fsg">No. Students. Group:</label>
 		  <select class="form-control" id="fsg" name="fsg">	
@@ -182,6 +143,8 @@ else{
 			<option value="0">Select</option>			
           </select>
         </div>
+        -->
+
 		<!--
 		<div class="form-group">
           <label for="rps">No. Responses per student:</label>
@@ -206,7 +169,7 @@ else{
 			while($data2 = mysqli_fetch_assoc($res2)){
 				$flow_id = $data2["fid"];
 				$flow_name = $data2["fname"];
-				$flow_pyramid = $data2["pyramid"];				
+				//$flow_pyramid = $data2["pyramid"];
 		?>		
 		<tr><td><?php echo $flow_name; ?></td><td><?php echo '<a traget="_blank" href="view_group.php?fid='.$flow_id.'">View</a>'; ?></td></tr>		
 		<?php

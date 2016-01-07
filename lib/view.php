@@ -3,12 +3,18 @@
 Namespace View;
 
 function element($path, $vars, $filter = true) {
+    global $device;
+
     $current_path = __DIR__;
 
     $element_path = $current_path . '/../elements/' . $path . '.php';
 
     if(!file_exists($element_path))
         throw Exception("The element does not exist");
+
+    $device_element_path = $current_path . '/../elements/' . $device . '/' . $path . '.php';
+    if(file_exists($device_element_path))
+        $element_path = $current_path . '/../elements/' . $device . '/' . $path . '.php';
 
     if(!ob_start())
         throw Exception("Failed to start buffer output");
