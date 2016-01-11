@@ -10,5 +10,5 @@ function init_cfg() {
     $answer_skip_timeout = 15;
     $answer_timeout = 128;
 
-    $pyramid_minsize = 4;
+    $pyramid_minsize = 8;
 }

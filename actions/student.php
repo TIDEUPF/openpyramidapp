@@ -16,6 +16,7 @@ if(!$fid = \Pyramid\get_current_flow()) {
 //avoid race condition
 $remaining_pyramids = \Pyramid\remaining_pyramids();
 if(($pid = \Pyramid\get_student_pyramid($fid, $sid) === false)) {
+    \Answer\submit();
     if ($remaining_pyramids and !\Answer\is_submitted()) {
         \Answer\request();
         exit;
@@ -37,7 +38,6 @@ if(($pid = \Pyramid\get_student_pyramid($fid, $sid) === false)) {
 //forced upgrade if hard timeout is reached
 if(\Group\is_level_timeout()) {
     \Pyramid\upgrade_level(true);
-    exit;
 }
 
 //enter submitted information

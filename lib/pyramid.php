@@ -11,8 +11,8 @@ function get_current_activity_level() {
     $gcal_result_1 = mysqli_query($link, "select * from pyramid_groups where pg_started = 1 and pg_fid = '$fid' order by pg_level desc");
     if(mysqli_num_rows($gcal_result_1) > 0) {
         while($gcal_data_1 = mysqli_fetch_assoc($gcal_result_1)) {
-            if(in_array($sid, explode(',',$gcal_data_1['pg_group'])))
-                $activity_level = $gcal_data_1['fsr_level'];
+            if(in_array($sid, explode(',',$gcal_data_1['pg_group'])) and $gcal_data_1['pg_level'] > $activity_level)
+                $activity_level = $gcal_data_1['pg_level'];
         };
     }
 
@@ -44,6 +44,13 @@ function add_latecomer($pid, $activity_level, $peer_group_id, $pid, $sid) {
 
 function upgrade_level($forced = false) {
     global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids;
+
+    //the answer phase has ended
+    if($activity_level == 0 and \Answer\is_timeout()) {
+        $time = time();
+        mysqli_query($link, "update pyramid_groups set pg_started = 1, pg_start_timestamp='{$time}' where pg_started = '0' and pg_fid='{$fid}' and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}'");
+        return true;
+    }
 
     if(!\Student\level_is_rated())
         return false;
@@ -425,7 +432,7 @@ function exists_student_pyramid($fid, $pid, $sid) {
 }
 
 function get_student_pyramid($fid, $sid) {
-    global $link;
+    global $link, $pid;
 
     $result = mysqli_query($link,"select * from pyramid_students where fid='$fid' and sid='$sid' limit 1");
 
@@ -434,11 +441,12 @@ function get_student_pyramid($fid, $sid) {
 
     $result_row = mysqli_fetch_assoc($result);
 
-    return (int)$result_row['pid'];
+    $pid = (int)$result_row['pid'];
+    return $pid;
 }
 
 function create_pyramid($fid, $fl, $fsg) {
-    global $link, $fid;
+    global $link, $fid, $flow_data, $pyramid_minsize;
 
     //find the last pid
     $pid = null;
@@ -451,7 +459,7 @@ function create_pyramid($fid, $fl, $fsg) {
     $pid = (int)$result_row['pid'] + 1;
 
     //select available flow students
-    $result = mysqli_query($link, "select * from flow_available_students where fid='$fid' and sid not in(select sid from pyramid_students where fid = '$fid')");
+    $result = mysqli_query($link, "select * from flow_available_students where fid='$fid' and sid not in(select sid from pyramid_students where fid = '$fid') limit {$pyramid_minsize}");
 
     if(!mysqli_num_rows($result))
         $students = [];
@@ -479,8 +487,8 @@ function create_pyramid_structure($fid, $pid, $sarry, $fl, $fsg) {
             $t_group_items = $pyramid_list[$tl][0];
             for($tin=0; $tin<count($t_group_items); $tin++) {
                 $group_comma = implode(",",$t_group_items[$tin]);
-                mysqli_query($link,"insert into pyramid_groups values ($fid, $pid, '$group_comma', '$tl', '$tin', '0', 0, '')");
-                mysqli_query($link,"insert into pyramid_groups_og values ($fid, $pid, '$group_comma', '$tl', '$tin', '0', 0)");
+                mysqli_query($link,"insert into pyramid_groups values ($fid, $pid, '$group_comma', '$tl', '$tin', '0', 0, 0, '', 0)");
+                mysqli_query($link,"insert into pyramid_groups_og values ($fid, $pid, '$group_comma', '$tl', '$tin', '0', 0, '', 0)");
             }
         } else {
             $t_group_items = $pyramid_list[$tl][0];
@@ -488,7 +496,7 @@ function create_pyramid_structure($fid, $pid, $sarry, $fl, $fsg) {
             for($tin=0; $tin<count($t_group_items); $tin++) {
                 $group_comma = implode(",", $t_group_items[$tin]);
                 $group_comma_relations = implode(",", $t_group_items_relation[$tin]);
-                mysqli_query($link,"insert into pyramid_groups values ($fid, $pid, '$group_comma', '$tl', '$tin', '$group_comma_relations', 0, '')");
+                mysqli_query($link,"insert into pyramid_groups values ($fid, $pid, '$group_comma', '$tl', '$tin', '$group_comma_relations', 0, 0, '', 0)");
                 mysqli_query($link,"insert into pyramid_groups_og values ($fid, $pid, '$group_comma', '$tl', '$tin', '$group_comma_relations', 0)");
             }
         }

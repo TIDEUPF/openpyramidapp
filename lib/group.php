@@ -160,12 +160,29 @@ function get_next_groups_rated_count() {
     return $cipgct_result_1_count;
 }
 
-function is_level_timeout() {
-    global $timeout, $activity_level;
+function is_level_zero_rating_started() {
+    global $link, $activity_level, $fid, $peer_group_id;
 
-    if(!\Answer\is_submitted())
+    $gcal_result_1 = mysqli_query($link, "select * from pyramid_groups where pg_group_id = '{$peer_group_id}' and pg_level = 0 and pg_started = 1 and pg_fid = '$fid'");
+    if (mysqli_num_rows($gcal_result_1) > 0)
+        return true;
+
+    return false;
+}
+
+function is_level_timeout() {
+    global $timeout, $activity_level, $fid, $peer_group_id, $flow_data;
+
+    if(!\Answer\is_submitted() and !is_level_zero_rating_started())
         return \Answer\is_timeout();
 
+    //hardtimer
+    $time = time();
+    $level_start_time = get_level_start_timestamp($fid, $activity_level, $peer_group_id);
+    if($time > $level_start_time + $flow_data['hardtimer_rating'])
+        return true;
+
+    //satisfaction timeout
     if(is_level_minimun_required_answers_to_set_timestamps_reached()) {
         if(!$timestamp = get_level_timeout_timestamp()) {
             $timestamp = set_level_timeout_timestamp();

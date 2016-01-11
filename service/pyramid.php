@@ -3,10 +3,11 @@
 include_once('../init.php');
 
 global $link, $fid, $pyramid_minsize, $flow_data;
-
+echo 'init passed';
 while(true) {
     sleep(1);
 
+    echo "iteration started\n";
     //there is no flow
     if (!\Pyramid\get_current_flow())
         continue;
@@ -23,6 +24,7 @@ while(true) {
         $pid = $pid_row['pid'];
 
         \Pyramid\update_pyramid($fid, $pid);
+        echo "users added and pyramid updated\n";
         continue;
     }
 
@@ -31,5 +33,5 @@ while(true) {
         continue;
 
     \Pyramid\create_pyramid($fid, $flow_data['levels'], $flow_data['nostupergrp']);
-
+    echo "created a new pyramid\n";
 }
