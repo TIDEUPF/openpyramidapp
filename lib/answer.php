@@ -33,6 +33,9 @@ function get_user_answer($sid, $fid) {
 function submit($params) {
     global $link, $sid, $fid, $input_result, $answer_submit_required_percentage, $peer_array;
 
+    if(\Answer\is_timeout())
+        return false;
+
     $answertimestamp = time();
 
     if(isset($_POST['skip'])) {
@@ -57,7 +60,7 @@ function submit($params) {
             //if(mysqli_affected_rows($link) > 0){ $success = 'Submitted.'; }
         } else {
             //insert new
-            mysqli_query($link, "insert into flow_student values ('', '$fid', '$sid', '$ans_input', 0, $answertimestamp)");
+            mysqli_query($link, "insert into flow_student values (null, '$fid', '$sid', '$ans_input', 0, $answertimestamp)");
             if (mysqli_affected_rows($link) > 0) {
                 $success = 'Submitted.';
             } else {
@@ -174,7 +177,7 @@ function request_rate($params) {
 }
 
 function submit_rate() {
-    global $link, $sid, $fid, $timeout, $input_result;
+    global $link, $sid, $fid, $timeout, $input_result, $activity_level;
 
     if(!isset($_POST['rate']))
         return false;
@@ -203,6 +206,10 @@ function submit_rate() {
         }
         if(empty($question_rating_values['optradio']))
             $error = 'Please Rate All!';
+
+        //timeout
+        if($question_rating_values['lvl'] != $activity_level)
+            return false;
 
         $rating_array[] = $question_rating_values;
     }
@@ -348,9 +355,12 @@ function view_final_answer($params) {
 }
 
 function get_answer_timeout() {
-    global $link, $sid, $fid, $ftimestamp, $answer_timeout, $answer_skip_timeout, $peer_array;
+    global $link, $sid, $fid, $pid, $ftimestamp, $answer_timeout, $answer_skip_timeout, $peer_array;
 
     $peer_array_sql = implode("','", \Util\sanitize_array($peer_array));
+    $r_start = mysqli_query($link, "select * from pyramid_students where fid = '$fid' and pid='{$pid}' order by `timestamp` asc limit 1");
+    $pyramid = mysqli_fetch_assoc($r_start);
+
     $r_submitted_answers = mysqli_query($link, "select * from flow_student where fid = '$fid' and sid in ('{$peer_array_sql}') order by `timestamp` asc");
     $n_submitted_answers = mysqli_num_rows($r_submitted_answers);
 
@@ -377,11 +387,12 @@ function get_answer_timeout() {
     return array(
         'time_left' => $answer_timeout_start,
         'time_left_skip' => $time_left_skip,
+        'start_timestamp' => $pyramid['timestamp'],
     );
 }
 
 function is_timeout() {
-    global $link, $sid, $fid, $ftimestamp, $answer_timeout, $peer_array, $activity_level;
+    global $link, $sid, $fid, $ftimestamp, $answer_timeout, $peer_array, $activity_level, $peer_group_id;
     //check for the minimum participants for timeout
     $answertimestamp = 0;
 
@@ -395,6 +406,11 @@ function is_timeout() {
     if(\Student\level_is_rated())
         return true;
 
+    //rating has started
+    $result = mysqli_query($link, "select * from pyramid_groups where pg_fid='{$fid}' and pg_level='0' and pg_group_id='{$peer_group_id}' and pg_started=1");
+    if(mysqli_num_rows($result))
+        return true;
+
     $peer_array_sql = implode("','", \Util\sanitize_array($peer_array));
     $r_submitted_answers = mysqli_query($link, "select * from flow_student where fid = '$fid' and sid in ('{$peer_array_sql}') order by `timestamp` asc");
     $n_submitted_answers = mysqli_num_rows($r_submitted_answers);
@@ -405,8 +421,10 @@ function is_timeout() {
 
     $required_peers = \Group\get_needed_results_to_end_level(false, 'answer');
 
+    /*
     if($n_submitted_answers < $required_peers)
         return false;
+    */
 
     if($n_submitted_answers >= $required_peers) {
         for($i=0;$i<$required_peers;$i++)
@@ -415,6 +433,9 @@ function is_timeout() {
         if(time() > $a_submitted_answers['timestamp'] + $answer_timeout)
             return true;
     }
+
+    //TODO: check hardtimer
+
 
     return false;
 }

@@ -201,28 +201,32 @@ function set_level_timeout_timestamp()
 }
 
 function get_time_left() {
-    global $link, $sid, $fid, $ftimestamp, $answer_timeout, $answer_skip_timeout, $peer_array, $timeout;
+    global $link, $sid, $fid, $ftimestamp, $answer_timeout, $answer_skip_timeout, $peer_array, $timeout, $flow_data;
 
     $timestamp = get_level_timeout_timestamp();
+    $start_timestamp = get_level_start_timestamp();
 
-    if(!is_numeric($timestamp))
-        return null;
+    if(!\Answer\is_timeout()) {
+        $hardtime_left = $flow_data['hardtimer_question'] + $start_timestamp - time();
+        if($hardtime_left < $answer_timeout or ($timestamp and is_numeric($timestamp))) {
+            $satisfaction_left = ($timestamp + $answer_timeout) - time();
+            return ($hardtime_left > $satisfaction_left) ? $hardtime_left : $satisfaction_left;
+        }
+    } else {
+        $hardtime_left = $flow_data['hardtimer_rating'] + $start_timestamp - time();
+        if($hardtime_left < $timeout or ($timestamp and is_numeric($timestamp))) {
+            $satisfaction_left = ($timestamp + $timeout) - time();
+            return ($hardtime_left > $satisfaction_left) ? $hardtime_left : $satisfaction_left;
+        }
+    }
 
-    if(!$timestamp)
-        return null;
-
-    if($timestamp)
-
-    if(!\Answer\is_submitted())
-        return ($timestamp + $answer_timeout) - time();
-    else
-        return ($timestamp + $timeout) - time();
-
+    return null;
 }
+
 function get_level_timeout_timestamp($fid, $activity_level, $peer_group_id) {
     global $link, $peer_group_id, $activity_level, $fid;
 
-    if(!\Answer\is_submitted()) {
+    if(!\Answer\is_timeout()) {
         $answer_user_timeout = \Answer\get_answer_timeout();
         return $answer_user_timeout['time_left'];
     }
@@ -231,6 +235,23 @@ function get_level_timeout_timestamp($fid, $activity_level, $peer_group_id) {
     if(mysqli_num_rows($submitted_group_answers_timestamp_query) > 0) {
         $submitted_group_answers_timestamp_row_array = mysqli_fetch_assoc($submitted_group_answers_timestamp_query);
         return $submitted_group_answers_timestamp_row_array['pg_timestamp'];
+    } else {
+        return FALSE;
+    }
+}
+
+function get_level_start_timestamp($fid, $activity_level, $peer_group_id) {
+    global $link, $peer_group_id, $activity_level, $fid;
+
+    if(!\Answer\is_timeout()) {
+        $answer_user_timeout = \Answer\get_answer_timeout();
+        return $answer_user_timeout['start_timestamp'];
+    }
+
+    $submitted_group_answers_timestamp_query = mysqli_query($link, "select * from pyramid_groups where pg_start_timestamp > 0 and pg_fid='{$fid}' and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}' limit 1");
+    if(mysqli_num_rows($submitted_group_answers_timestamp_query) > 0) {
+        $submitted_group_answers_timestamp_row_array = mysqli_fetch_assoc($submitted_group_answers_timestamp_query);
+        return $submitted_group_answers_timestamp_row_array['pg_start_timestamp'];
     } else {
         return FALSE;
     }

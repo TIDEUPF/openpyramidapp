@@ -6,14 +6,23 @@ $sname = Student\get_username();
 $sid = $_SESSION['student'];
 
 // $levels, $fname, $fdes, $fid, $fid_timestamp
-if(!\Pyramid\get_current_flow()) {
-    $activity_explanation_view = \View\element("activity_explanation", array());
-
-    \View\page(array(
-        'title' => 'Activity explanation',
-        'body' => $activity_explanation_view,
-    ));
+if(!$fid = \Pyramid\get_current_flow()) {
+    //no flow available
     exit;
+}
+
+\Pyramid\flow_add_student($fid, $sid);
+
+//avoid race condition
+$remaining_pyramids = \Pyramid\remaining_pyramids();
+if(($pid = \Pyramid\get_student_pyramid($fid, $sid) === false)) {
+    if ($remaining_pyramids and !\Answer\is_submitted()) {
+        \Answer\request();
+        exit;
+    } else {
+        \Pyramid\wait_pyramid();
+        exit;
+    }
 }
 
 //$activity_level
@@ -25,8 +34,9 @@ if(!\Pyramid\get_current_flow()) {
 //check if the group has completed the level and upgrade the level
 \Pyramid\upgrade_level();
 
+//forced upgrade if hard timeout is reached
 if(\Group\is_level_timeout()) {
-    \Student\timeout_view();
+    \Pyramid\upgrade_level(true);
     exit;
 }
 
@@ -48,15 +58,16 @@ if(\Answer\submit_error()) {
     exit;
 }
 
+//not needed, inclusive
 //delete inactive students from the current level
-\Pyramid\set_previous_level_peer_active_group_ids();
+//\Pyramid\set_previous_level_peer_active_group_ids();
 
 if(\Pyramid\is_complete()) {
     \Pyramid\show_final_answer();
     exit;
 }
 
-if(!\Answer\is_submitted()) {
+if(!\Answer\is_timeout() and !\Answer\is_submitted()) {
     \Answer\request();
     exit;
 }

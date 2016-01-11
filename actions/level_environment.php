@@ -3,9 +3,25 @@ Student\enforce_login();
 
 $sname = Student\get_username();
 $sid = $_SESSION['student'];
+global $fid;
 
 // $levels, $fname, $fdes, $fid, $fid_timestamp
 $reset_flow = !\Pyramid\get_current_flow();
+
+//without pyramid cannot apply the timers
+if(($pid = \Pyramid\get_student_pyramid($fid, $sid) === false)) {
+    $output = array(
+        'reset' => false,
+        'expired' => false,
+        'countdown_started' => false,
+        'time_left' => 9999999,
+    );
+
+    header('Connection: close');
+    header('Content-type: application/json');
+    echo json_encode($output);
+    exit;
+}
 
 //$activity_level
 \Pyramid\get_current_activity_level();
