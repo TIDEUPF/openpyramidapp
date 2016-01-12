@@ -1,4 +1,11 @@
 <style>
+    button.ui-btn {
+        width: 300px !important;
+    }
+
+    .ui-input-text {
+        width: 338px !important;
+    }
 
     button.ui-btn,
     .ui-page-theme-a {

@@ -1,4 +1,8 @@
 <style>
+    button.ui-btn {
+        width: 300px !important;
+        margin: auto !important;
+    }
 
     button.ui-btn,
     .ui-page-theme-a {
