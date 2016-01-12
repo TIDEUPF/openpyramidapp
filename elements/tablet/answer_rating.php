@@ -141,7 +141,8 @@
             <div style="clear:both"></div>
         </div>
         <div>
-            <div id="answer-header-text"><?=$header_text?></div>
+            <!--<div id="answer-header-text"><?=$header_text?></div>-->
+            <div id="answer-header-text">Rating is individual. Please rate all options!</div>
         </div>
 
     </div>
@@ -152,7 +153,7 @@
             <fieldset data-role="controlgroup" data-type="horizontal">
                 <legend><?=htmlspecialchars($answer_data['answer_text'])?></legend>
 
-                <select id="id-answer-rating-<?=$i?>" class="rating-widget" name="<?=$i?>" data-role="none">
+                <select id="id-answer-rating-<?=$i?>" class="rating-widget" name="optradio<?=($i+1)?>" data-role="none">
                 <?php for($i=0;$i<=5;$i++):?>
                 <option value="<?=$i?>" <?php if($answer_data['selected'] == $i) echo 'selected="selected"';?>><?=$rating_labels[$i]?></option>
                 <?endfor;?>
@@ -171,7 +172,7 @@
 
     <link rel="stylesheet" href="chat/client/embedded.css"/>
     <div id="rating-chat" class="ui-corner-all ui-shadow-inset">
-        <div style="margin: .5em 0 0 .3em;">Discussion chat</div>
+        <div style="margin: .5em 0 0 .3em;">Please use this space to discuss with peers about their options before rating.</div>
         <ul class="pages">
             <li class="chat page">
                 <div class="chatArea">
@@ -192,6 +193,7 @@
 
         <div>
             <div id="answer-waiting-group"><?=$answer_waiting_message?></div>
+            <div style="font-size: 1.35em;">Please note that when you submit rating, you will no longer be able to edit rating values. Also you will be removed from the discussion thread for this level.</div>
             <div id="answer-next-button"><button class="ui-btn" name="rate"><?= $answer_rate_submit?></button></div>
         </div>
 

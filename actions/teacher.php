@@ -16,15 +16,15 @@ if(isset($_SESSION['user'])) {
 		$fesname = '';//$fesname =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['fesname']))));
 		$fl = (int) $_POST['fl'];
 		$fsg = (int) $_POST['fsg'];
-		$fl = 1;
-		$fsg = 1;
+		$fl = 3;
+		$fsg = 2;
 		$rps = 1;//$rps = (int) $_POST['rps'];
 
 		if($fl < 1 || $rps < 1 || $fsg < 1)	{
 			$error = 'Levels and Responses cannot be 0';
 		} else {
 			$datestamp = time();
-			mysqli_query($link,"insert into flow values ('', '$teacher_id', '$fname', '$fdes', '$fcname', '$fesname', '$fsg', '$fl', '$rps', '$datestamp')");
+			mysqli_query($link,"insert into flow values (null, '$teacher_id', '$fname', '$fdes', '$fcname', '$fesname', '$fsg', '$fl', '$rps', '$datestamp', 6000, 6000, 8)");
 		}
 	}
 

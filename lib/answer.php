@@ -254,7 +254,7 @@ function skip_rating() {
 
     $remaining_answers = $st_count - count($available_answers);
     for($i=0;$i<$remaining_answers;$i++) {
-        mysqli_query($link, "insert into flow_student_rating values ('', '$fid', '$sid', '{$activity_level}', '$peer_group_id', '0', '-1', NOW(), 1, {$i})");
+        mysqli_query($link, "insert into flow_student_rating values (null, '$fid', '$sid', '{$activity_level}', '$peer_group_id', '0', '-1', NOW(), 1, {$i})");
         if (mysqli_affected_rows($link) <= 0) {
             //TODO: database inconsistency
         }

@@ -148,6 +148,7 @@
     var countdown_started = false;
     var countdown_interval = null;
     var polling_interval_d = null;
+    var a_lvl = <?=(int)$hidden_input_array['a_lvl']?>;
 
 
     /*
@@ -186,7 +187,16 @@
         if(data.reset)
             newflow();
 
+        /*
         if(data.expired)
+            refreshp();
+            */
+
+        /*the flow is in a new level*/
+        if(data.a_lvl != a_lvl)
+            refreshp();
+
+        if(data.rating)
             refreshp();
 
         //if(data.countdown_started && data.time_left < 0)

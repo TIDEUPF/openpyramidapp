@@ -79,7 +79,13 @@ if(!isset($_SESSION['student'])) {
         'title' => 'Student Login',
         'body' => $login_form,
     ));
-} else {
+} else {//successfull login
+
+    //register the user in the current flow
+    if($fid = \Pyramid\get_current_flow()) {
+        \Pyramid\flow_add_student($fid, $_SESSION['student']);
+    }
+
     //show activity explanation
     $activity_explanation_view = View\element("activity_explanation", $vars);
 

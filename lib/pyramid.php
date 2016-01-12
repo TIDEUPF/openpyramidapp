@@ -45,40 +45,41 @@ function add_latecomer($pid, $activity_level, $peer_group_id, $pid, $sid) {
 function upgrade_level($forced = false) {
     global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids;
 
-    //the answer phase has ended
-    if($activity_level == 0 and \Answer\is_timeout()) {
-        $time = time();
-        mysqli_query($link, "update pyramid_groups set pg_started = 1, pg_start_timestamp='{$time}' where pg_started = '0' and pg_fid='{$fid}' and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}'");
-        return true;
-    }
+    if(!$forced) {
+        //the answer phase has ended
+        if ($activity_level == 0 and \Answer\is_timeout() and !\Group\is_level_zero_rating_started()) {
+            $time = time();
+            mysqli_query($link, "update pyramid_groups set pg_started = 1, pg_start_timestamp='{$time}' where pg_started = '0' and pg_fid='{$fid}' and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}'");
+            return true;
+        }
 
-    if(!\Student\level_is_rated())
-        return false;
+        if (!\Student\level_is_rated())
+            return false;
 
-    $upgrade = false;
-    //check if the highest rated level has a selected answer
-    $gcal_result_2 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level = '$activity_level' and sa_group_id = '$peer_group_id'");
-    if(mysqli_num_rows($gcal_result_2) > 0)
-    {
-        $upgrade = true;
-    }
-    else
-    {
-        //here decide the criteria to allow to proceed to the next level
-        $cgfl_temp = \Group\check_if_group_finished_level();
-
-        if($cgfl_temp and !($activity_level == 0 and !\Student\level_is_rated()))
-        {
-            set_selected_answers();
+        $upgrade = false;
+        //check if the highest rated level has a selected answer
+        $gcal_result_2 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level = '$activity_level' and sa_group_id = '$peer_group_id'");
+        if (mysqli_num_rows($gcal_result_2) > 0) {
             $upgrade = true;
+        } else {
+            //here decide the criteria to allow to proceed to the next level
+            $cgfl_temp = \Group\check_if_group_finished_level();
+
+            if ($cgfl_temp and !($activity_level == 0 and !\Student\level_is_rated())) {
+                set_selected_answers();
+                $upgrade = true;
+            }
         }
     }
 
-    if($upgrade) {
+    if($upgrade or $forced) {
         $activity_level++;
         \Group\get_members();
         $time = time();
-        mysqli_query($link, "update pyramid_groups set pg_started = 1, pg_start_timestamp='{$time}' where pg_fid='{$fid}' and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}'");
+
+        //register only when all sibling groups are completed
+        if(\Group\check_if_previous_groups_completed_task())
+            mysqli_query($link, "update pyramid_groups set pg_started = 1, pg_start_timestamp='{$time}' where pg_fid='{$fid}' and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}'");
     }
 }
 
@@ -273,7 +274,7 @@ function wait_pyramid($params) {
         ),
     );
 
-    $body = \View\element("answer_waiting", $vars);
+    $body = \View\element("pyramid_waiting", $vars);
 
     \View\page(array(
         'title' => 'Question',

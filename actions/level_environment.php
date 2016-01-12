@@ -15,6 +15,8 @@ if(($pid = \Pyramid\get_student_pyramid($fid, $sid) === false)) {
         'expired' => false,
         'countdown_started' => false,
         'time_left' => 9999999,
+        'a_lvl' => 0,
+        'rating' => false,
     );
 
     header('Connection: close');
@@ -23,7 +25,7 @@ if(($pid = \Pyramid\get_student_pyramid($fid, $sid) === false)) {
     exit;
 }
 
-//$activity_level
+global $activity_level;
 \Pyramid\get_current_activity_level();
 
 //$peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp
@@ -42,6 +44,8 @@ $output = array(
     'expired' => !empty($expired),
     'countdown_started' => ($time_left > 0),
     'time_left' => (int)$time_left,
+    'a_lvl' => (int)$activity_level,
+    'rating' => \Answer\is_timeout(),
 );
 
 header('Connection: close');

@@ -8,7 +8,7 @@ function init_cfg() {
     $answer_submit_required_percentage = 80;
     $timeout = 120;
     $answer_skip_timeout = 15;
-    $answer_timeout = 128;
+    $answer_timeout = 120;
 
     $pyramid_minsize = 8;
 }

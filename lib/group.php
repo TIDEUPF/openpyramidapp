@@ -99,12 +99,12 @@ function check_if_group_finished_level()
 
 function check_if_previous_groups_completed_task()
 {
-    global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+    global $link, $sid, $fid, $flow_data, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
     $activity_level_previous = $activity_level-1;
 
     //the first stage is always true
-    if(!\Answer\is_submitted())
+    if(!\Answer\is_submitted() and !is_level_zero_rating_started())
         return true;
 
     //check if every group member has submitted the answer or the timeout is expired
@@ -115,6 +115,14 @@ function check_if_previous_groups_completed_task()
     $previous_sa_count = get_previous_groups_rated_count();
 
     if($previous_sa_count >= $required_sa_count)
+        return true;
+
+    //if all the groups are timed out the level is complete
+    $time = time();
+    $max_start_time = $time - $flow_data['hardtimer_rating'];
+    $complete_query = mysqli_query($link, "select * from pyramid_groups where pg_start_timestamp <= '{$max_start_time}' and pg_group_id in ({$peer_group_combined_ids}) and pg_level = '{$activity_level_previous}' and pg_started = 1 and pg_fid = '$fid'");
+    $all_query = mysqli_query($link, "select * from pyramid_groups where pg_group_id in ({$peer_group_combined_ids}) and pg_level = '{$activity_level_previous}' and pg_fid = '$fid'");
+    if(mysqli_num_rows($complete_query) == mysqli_num_rows($all_query))
         return true;
 
     return false;
@@ -179,7 +187,7 @@ function is_level_timeout() {
     //hardtimer
     $time = time();
     $level_start_time = get_level_start_timestamp($fid, $activity_level, $peer_group_id);
-    if($time > $level_start_time + $flow_data['hardtimer_rating'])
+    if($level_start_time > 0 and $time > $level_start_time + $flow_data['hardtimer_rating'])
         return true;
 
     //satisfaction timeout
@@ -227,13 +235,13 @@ function get_time_left() {
         $hardtime_left = $flow_data['hardtimer_question'] + $start_timestamp - time();
         if($hardtime_left < $answer_timeout or ($timestamp and is_numeric($timestamp))) {
             $satisfaction_left = ($timestamp + $answer_timeout) - time();
-            return ($hardtime_left > $satisfaction_left) ? $hardtime_left : $satisfaction_left;
+            return ($hardtime_left > $satisfaction_left) ? $satisfaction_left : $hardtime_left;
         }
     } else {
         $hardtime_left = $flow_data['hardtimer_rating'] + $start_timestamp - time();
         if($hardtime_left < $timeout or ($timestamp and is_numeric($timestamp))) {
             $satisfaction_left = ($timestamp + $timeout) - time();
-            return ($hardtime_left > $satisfaction_left) ? $hardtime_left : $satisfaction_left;
+            return ($hardtime_left > $satisfaction_left) ? $satisfaction_left : $hardtime_left;
         }
     }
 
