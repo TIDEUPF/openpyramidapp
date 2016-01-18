@@ -216,9 +216,10 @@
             .css('height', '1.5em')
             .css('padding-top', '6px');
 
-        $('#countdown-padding')
+        /*$('#countdown-padding')
             .show()
             .css('height', '2em');
+            */
     }
 
     function update_countdown() {

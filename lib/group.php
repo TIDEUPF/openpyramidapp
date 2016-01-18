@@ -241,7 +241,7 @@ function get_time_left() {
         $hardtime_left = $flow_data['hardtimer_rating'] + $start_timestamp - time();
         if($hardtime_left < $timeout or ($timestamp and is_numeric($timestamp))) {
             $satisfaction_left = ($timestamp + $timeout) - time();
-            return ($hardtime_left > $satisfaction_left) ? $satisfaction_left : $hardtime_left;
+            return ($hardtime_left > $satisfaction_left and $timestamp) ? $satisfaction_left : $hardtime_left;
         }
     }
 

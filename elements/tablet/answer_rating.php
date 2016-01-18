@@ -113,13 +113,15 @@
     }
 
     #countdown {
-        /*display: none;*/
-        position: fixed;
+        display: none;
+        position: relative;
         bottom: 0px;
         left: 0px;
         height: 0em;
-        text-align: center;
         right: 0px;
+
+        text-align: center;
+
         background-color: #000000;
         padding-top: 0px;
         color: white;
@@ -137,9 +139,15 @@
         /*display: none;*/
     }
 
+    .question-number {
+        border: 1px solid black;
+        background-color: black;
+        padding: 4px;
+        border-radius: 4px;
+        margin-right: 4px;
+    }
 </style>
 <div id="answer-frame">
-    <div id="countdown"><span id="countdown-text"></span>s left</div>
     <form method="post" action="student.php" data-ajax="false">
     <div id="answer-header-frame">
 
@@ -160,7 +168,7 @@
         <?php foreach($answer_text_array as $i=> $answer_data):?>
         <div class="answer-rating-widget">
             <fieldset data-role="controlgroup" data-type="horizontal">
-                <legend><?=htmlspecialchars($answer_data['answer_text'])?></legend>
+                <legend><span class="question-number"><?=($i+1)?></span><?=htmlspecialchars($answer_data['answer_text'])?></legend>
 
                 <select id="id-answer-rating-<?=$i?>" class="rating-widget" name="optradio<?=($i+1)?>" data-role="none">
                 <?php for($i=0;$i<=5;$i++):?>
@@ -214,6 +222,8 @@
 
     </form>
     <div id="countdown-padding"></div>
+    <div id="countdown"><span id="countdown-text"></span>s left</div>
+
 </div>
 <script>
     var polling_interval = 30;
@@ -247,20 +257,33 @@
     }
 
     function show_countdown(time_left) {
+        var countdown_height = 30;
         countdown_started = true;
         this.time_left = time_left - 5;
         if(!countdown_interval)
             countdown_interval = setInterval(update_countdown, 1*1000);
         update_countdown();
 
+        var countdown_bottom = $('body').outerHeight()
+            - $('#answer-next-button').position().top
+            - $('#answer-next-button').outerHeight(true)
+            - (countdown_height + 4);
+
+        if(countdown_bottom < 0)
+            countdown_bottom = 0;
+
+        $('#countdown').css('bottom', -countdown_bottom+'px');
+
         $('#countdown')
             .show()
-            .css('height', '1.5em')
+            .css('height', countdown_height+'px')
             .css('padding-top', '6px');
 
+        /*
         $('#countdown-padding')
             .show()
             .css('height', '2em');
+            */
     }
 
     function update_countdown() {
