@@ -13,11 +13,13 @@ if(isset($_SESSION['user'])) {
 		$fname = mysqli_real_escape_string($link, stripslashes(trim(strip_tags($_POST['fname']))));
 		$fdes =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['fdes']))));
 		$fcname =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['fcname']))));
+		$tst = 1000 * mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['tst']))));
+		$rt = 1000 *mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['rt']))));
 		$fesname = '';//$fesname =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['fesname']))));
 		$fl = (int) $_POST['fl'];
 		$fsg = (int) $_POST['fsg'];
-		$fl = 3;
-		$fsg = 2;
+		//$fl = 3;
+		//$fsg = 2;
 		$rps = 1;//$rps = (int) $_POST['rps'];
 
 		if($fl < 1 || $rps < 1 || $fsg < 1)	{
@@ -120,30 +122,63 @@ if(isset($_SESSION['user'])) {
 		-->
         <h4>Pyramid Details</h4>
 
-			<!--
+			<div class="form-group">
+				<label for="fma">Time available in minutes:</label>
+				<input type="text" class="form-control" id="fma" name="fma"/>
+			</div>
+
+			<div class="form-group">
+				<label for="expe">Number of expected students:</label>
+				<input type="text" class="form-control" id="expe" name="expe"/>
+			</div>
+
+			<div class="form-group">
+				<label for="tst">Text submission timer:</label>
+				<select class="form-control" id="tst" name="tst">
+					<option value="2" selected="selected">2</option>
+					<option value="3">3</option>
+					<option value="4">4</option>
+					<option value="5">5</option>
+					<option value="6">6</option>
+					<option value="7">7</option>
+					<option value="8">8</option>
+					<option value="9">9</option>
+					<option value="10">10</option>
+				</select>
+			</div>
+
+			<div class="form-group">
+				<label for="rt">Rating timer:</label>
+				<select class="form-control" id="rt" name="rt">
+					<option value="2">2</option>
+					<option value="3" selected="selected">3</option>
+					<option value="4">4</option>
+					<option value="5">5</option>
+					<option value="6">6</option>
+					<option value="7">7</option>
+					<option value="8">8</option>
+					<option value="9">9</option>
+					<option value="10">10</option>
+				</select>
+			</div>
+
+
 		<div class="form-group">
-          <label for="fsg">No. Students. Group:</label>
-		  <select class="form-control" id="fsg" name="fsg">	
-			<option value="0">Select</option>
-			<option value="2">2</option>
+          <label for="fsg">No. Students. per Group:</label>
+		  <select class="form-control" id="fsg" name="fsg">
+			<option value="2" selected="selected">2</option>
 			<option value="3">3</option>
-			<option value="4">4</option>
-			<option value="5">5</option>
-			<option value="6">6</option>
-			<option value="7">7</option>
-			<option value="8">8</option>
-			<option value="9">9</option>
-			<option value="10">10</option>
           </select>
         </div>
 		
 		<div class="form-group">
           <label for="fl">No. Levels:</label>
 		  <select class="form-control" id="fl" name="fl">
-			<option value="0">Select</option>			
+			  <option value="2">2</option>
+			  <option value="3" selected="selected">3</option>
+			  <option value="4">4</option>
           </select>
         </div>
-        -->
 
 		<!--
 		<div class="form-group">
@@ -171,7 +206,7 @@ if(isset($_SESSION['user'])) {
 				$flow_name = $data2["fname"];
 				//$flow_pyramid = $data2["pyramid"];
 		?>		
-		<tr><td><?php echo $flow_name; ?></td><td><?php echo '<a traget="_blank" href="view_group.php?fid='.$flow_id.'">View</a>'; ?></td></tr>		
+		<tr><td><?php echo $flow_name; ?></td><td><?php echo '<a target="_blank" href="view_group.php?fid='.$flow_id.'">View</a>'; ?></td></tr>
 		<?php
 			}
 			echo '</table>';
