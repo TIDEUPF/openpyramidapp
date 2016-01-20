@@ -86,19 +86,20 @@ else{
 				echo '<tr> <td style="padding:10px;"> <b> <font color="#4e9a06" size="4">'.'Level -'.($level+1).'</b> </font></td> </tr> ';
 				echo ' <tr> <td style="padding:10px;"><font color="#cc0000"><b>'.$group.'</b></font></td> </tr>';
 
-				if( mysqli_num_rows(mysqli_query($link, "select * from pyramid_groups where pg_fid = '$fid'")) == mysqli_num_rows(mysqli_query($link, "select * from selected_answers where sa_fid = '$fid'")) ){
+				$res3 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level='$level' and sa_group_id='$pg_group'");
+				if( mysqli_num_rows($res3) > 0 ) { //the group has selected an answer
 
-					$res3 = mysqli_query($link, "select * from flow where fid = '$fid'");
 					$data3 = mysqli_fetch_assoc($res3);
-					$activity_level = $data3['levels'];
-					$activity_level = $activity_level-1;
-					$result_11= mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level = '$activity_level'");
-					echo '<br /><span class="label btn-success">Selected answers are:</span><br />';
-					while($data_t_11 = mysqli_fetch_assoc($result_11)){
-						$qa_last_selected_id = $data_t_11['sa_selected_id'];
-						$result_12= mysqli_query($link, "select * from flow_student where fid = '$fid' and sid = '$qa_last_selected_id'");
-						$data_t_12 = mysqli_fetch_assoc($result_12);
-						echo '<br /><span class="">'.$data_t_12['fs_answer'].'</span><br />';
+					$selected_id = $data3['$sa_selected_id'];
+
+					$res4 = mysqli_query($link, "select * from flow_students where fid = '$fid' and sid='$selected_id'");
+					if(mysqli_num_rows($res4)>0) {
+						$data4 = mysqli_fetch_assoc($res4);
+						$answer = $data3['fs_answer'];
+						echo '<br /><span class="label btn-success">Selected group answer:</span><br />';
+						echo '<br /><span class="">'.$answer.'</span><br />';
+					} else {
+						echo '<br /><span class="label btn-success">The group did not select an answer.</span><br />';
 					}
 				}
 
