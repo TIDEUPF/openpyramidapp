@@ -190,7 +190,7 @@ function show_final_answer() {
 }
 
 function get_current_flow() {
-    global $levels, $fname, $fdes, $fid, $link, $ftimestamp, $flow_data;
+    global $levels, $fname, $fdes, $fid, $link, $ftimestamp, $flow_data, $timeout, $answer_timeout;
     //get information the latest flow
     $res3 = mysqli_query($link, "select * from flow order by fid desc limit 1");
     if(mysqli_num_rows($res3) > 0){
@@ -201,6 +201,10 @@ function get_current_flow() {
         $fdes = $data3["fdes"];
         $fid = $data3["fid"];
         $ftimestamp = (int)$data3["timestamp"];
+        $pyramid_minsize = (int)$data3["pyramid_minsize"];
+        $timeout = (int)$data3["question_timeout"];
+        $answer_timeout = (int)$data3["rating_timeout"];
+
 
         if(isset($_SESSION['fid'])) {
             if($_SESSION['fid'] != $fid) {

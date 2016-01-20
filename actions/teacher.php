@@ -13,20 +13,28 @@ if(isset($_SESSION['user'])) {
 		$fname = mysqli_real_escape_string($link, stripslashes(trim(strip_tags($_POST['fname']))));
 		$fdes =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['fdes']))));
 		$fcname =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['fcname']))));
-		$tst = 1000 * mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['tst']))));
-		$rt = 1000 *mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['rt']))));
+		$tst = mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['tst']))));
+		$rt = mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['rt']))));
+		$expe = mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['expe']))));
 		$fesname = '';//$fesname =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['fesname']))));
 		$fl = (int) $_POST['fl'];
 		$fsg = (int) $_POST['fsg'];
-		//$fl = 3;
-		//$fsg = 2;
+
+		//80 per cent of expected students
+		$min_pyramid = floor($expe*0.8);
+
+		//number of levels
+		$max_levels = log(floor($nstudents/$fsg), $fsg);
+		if($fl > $max_levels)
+			$fl = $max_levels;
+
 		$rps = 1;//$rps = (int) $_POST['rps'];
 
 		if($fl < 1 || $rps < 1 || $fsg < 1)	{
 			$error = 'Levels and Responses cannot be 0';
 		} else {
 			$datestamp = time();
-			mysqli_query($link,"insert into flow values (null, '$teacher_id', '$fname', '$fdes', '$fcname', '$fesname', '$fsg', '$fl', '$rps', '$datestamp', 6000, 6000, 8)");
+			mysqli_query($link,"insert into flow values (null, '$teacher_id', '$fname', '$fdes', '$fcname', '$fesname', '$fsg', '$fl', '$min_pyramid', '$expe', '$rps', '$datestamp', $test, $rt, 6000, 6000)");
 		}
 	}
 
@@ -35,6 +43,9 @@ if(isset($_SESSION['user'])) {
 	header("location: login.php");
 	exit(0);
 }	
+
+global $default_teacher_question;
+$tq = $default_teacher_question;
 
 ?><!DOCTYPE html>
 <html>
@@ -121,6 +132,11 @@ if(isset($_SESSION['user'])) {
         </div>
 		-->
         <h4>Pyramid Details</h4>
+
+			<div class="form-group">
+				<label for="qs">Petition for your students:</label>
+				<input type="text" class="form-control" id="qs" name="qs" value="<?php echo htmlspecialchars($default_teacher_question) ?>" />
+			</div>
 
 			<div class="form-group">
 				<label for="fma">Time available in minutes:</label>
