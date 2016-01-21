@@ -46,15 +46,20 @@ if(\Group\is_level_timeout()) {
 
 //new data entered
 if(\Answer\is_new_data()) {
-    //wait
-    \Pyramid\wait();
-    exit;
+    if(\Answer\submit_error()) {
+        //TODO: implement retry
+        \Answer\retry();
+        exit;
+    } else {
+        //reload values
+        \Pyramid\upgrade_level();
+        \Group\get_members();
+    }
 }
 
 //wrong answer
 if(\Answer\submit_error()) {
-    //TODO: implement retry
-    \Answer\retry();
+
     exit;
 }
 

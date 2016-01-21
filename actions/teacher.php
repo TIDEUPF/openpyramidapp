@@ -13,8 +13,8 @@ if(isset($_SESSION['user'])) {
 		$fname = mysqli_real_escape_string($link, stripslashes(trim(strip_tags($_POST['fname']))));
 		$fdes =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['fdes']))));
 		$fcname =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['fcname']))));
-		$tst = mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['tst']))));
-		$rt = mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['rt']))));
+		$tst = 60 * (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['tst']))));
+		$rt = 60 * (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['rt']))));
 		$expe = mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['expe']))));
 		$fesname = '';//$fesname =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['fesname']))));
 		$fl = (int) $_POST['fl'];
@@ -24,7 +24,7 @@ if(isset($_SESSION['user'])) {
 		$min_pyramid = floor($expe*0.8);
 
 		//number of levels
-		$max_levels = log(floor($nstudents/$fsg), $fsg);
+		$max_levels = floor(log(floor($min_pyramid/$fsg), $fsg));
 		if($fl > $max_levels)
 			$fl = $max_levels;
 
@@ -34,7 +34,7 @@ if(isset($_SESSION['user'])) {
 			$error = 'Levels and Responses cannot be 0';
 		} else {
 			$datestamp = time();
-			mysqli_query($link,"insert into flow values (null, '$teacher_id', '$fname', '$fdes', '$fcname', '$fesname', '$fsg', '$fl', '$min_pyramid', '$expe', '$rps', '$datestamp', $test, $rt, 6000, 6000)");
+			mysqli_query($link,"insert into flow values (null, '$teacher_id', '$fname', '$fdes', '$fcname', '$fesname', '$fsg', '$fl', '$min_pyramid', '$expe', '$rps', '$datestamp', $tst, $rt, 6000, 6000)");
 		}
 	}
 
@@ -55,8 +55,8 @@ $tq = $default_teacher_question;
 	<script src="vendors/jquery/jquery-2.1.4.min.js"></script>
 	<script type="text/javascript">
 	$(document).ready(function(){
-		var student_c = <?php echo $student_count.';'; ?>
-		$("#fsg").change(function() {	
+		$("#fsg").change(function() {
+			var student_c = Math.floor(parseInt($("#expe").val(), 10) * 0.8);
 			var lval = $("#fsg :selected").val();
 			if(lval != 0)
 			{
@@ -71,12 +71,18 @@ $tq = $default_teacher_question;
 					do{
 						var x = Math.pow(2,i);
 						var result = first_groups/x;
-						$("#fl").append($("<option>").attr("value", i).text(i));						
+						var $fl = $("<option>").attr("value", i).text(i)
+						if(i == 3)
+							$fl.attr("selected", "selected");
+						$("#fl").append($fl);
+
 						i++;
 					}while(result >= 2);
-					
-					$("#fl").append($("<option>").attr("value", i).text(i));
-					
+
+					var $fl = $("<option>").attr("value", i).text(i)
+					if(i == 3)
+						$fl.attr("selected", "selected");
+					$("#fl").append($fl);
 				}
 				else
 				{	
@@ -140,19 +146,25 @@ $tq = $default_teacher_question;
 
 			<div class="form-group">
 				<label for="fma">Time available in minutes:</label>
-				<input type="text" class="form-control" id="fma" name="fma"/>
+				<select class="form-control" id="fma" name="fma">
+					<option value="5">5</option>
+					<option value="10" selected="selected">10</option>
+					<option value="15">15</option>
+					<option value="20">20</option>
+					<option value="25">25</option>
+				</select>
 			</div>
 
 			<div class="form-group">
 				<label for="expe">Number of expected students:</label>
-				<input type="text" class="form-control" id="expe" name="expe"/>
+				<input type="text" class="form-control" id="expe" name="expe" value="20" />
 			</div>
 
 			<div class="form-group">
-				<label for="tst">Text submission timer:</label>
+				<label for="tst">Text submission timer in minutes:</label>
 				<select class="form-control" id="tst" name="tst">
-					<option value="2" selected="selected">2</option>
-					<option value="3">3</option>
+					<option value="2">2</option>
+					<option value="3" selected="selected">3</option>
 					<option value="4">4</option>
 					<option value="5">5</option>
 					<option value="6">6</option>
@@ -164,10 +176,10 @@ $tq = $default_teacher_question;
 			</div>
 
 			<div class="form-group">
-				<label for="rt">Rating timer:</label>
+				<label for="rt">Rating timer in minutes:</label>
 				<select class="form-control" id="rt" name="rt">
-					<option value="2">2</option>
-					<option value="3" selected="selected">3</option>
+					<option value="2" selected="selected">2</option>
+					<option value="3">3</option>
 					<option value="4">4</option>
 					<option value="5">5</option>
 					<option value="6">6</option>
