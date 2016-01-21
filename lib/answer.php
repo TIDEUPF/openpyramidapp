@@ -99,14 +99,17 @@ function retry() {
 }
 
 function request($params) {
-    global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_group_id, $peer_array;
+    global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_group_id, $peer_array, $flow_data;
 
     $timeout = get_answer_timeout();
+    $petition = (empty($flow_data['question'])) ? 'Write a question' : $flow_data['question'];
+    $level_text = (\Pyramid\get_current_level() >= 0) ? 'Level ' . \Pyramid\get_current_level() .'/' . $levels : '';
+    $username_text = (count(\Group\get_status_bar_peers()) > 0) ? $sname . ' + ' . (count(\Group\get_status_bar_peers())-1) : $sname;
 
     $vars = array(
         'username' 				    => $sname . ' + ' . (count(\Group\get_status_bar_peers())-1),
-        'level' 				    => 'Level ' . \Pyramid\get_current_level() .'/' . $levels,
-        'answer_text' 			    => 'Write a question',
+        'level' 				    => $level_text,
+        'answer_text' 			    => $petition,
         'answer_submit_button' 	    => 'Submit your question',
         'answer_submit_skip_button' => 'Skip the question',
         'answer_timeout'            => $timeout['time_left'],

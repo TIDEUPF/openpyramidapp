@@ -113,29 +113,29 @@
     }
 
     #countdown {
-        display: none;
+        /*display: none;*/
         position: relative;
         bottom: 0px;
         left: 0px;
-        height: 0em;
+        height: 30px;
         right: 0px;
 
         text-align: center;
 
-        background-color: #000000;
+        /*background-color: #000000;*/
         padding-top: 0px;
         color: white;
         text-shadow: 0 /*{a-page-shadow-x}*/ 1px /*{a-page-shadow-y}*/ 0 /*{a-page-shadow-radius}*/ #000000 /*{a-page-shadow-color}*/;
         font-size: 120%;
-        transition-property: all;
-        transition-duration: 1s;
-        z-index: 1000;
+        /*transition-property: all;*/
+        /*transition-duration: 1s;*/
+        /*z-index: 1000;*/
     }
 
     #countdown-padding {
         height: 0em;
-        transition-property: all;
-        transition-duration: 1s;
+        /*transition-property: all;*/
+        /*transition-duration: 1s;*/
         /*display: none;*/
     }
 
@@ -145,10 +145,49 @@
         padding: 4px;
         border-radius: 4px;
         margin-right: 4px;
+        text-shadow: none;
+        color: #E4E4E4;
+        font-weight: bold;
     }
+
+    #submit-confirmation {
+        display: none;
+        position: fixed;
+        width: 200px;
+        top: 50%;
+        left: 50%;
+        z-index: 1000;
+        padding: 30px;
+        border: 2px solid grey;
+        border-radius: 4px;
+        background-color: #D3D3D3;
+        margin-left: -132px;
+        margin-top: -32px;
+    }
+
+    #submit-confirmation button {
+        margin-bottom: 20px !important;
+        display: block;
+        width: 100px !important;
+    }
+
+    #confirm-text {
+        display: block;
+        text-align: center;
+        font-size: 110%;
+        margin-bottom: 20px;
+        margin-top: -10px;
+    }
+
 </style>
 <div id="answer-frame">
     <form method="post" action="student.php" data-ajax="false">
+        <div id="submit-confirmation">
+            <span id="confirm-text">Are you sure that you want to finish rating and discussion for this level?</span>
+            <button id="yes-submit" type="submit" name="rate">Yes</button>
+            <button id="no-submit">No</button>
+        </div>
+
     <div id="answer-header-frame">
 
         <div id="topbar">
@@ -210,8 +249,8 @@
 
         <div>
             <div id="answer-waiting-group"><?=$answer_waiting_message?></div>
-            <div style="font-size: 1.35em;">Please note that when you submit rating, you will no longer be able to edit rating values. Also you will be removed from the discussion thread for this level.</div>
-            <div id="answer-next-button"><button class="ui-btn" name="rate"><?= $answer_rate_submit?></button></div>
+            <div style="font-size: 1.35em; margin-top:20px;">Please note that when you submit rating, you will no longer be able to edit rating values. Also you will be removed from the discussion thread for this level.</div>
+            <div id="answer-next-button"><button class="ui-btn"><?= $answer_rate_submit?></button></div>
         </div>
 
     </div>
@@ -222,7 +261,7 @@
 
     </form>
     <div id="countdown-padding"></div>
-    <div id="countdown"><span id="countdown-text"></span>s left</div>
+    <div id="countdown"><span id="countdown-text"></span></div>
 
 </div>
 <script>
@@ -231,6 +270,16 @@
     var countdown_started = false;
     var countdown_interval = null;
     var polling_interval_d = null;
+
+    $("#answer-next-button button").on('click', function(e){
+        e.preventDefault();
+        $('#submit-confirmation').show();
+    });
+
+    $("#no-submit").on('click', function(e){
+        e.preventDefault();
+        $('#submit-confirmation').hide();
+    });
 
     $('#answer-header-logout').on('touchstart', function(e) {
         window.location="logout.php";
@@ -277,7 +326,8 @@
         $('#countdown')
             .show()
             .css('height', countdown_height+'px')
-            .css('padding-top', '6px');
+            .css('padding-top', '6px')
+            .css('background-color', '#000');
 
         /*
         $('#countdown-padding')
@@ -287,9 +337,16 @@
     }
 
     function update_countdown() {
+        var text_left = '';
         countdown_started = true;
         time_left--;
-        $('#countdown-text').text(time_left);
+        var minutes_left = Math.floor(time_left/60);
+        if(minutes_left == 1)
+            text_left = minutes_left + ' minute ';
+        else if(minutes_left > 1)
+            text_left = minutes_left + ' minutes ';
+        text_left += time_left%60 + ' seconds left';
+        $('#countdown-text').text(text_left);
         if(time_left <= 0) {
             clearInterval(countdown_interval);
             countdown_finished();

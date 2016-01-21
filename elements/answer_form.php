@@ -64,38 +64,39 @@
         font-weight: bold;
     }
 
-    #answer-submit-skip-button {
+    #answer-submit-skip-button button {
         display: none;
     }
 
     #countdown {
         /*display: none;*/
-        position: fixed;
+        position: relative;
         bottom: 0px;
         left: 0px;
-        height: 0em;
-        text-align: center;
+        height: 30px;
         right: 0px;
-        background-color: #000000;
+
+        text-align: center;
+
+        /*background-color: #000000;*/
         padding-top: 0px;
         color: white;
         text-shadow: 0 /*{a-page-shadow-x}*/ 1px /*{a-page-shadow-y}*/ 0 /*{a-page-shadow-radius}*/ #000000 /*{a-page-shadow-color}*/;
         font-size: 120%;
-        transition-property: all;
-        transition-duration: 1s;
-        z-index: 1000;
+        /*transition-property: all;*/
+        /*transition-duration: 1s;*/
+        /*z-index: 1000;*/
     }
 
     #countdown-padding {
         height: 0em;
-        transition-property: all;
+        /*transition-property: all;*/
         transition-duration: 1s;
         /*display: none;*/
     }
 
 </style>
 <div id="answer-frame">
-    <div id="countdown"><span id="countdown-text"></span>s left</div>
     <form method="post" action="student.php" data-ajax="false">
     <div id="answer-header-frame">
 
@@ -142,6 +143,7 @@
     <?php endforeach?>
     </form>
     <div id="countdown-padding"></div>
+    <div id="countdown"><span id="countdown-text"></span></div>
 </div>
 <script>
     answer = new Object();
@@ -211,26 +213,49 @@
     }
 
     function show_countdown(time_left) {
+        var countdown_height = 30;
         countdown_started = true;
         this.time_left = time_left - 5;
         if(!countdown_interval)
             countdown_interval = setInterval(update_countdown, 1*1000);
         update_countdown();
 
+        var countdown_bottom = $('body').outerHeight()
+            - $('#answer-submit-skip-button').position().top
+            - $('#answer-submit-skip-button').outerHeight(true)
+            - (countdown_height + 4);
+
+        if(countdown_bottom < 0)
+            countdown_bottom = 0;
+
+        $('#countdown').css('bottom', (-countdown_bottom)+'px');
+
+        //$('#countdown').css('transition-property', 'all');
+
         $('#countdown')
             .show()
-            .css('height', '1.5em')
-            .css('padding-top', '6px');
+            .css('height', countdown_height+'px')
+            .css('padding-top', '6px')
+            .css('background-color', '#000');
 
-        $('#countdown-padding')
-            .show()
-            .css('height', '2em');
+        /*
+         $('#countdown-padding')
+         .show()
+         .css('height', '2em');
+         */
     }
 
     function update_countdown() {
+        var text_left = '';
         countdown_started = true;
         time_left--;
-        $('#countdown-text').text(time_left);
+        var minutes_left = Math.floor(time_left/60);
+        if(minutes_left == 1)
+            text_left = minutes_left + ' minute ';
+        else if(minutes_left > 1)
+            text_left = minutes_left + ' minutes ';
+        text_left += time_left%60 + ' seconds left';
+        $('#countdown-text').text(text_left);
         if(time_left <= 0) {
             clearInterval(countdown_interval);
             countdown_finished();
