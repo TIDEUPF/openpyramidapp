@@ -1,6 +1,6 @@
 <style>
     button.ui-btn {
-        width: 300px !important;
+        width: 378px !important;
     }
 
     .ui-input-text {

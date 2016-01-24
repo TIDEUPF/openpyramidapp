@@ -12,6 +12,7 @@ $(function() {
     var $usernameInput = $('.usernameInput'); // Input for username
     var $messages = $('.messages'); // Messages area
     var $inputMessage = $('.inputMessage'); // Input message input box
+    var $chat_write = $(''); // Input message input box
 
     var $loginPage = $('.login.page'); // The login page
     var $chatPage = $('.chat.page'); // The chatroom page
@@ -26,7 +27,7 @@ $(function() {
     //$currentInput =
 
     //var socket = io();
-    var socket = io(chat_url);
+    //var socket = io(chat_url);
 
     // Tell the server your username
     socket.emit('add user', username);
@@ -80,6 +81,7 @@ $(function() {
             });
             // tell server to execute 'new message' and send along one parameter
             socket.emit('new message', { message: message, room: room});
+            logSentMsg(message, room, username);
         }
     }
 
@@ -232,6 +234,11 @@ $(function() {
 
     // Click events
 
+    $('#chat-write').on('click', function(e){
+        e.preventDefault();
+        sendMessage();
+    });
+
     // Focus input when clicking anywhere on login page
     $loginPage.click(function () {
         $currentInput.focus();
@@ -258,6 +265,7 @@ $(function() {
     // Whenever the server emits 'new message', update the chat body
     socket.on('new message', function (data) {
         addChatMessage(data);
+        logRecMsg(data.message, room, data.username, username);
     });
 
     // Whenever the server emits 'user joined', log it in the chat body

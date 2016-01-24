@@ -68,6 +68,12 @@
         display: none;
     }
 
+    #answer-submit-skip-button {
+        height: 45px;
+        text-align: center;
+        margin-top: 5px;
+    }
+
     #countdown {
         /*display: none;*/
         position: relative;
@@ -173,7 +179,7 @@
 
     if(answer.skip_timeout) {
         setTimeout(function() {
-            $('#answer-submit-skip-button').show();
+            $('#answer-submit-skip-button button').show();
             //$('button[name=skip_button]').on('touchstart', insert_skip_flag);
             //$('button[name=skip_button]').on('click', insert_skip_flag);
         }, answer.skip_timeout*1000);
@@ -223,7 +229,7 @@
         var countdown_bottom = $('body').outerHeight()
             - $('#answer-submit-skip-button').position().top
             - $('#answer-submit-skip-button').outerHeight(true)
-            - (countdown_height + 4);
+            - (countdown_height + 5);
 
         if(countdown_bottom < 0)
             countdown_bottom = 0;

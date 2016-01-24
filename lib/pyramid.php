@@ -53,7 +53,7 @@ function upgrade_level($forced = false) {
             return true;
         }
 
-        if (!\Student\level_is_rated())
+        if (!\Student\level_is_rated() and !\Group\sa_exists())
             return false;
 
         $upgrade = false;
@@ -72,14 +72,35 @@ function upgrade_level($forced = false) {
         }
     }
 
+    if($forced) {
+        //the answer phase has ended
+        if ($activity_level == 0 and \Answer\is_timeout() and !\Group\is_level_zero_rating_started()) {
+            $time = time();
+
+//            if(!\Answer\is_available_answers())
+//                mysqli_query($link, "insert into flow_student values (null, '$fid','$sid', '', 1, $time)");
+
+            mysqli_query($link, "update pyramid_groups set pg_started = 1, pg_start_timestamp='{$time}' where pg_started = '0' and pg_fid='{$fid}' and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}'");
+            return true;
+        } else {
+            if(!set_selected_answers()) {
+                mysqli_query($link, "insert into selected_answers values ('$fid', '$activity_level', '$peer_group_id', '-1', '0', '1')");
+                \Util\log(['activity' => 'level_finished_with_no_rates']);
+            }
+        }
+    }
+
     if($upgrade or $forced) {
         $activity_level++;
         \Group\get_members();
         $time = time();
+        \Util\log(['activity' => 'group_upgrade']);
 
         //register only when all sibling groups are completed
-        if(\Group\check_if_previous_groups_completed_task())
+        if(\Group\check_if_previous_groups_completed_task()) {
             mysqli_query($link, "update pyramid_groups set pg_started = 1, pg_start_timestamp='{$time}' where pg_fid='{$fid}' and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}'");
+            \Util\log(['activity' => 'siblings_finished_level_upgrade']);
+        }
     }
 }
 
@@ -88,12 +109,19 @@ function set_selected_answers() {
 
     //to sum the ratings
     $ssa_result_1= mysqli_query($link, "SELECT fsr_to_whom_rated_id, skip, SUM(fsr_rating) as sum FROM `flow_student_rating` where fsr_fid = '$fid' and fsr_level = '$activity_level' and fsr_group_id = '$peer_group_id' group by fsr_to_whom_rated_id order by SUM(fsr_rating) desc limit 1");
-    $ssa_data_1 = mysqli_fetch_assoc($ssa_result_1);
 
-    $selected_id = $ssa_data_1['fsr_to_whom_rated_id'];
-    $selected_id_rating_sum = $ssa_data_1['sum'];
-    $skip = $ssa_data_1['skip'];
-    mysqli_query($link,"insert into selected_answers values ('$fid', '$activity_level', '$peer_group_id', '$selected_id', '$selected_id_rating_sum', '$skip')");
+    if(mysqli_num_rows($ssa_result_1)> 0) {
+        $ssa_data_1 = mysqli_fetch_assoc($ssa_result_1);
+
+        $selected_id = $ssa_data_1['fsr_to_whom_rated_id'];
+        $selected_id_rating_sum = $ssa_data_1['sum'];
+        $skip = $ssa_data_1['skip'];
+        mysqli_query($link, "insert into selected_answers values ('$fid', '$activity_level', '$peer_group_id', '$selected_id', '$selected_id_rating_sum', '$skip')");
+        \Util\log(['activity' => 'selected_answer', 'answer' => $selected_id, 'rating' => $selected_id_rating_sum]);
+        return true;
+    }
+
+    return false;
 }
 
 /*
@@ -177,7 +205,7 @@ function show_final_answer() {
     global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
     $activity_level_previous = $activity_level-1;
-    $result_11 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level = '$activity_level_previous'");
+    $result_11 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level = '$activity_level_previous' and skip = '0'");
     $answers = array();
     while ($data_t_11 = mysqli_fetch_assoc($result_11)) {
         $qa_last_selected_id = $data_t_11['sa_selected_id'];
@@ -185,8 +213,13 @@ function show_final_answer() {
         $data_t_12 = mysqli_fetch_assoc($result_12);
         $answers[] = $data_t_12['fs_answer'];
     }
-    \Answer\view_final_answer(array('final_answer_array' => $answers));
 
+    if(empty($answers))
+        $answers[] = 'There were no answers';
+
+    \Util\log(['activity' => 'final_answers', 'answers' => $answers]);
+
+    \Answer\view_final_answer(array('final_answer_array' => $answers));
 }
 
 function get_current_flow() {
@@ -202,8 +235,8 @@ function get_current_flow() {
         $fid = $data3["fid"];
         $ftimestamp = (int)$data3["timestamp"];
         $pyramid_minsize = (int)$data3["pyramid_minsize"];
-        $timeout = (int)$data3["question_timeout"];
-        $answer_timeout = (int)$data3["rating_timeout"];
+        $timeout = (int)$data3["rating_timeout"];
+        $answer_timeout = (int)$data3["question_timeout"];
 
 
         if(isset($_SESSION['fid'])) {
@@ -230,8 +263,13 @@ function wait($params) {
     $initial_level = $activity_level;
     upgrade_level();
 
+    $peers = implode(', ', \group\get_peers_sname());
+    if(strlen($peers) > 15)
+        $peers = substr($peers, 0, 15) . '...';
+
     $vars = array(
         'username' 					=> $sname . ' + ' . (count(\Group\get_status_bar_peers())-1),
+        'username' 					=> $sname . ' + ' . $peers,
         'level' 				    => 'Level ' . \Pyramid\get_current_level() .'/' . $levels,
         'answer_text' 			=> 'Write a question',
         'answer_submit_button' 	=> 'Submit your question',
@@ -252,6 +290,14 @@ function wait($params) {
     if(isset($params['error']))
         $vars['error'] = $params['error'];
 
+    $hidden_input_array['username'] = $sname;
+    $hidden_input_array['fid'] = $fid;
+    $hidden_input_array['level'] = \Pyramid\get_current_level();
+    $hidden_input_array['page'] = "waiting";
+    $hidden_input_array['group_id'] = $peer_group_id;
+
+    $vars['hidden_input_array'] = array_merge($vars['hidden_input_array'], $hidden_input_array);
+
     $body = \View\element("answer_waiting", $vars);
 
     \View\page(array(
@@ -268,8 +314,8 @@ function wait_pyramid($params) {
     upgrade_level();
 
     $vars = array(
-        'username' 					=> $sname . ' + ' . (count(\Group\get_status_bar_peers())-1),
-        'level' 				    => 'Level 0' . '/' . $levels,
+        'username' 					=> $sname,
+        'level' 				    => 'Level 1' . '/' . $levels,
         'answer_text' 			=> 'Write a question',
         'answer_submit_button' 	=> 'Submit your question',
         'hidden_input_array' 		=> array(
@@ -277,6 +323,13 @@ function wait_pyramid($params) {
             'a_peer_group_id'	=> $peer_group_id,
         ),
     );
+
+    $hidden_input_array['username'] = $sname;
+    $hidden_input_array['fid'] = $fid;
+    $hidden_input_array['level'] = 1;
+    $hidden_input_array['page'] = "pyramid_creation_waiting";
+
+    $vars['hidden_input_array'] = array_merge($vars['hidden_input_array'], $hidden_input_array);
 
     $body = \View\element("pyramid_waiting", $vars);
 
@@ -350,10 +403,17 @@ function update_pyramid($fid, $pid) {
     $nbase_groups = count($pyramid["0"]);
     $latecomers = available_students();
     $nlatecomers = count($latecomers);
-    $split_size = ceil($nlatecomers/$nbase_groups);
+    //$split_size = ceil($nlatecomers/$nbase_groups);
+
+    foreach($latecomers as $lt) {
+        $dest_group = mt_rand(1,9999) % $nbase_groups;
+        $pyramid["0"]["$dest_group"]['pg_latecomers'][] = $lt;
+    }
+    /*
     for($i=0; $i<$nbase_groups; $i++) {
         $pyramid["0"]["$i"]['pg_latecomers'] = array_slice($latecomers, $i*$split_size, $split_size);
     }
+    */
 
     for($i=0; $i<=$top_level; $i++) {
         foreach($pyramid["$i"] as $group_row) {
@@ -493,7 +553,7 @@ function create_pyramid_structure($fid, $pid, $sarry, $fl, $fsg) {
             for($tin=0; $tin<count($t_group_items); $tin++) {
                 $group_comma = implode(",",$t_group_items[$tin]);
                 mysqli_query($link,"insert into pyramid_groups values ($fid, $pid, '$group_comma', '$tl', '$tin', '0', 0, 0, '', 0)");
-                mysqli_query($link,"insert into pyramid_groups_og values ($fid, $pid, '$group_comma', '$tl', '$tin', '0', 0, '', 0)");
+                mysqli_query($link,"insert into pyramid_groups_og values ($fid, $pid, '$group_comma', '$tl', '$tin', '0', 0, 0, '', 0)");
             }
         } else {
             $t_group_items = $pyramid_list[$tl][0];
@@ -502,7 +562,7 @@ function create_pyramid_structure($fid, $pid, $sarry, $fl, $fsg) {
                 $group_comma = implode(",", $t_group_items[$tin]);
                 $group_comma_relations = implode(",", $t_group_items_relation[$tin]);
                 mysqli_query($link,"insert into pyramid_groups values ($fid, $pid, '$group_comma', '$tl', '$tin', '$group_comma_relations', 0, 0, '', 0)");
-                mysqli_query($link,"insert into pyramid_groups_og values ($fid, $pid, '$group_comma', '$tl', '$tin', '$group_comma_relations', 0)");
+                mysqli_query($link,"insert into pyramid_groups_og values ($fid, $pid, '$group_comma', '$tl', '$tin', '$group_comma_relations', 0, 0, '', 0)");
             }
         }
     }

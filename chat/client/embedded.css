@@ -23,6 +23,7 @@ ul.pages {
 .messages {
     font-size: 100%;
     list-style: none;
+    /*width: 100%*/
 }
 
 .inputMessage {

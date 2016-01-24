@@ -4,14 +4,16 @@ Student\enforce_login();
 
 $sname = Student\get_username();
 $sid = $_SESSION['student'];
+global $fid;
 
 // $levels, $fname, $fdes, $fid, $fid_timestamp
-if(!$fid = \Pyramid\get_current_flow()) {
-    //no flow available
-    exit;
+if(!\Pyramid\get_current_flow()) {
+    //flow changed
 }
 
 \Pyramid\flow_add_student($fid, $sid);
+
+\Util\log(['activity' => 'page_load']);
 
 //avoid race condition
 $remaining_pyramids = \Pyramid\remaining_pyramids();
@@ -37,6 +39,7 @@ if(($pid = \Pyramid\get_student_pyramid($fid, $sid) === false)) {
 
 //forced upgrade if hard timeout is reached
 if(\Group\is_level_timeout()) {
+    \Util\log(['activity' => 'level_timeout']);
     \Pyramid\upgrade_level(true);
 }
 
@@ -58,10 +61,11 @@ if(\Answer\is_new_data()) {
 }
 
 //wrong answer
-if(\Answer\submit_error()) {
+/*if(\Answer\submit_error()) {
 
     exit;
 }
+*/
 
 //not needed, inclusive
 //delete inactive students from the current level
@@ -78,7 +82,7 @@ if(!\Answer\is_timeout() and !\Answer\is_submitted()) {
 }
 
 //we need the answers for other groups too
-if(\Group\check_if_previous_groups_completed_task() and !\Student\level_is_rated()) {
+if(\Group\check_if_previous_groups_completed_task() and !\Student\level_is_rated() and !\Group\sa_exists()) {
     if(\Answer\is_available_answers())
         \Answer\request_rate();
     else

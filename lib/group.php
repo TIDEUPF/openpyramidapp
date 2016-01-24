@@ -52,19 +52,20 @@ function get_needed_results_to_end_level($full_requirements = false, $level = nu
     if(!\Answer\is_submitted() or $level == 'answer') {
         $needed_results = count($peer_array);
         $status_percentage = $answer_submit_required_percentage;
-        $st_count = 1;
+        $opt_count = 1;
     } elseif($activity_level == 0) {
-        $needed_results = $group_size * $group_size; //in the first level, it's no. of choices * student count
+        //in the rating stage we can have more users than questions and skips
+        $opt_count = count(\Answer\get_selected_ids(true));
+        $needed_results = $opt_count * $group_size; //in the first level, it's no. of choices * student count
         $status_percentage = $answer_submit_required_percentage;
-        $st_count = $group_size;
     } else{
-        $st_count = count($peer_group_combined_ids_temp);
-        $needed_results = $group_size * $st_count; //because now every student is rating two answers, need to occupy all answers
+        $opt_count = count(\Answer\get_selected_ids(true));
+        $needed_results = $group_size * $opt_count; //because now every student is rating two answers, need to occupy all answers
         $status_percentage = $answer_required_percentage;
     }
 
     if(!$full_requirements) {
-        $needed_results = floor(floor($needed_results * $status_percentage / 100.0)/$st_count)*$st_count;
+        $needed_results = floor(floor($needed_results * $status_percentage / 100.0)/$opt_count)*$opt_count;
     }
 
     if(empty($needed_results))
@@ -104,16 +105,16 @@ function check_if_previous_groups_completed_task()
     $activity_level_previous = $activity_level-1;
 
     //the first stage is always true
-    if(!\Answer\is_submitted() and !is_level_zero_rating_started())
+    if($activity_level == 0 and !\Answer\is_submitted() and !is_level_zero_rating_started())
         return true;
 
     //check if every group member has submitted the answer or the timeout is expired
     if($activity_level_previous == -1)
         return \Answer\is_timeout();
 
+    //the previous groups have selected an answer
     $required_sa_count = count(explode(",",$peer_group_combined_ids));
     $previous_sa_count = get_previous_groups_rated_count();
-
     if($previous_sa_count >= $required_sa_count)
         return true;
 
@@ -181,7 +182,7 @@ function is_level_zero_rating_started() {
 function is_level_timeout() {
     global $timeout, $activity_level, $fid, $peer_group_id, $flow_data;
 
-    if(!\Answer\is_submitted() and !is_level_zero_rating_started())
+    if($activity_level == 0 and !\Answer\is_submitted() and !is_level_zero_rating_started())
         return \Answer\is_timeout();
 
     //hardtimer
@@ -235,7 +236,7 @@ function get_time_left() {
         $hardtime_left = $flow_data['hardtimer_question'] + $start_timestamp - time();
         if($hardtime_left < $answer_timeout or ($timestamp and is_numeric($timestamp))) {
             $satisfaction_left = ($timestamp + $answer_timeout) - time();
-            return ($hardtime_left > $satisfaction_left) ? $satisfaction_left : $hardtime_left;
+            return ($hardtime_left > $satisfaction_left and $timestamp) ? $satisfaction_left : $hardtime_left;
         }
     } else {
         $hardtime_left = $flow_data['hardtimer_rating'] + $start_timestamp - time();
@@ -332,4 +333,43 @@ function get_status_bar_groups_count() {
     $array_size = count($peer_group_combined_ids_array);
 
     return $array_size;
+}
+
+function get_peers_sname() {
+    global $sname, $peer_array;
+
+    $sname_list = get_sname_list($peer_array);
+    $peer_list = [];
+    foreach($sname_list as $peer) {
+        if($peer != $sname)
+            $peer_list[] = $peer;
+    }
+
+    return $peer_list;
+}
+
+function get_sname_list($sid_array) {
+    global $link;
+
+    $result = [];
+    $sid_list = implode("','", $sid_array);
+    $sname_result = mysqli_query($link, "select * from students where sid in ('$sid_list')");
+    if(mysqli_num_rows($sname_result) > 0) {
+        while($sname_result_array = mysqli_fetch_assoc($sname_result)) {
+            $result[] = $sname_result_array['sname'];
+        }
+    }
+
+    return $result;
+}
+
+function sa_exists() {
+    global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids;
+
+    $gcal_result_2 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level = '$activity_level' and sa_group_id = '$peer_group_id'");
+    if (mysqli_num_rows($gcal_result_2) > 0) {
+        return true;
+    }
+
+    return false;
 }

@@ -1,5 +1,12 @@
 <?php
 $error;
+
+
+
+if(empty($_SESSION['user_id'])) {
+    $_SESSION['user_id'] = sha1(mt_rand(0,9999999999));
+}
+
 if(!isset($_SESSION['student'])) {
     if(isset($_POST['loginBtn'])) {
         if(empty($_POST['usr'])) {
@@ -26,11 +33,12 @@ if(!isset($_SESSION['student'])) {
                 //else{
                     $sname = strtolower($uname);
                     $sname[0] = strtoupper($sname[0]);
-                    $sname = str_replace(array('*', "'", ',', ' ', '"', '(', ')', '<', '>', '=', ';', '-', '#', '/', '@', '$', '%', '\\', '`'), '', $sname);
-                    $uname = str_replace(array('*', "'", ',', ' ', '"', '(', ')', '<', '>', '=', ';', '-', '#', '/', '@', '$', '%', '\\', '`'), '', $uname);
+                    $sname = str_replace(array('*', "'", ',', ' ', '"', '(', ')', '<', '>', '=', ';', '-', '#', '/', '$', '%', '\\', '`'), '', $sname);
+                    $uname = str_replace(array('*', "'", ',', ' ', '"', '(', ')', '<', '>', '=', ';', '-', '#', '/', '$', '%', '\\', '`'), '', $uname);
                     mysqli_query($link,"insert into students values ('$uname', '$sname', NOW() )");
                     if(mysqli_affected_rows($link) > 0) {
                         $_SESSION['student'] = $uname;
+                        $_SESSION['sname'] = $sname;
                         //header("location: student_activity.php"); exit(0);
                     } else{
                         $res2 = mysqli_query($link, "select * from students where sid = '$uname'");
@@ -38,6 +46,7 @@ if(!isset($_SESSION['student'])) {
                              $error = 'Database error!';
                          } else {
                              $_SESSION['student'] = $uname;
+                             $_SESSION['sname'] = $sname;
                          }
                     }
                // }
@@ -73,6 +82,9 @@ if(!isset($_SESSION['student'])) {
     if(!empty($error))
         $vars['error'] = $error;
 
+    $vars['hidden_input_array'] = [];
+    $hidden_input_array['page'] = "student_login";
+    $vars['hidden_input_array'] = array_merge($vars['hidden_input_array'], $hidden_input_array);
     $login_form = View\element("login", $vars);
 
     \View\page(array(
@@ -85,6 +97,16 @@ if(!isset($_SESSION['student'])) {
     if($fid = \Pyramid\get_current_flow()) {
         \Pyramid\flow_add_student($fid, $_SESSION['student']);
     }
+
+    $vars = [];
+    $vars['hidden_input_array'] = [];
+
+    $hidden_input_array['username'] = $_SESSION['sname'];
+    $hidden_input_array['fid'] = $fid;
+    $hidden_input_array['level'] = 1;
+    $hidden_input_array['page'] = "activity_explanation";
+
+    $vars['hidden_input_array'] = array_merge($vars['hidden_input_array'], $hidden_input_array);
 
     //show activity explanation
     $activity_explanation_view = View\element("activity_explanation", $vars);

@@ -35,11 +35,9 @@ if(isset($_SESSION['user'])) {
 			$error = 'Levels and Responses cannot be 0';
 		} else {
 			$datestamp = time();
-			mysqli_query($link,"insert into flow values (null, '$teacher_id', '$fname', '$fdes', '$fcname', '$fesname', '$fsg', '$fl', '$min_pyramid', '$expe', '$rps', '$datestamp', $tst, $rt, 6000, 6000, '{$qs}')");
+			mysqli_query($link,"insert into flow values (null, '$teacher_id', '$fname', '$fdes', '$fcname', '$fesname', '$fsg', '$fl', '$min_pyramid', '$expe', '$rps', '$datestamp', $tst, $rt, 240, 300, '{$qs}')");
 		}
 	}
-
-
 } else {
 	header("location: login.php");
 	exit(0);
@@ -54,7 +52,10 @@ $tq = $default_teacher_question;
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="vendors/bootstrap/bootstrap.min.css">
 	<script src="vendors/jquery/jquery-2.1.4.min.js"></script>
+	  <script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
+	  <script src="lib/actions.js"></script>
 	<script type="text/javascript">
+		var socket = io();
 	$(document).ready(function(){
 		$("#fsg").change(function() {
 			var student_c = Math.floor(parseInt($("#expe").val(), 10) * 0.8);
@@ -113,7 +114,10 @@ $tq = $default_teacher_question;
 	</script>
   </head>
   <body>
-  
+  <script>
+
+  </script>
+  <input type="hidden" name="page" value="teacher_create_flow" />
   <?php include('topnav.php'); ?>
     <div class="container">
 		<h3><b>Create Flow</b></h3>

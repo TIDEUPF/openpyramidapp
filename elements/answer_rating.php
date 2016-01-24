@@ -140,7 +140,7 @@
             <fieldset data-role="controlgroup" data-type="horizontal">
                 <legend><?=htmlspecialchars($answer_data['answer_text'])?></legend>
 
-                <select id="id-answer-rating-<?=$i?>" class="rating-widget" name="optradio<?=($i+1)?>" data-role="none">
+                <select id="id-answer-rating-<?=($i+1)?>" class="rating-widget" name="optradio<?=($i+1)?>" data-role="none" answer_sid="<?=$hidden_input_array['to_whom_rated_id'.($i+1)]?>">
                 <?php for($i=0;$i<=5;$i++):?>
                 <option value="<?=$i?>" <?php if($answer_data['selected'] == $i) echo 'selected="selected"';?>><?=$rating_labels[$i]?></option>
                 <?endfor;?>

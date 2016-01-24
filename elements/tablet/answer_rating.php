@@ -4,11 +4,6 @@
         margin: auto !important;
     }
 
-    .ui-input-text {
-        width: 300px !important;
-        margin: auto !important;
-    }
-
     button.ui-btn,
     .ui-page-theme-a {
         color: #696969 !important;
@@ -179,6 +174,30 @@
         margin-top: -10px;
     }
 
+    #chat-write {
+        display: inline-block;
+        border: none;
+        background: none;
+        margin-left: -55px;
+        z-index: 1000;
+        position: relative;
+        margin-bottom: -5px;
+        box-shadow: none;
+        webkit-box-shadow: none;
+    }
+
+    li.chat.page div.ui-input-text {
+        display: inline-block;
+        /*margin: 10px 0 10px 10px !important;*/
+        /*margin: 0 !important;*/
+    }
+
+    .ui-input-text {
+        width: 400px !important;
+        /*margin: auto !important;*/
+    }
+
+
 </style>
 <div id="answer-frame">
     <form method="post" action="student.php" data-ajax="false">
@@ -209,7 +228,7 @@
             <fieldset data-role="controlgroup" data-type="horizontal">
                 <legend><span class="question-number"><?=($i+1)?></span><?=htmlspecialchars($answer_data['answer_text'])?></legend>
 
-                <select id="id-answer-rating-<?=$i?>" class="rating-widget" name="optradio<?=($i+1)?>" data-role="none">
+                <select id="id-answer-rating-<?=($i+1)?>" class="rating-widget" name="optradio<?=($i+1)?>" data-role="none" answer_sid="<?=$hidden_input_array['to_whom_rated_id'.($i+1)]?>" answer_text="<?=htmlspecialchars($answer_data['answer_text'])?>">
                 <?php for($i=0;$i<=5;$i++):?>
                 <option value="<?=$i?>" <?php if($answer_data['selected'] == $i) echo 'selected="selected"';?>><?=$rating_labels[$i]?></option>
                 <?endfor;?>
@@ -234,14 +253,13 @@
                 <div class="chatArea">
                     <ul class="messages"></ul>
                 </div>
-                <input class="inputMessage" placeholder="Send a message to your peers..."/>
+                <input type="text" class="inputMessage" placeholder="Send a message to your peers..."/><a id="chat-write" href="#" class="ui-btn ui-icon-edit ui-btn-icon-left"></a>
             </li>
         </ul>
     </div>
 
     <div style="clear:both"></div>
 
-    <script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
     <script src="jslib/chatvars.js"></script>
     <script src="chat/client/chat.js"></script>
 
@@ -250,7 +268,7 @@
         <div>
             <div id="answer-waiting-group"><?=$answer_waiting_message?></div>
             <div style="font-size: 1.35em; margin-top:20px;">Please note that when you submit rating, you will no longer be able to edit rating values. Also you will be removed from the discussion thread for this level.</div>
-            <div id="answer-next-button"><button class="ui-btn"><?= $answer_rate_submit?></button></div>
+            <div id="answer-next-button"><button id="answer-next-button-ui" class="ui-btn"><?= $answer_rate_submit?></button></div>
         </div>
 
     </div>
@@ -328,6 +346,8 @@
             .css('height', countdown_height+'px')
             .css('padding-top', '6px')
             .css('background-color', '#000');
+
+        logTimerActivation();
 
         /*
         $('#countdown-padding')

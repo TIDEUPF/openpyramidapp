@@ -18,12 +18,15 @@ while(true) {
 
     //put remaining users in the last pyramid immediatly
     if(!\Pyramid\remaining_pyramids() and $nflow_students > 0) {
+        while($user = mysqli_fetch_assoc($result))
+            $users[] = $user['sid'];
         //last pyramid
         $result = mysqli_query($link, "select pg_pid as pid from pyramid_groups where pg_fid='$fid' order by pg_pid desc limit 1");
         $pid_row = mysqli_fetch_assoc($result);
         $pid = $pid_row['pid'];
 
         \Pyramid\update_pyramid($fid, $pid);
+        \Util\log(['activity' => 'added_latecomers_to_pyramid', 'users' => $users]);
         echo "users added and pyramid updated\n";
         continue;
     }
@@ -33,5 +36,6 @@ while(true) {
         continue;
 
     \Pyramid\create_pyramid($fid, $flow_data['levels'], $flow_data['nostupergrp']);
+    \Util\log(['activity' => 'new_pyramid']);
     echo "created a new pyramid\n";
 }

@@ -36,9 +36,14 @@ else{
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="vendors/bootstrap/bootstrap.min.css">
+      <script src="vendors/jquery/jquery-2.1.4.min.js"></script>
+      <script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
+      <script src="lib/actions.js"></script>
+      <script>var socket = io();</script>
   </head>
 
   <body>
+  <input type="hidden" name="page" value="teacher_login" />
   <?php include('topnav.php'); ?>
     <div class="container">
       <h2>Teacher Login</h2>

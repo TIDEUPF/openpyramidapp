@@ -11,7 +11,7 @@ $reset_flow = !\Pyramid\get_current_flow();
 //without pyramid cannot apply the timers
 if(($pid = \Pyramid\get_student_pyramid($fid, $sid) === false)) {
     $output = array(
-        'reset' => false,
+        'reset' => $reset_flow,
         'expired' => false,
         'countdown_started' => false,
         'time_left' => 9999999,
