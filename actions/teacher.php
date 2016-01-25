@@ -16,6 +16,8 @@ if(isset($_SESSION['user'])) {
 		$qs =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['qs']))));
 		$tst = 60 * (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['tst']))));
 		$rt = 60 * (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['rt']))));
+		$htst = $tst + 120;
+		$hrt = $rt + 120;
 		$expe = mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['expe']))));
 		$fesname = '';//$fesname =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['fesname']))));
 		$fl = (int) $_POST['fl'];
@@ -35,7 +37,7 @@ if(isset($_SESSION['user'])) {
 			$error = 'Levels and Responses cannot be 0';
 		} else {
 			$datestamp = time();
-			mysqli_query($link,"insert into flow values (null, '$teacher_id', '$fname', '$fdes', '$fcname', '$fesname', '$fsg', '$fl', '$min_pyramid', '$expe', '$rps', '$datestamp', $tst, $rt, 240, 300, '{$qs}')");
+			mysqli_query($link,"insert into flow values (null, '$teacher_id', '$fname', '$fdes', '$fcname', '$fesname', '$fsg', '$fl', '$min_pyramid', '$expe', '$rps', '$datestamp', $tst, $rt, $htst, $hrt, '{$qs}')");
 		}
 	}
 } else {

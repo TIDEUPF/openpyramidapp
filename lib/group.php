@@ -182,7 +182,10 @@ function is_level_zero_rating_started() {
 function is_level_timeout() {
     global $timeout, $activity_level, $fid, $peer_group_id, $flow_data;
 
-    if($activity_level == 0 and !\Answer\is_submitted() and !is_level_zero_rating_started())
+    //if($activity_level == 0 and !\Answer\is_submitted() and !is_level_zero_rating_started())
+    //    return \Answer\is_timeout();
+
+    if($activity_level == 0 and !is_level_zero_rating_started())
         return \Answer\is_timeout();
 
     //hardtimer

@@ -221,7 +221,7 @@
     function show_countdown(time_left) {
         var countdown_height = 30;
         countdown_started = true;
-        this.time_left = time_left - 5;
+        this.time_left = time_left - 10;
         if(!countdown_interval)
             countdown_interval = setInterval(update_countdown, 1*1000);
         update_countdown();
