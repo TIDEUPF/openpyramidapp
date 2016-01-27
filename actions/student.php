@@ -34,16 +34,6 @@ if(($pid = \Pyramid\get_student_pyramid($fid, $sid) === false)) {
 //$peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp
 \Group\get_members();
 
-if(\Pyramid\is_complete()) {
-    \Pyramid\show_final_answer();
-    exit;
-}
-
-if(\Pyramid\is_final_level_complete()) {
-    \Pyramid\wait();
-    exit;
-}
-
 //check if the group has completed the level and upgrade the level
 \Pyramid\upgrade_level();
 
@@ -86,13 +76,20 @@ if(\Pyramid\is_complete()) {
     exit;
 }
 
+/*
+if(\Pyramid\is_final_level_complete()) {
+    \Pyramid\wait();
+    exit;
+}
+*/
+
 if(!\Answer\is_timeout() and !\Answer\is_submitted()) {
     \Answer\request();
     exit;
 }
 
 //we need the answers for other groups too
-if(\Group\check_if_previous_groups_completed_task() and !\Student\level_is_rated() and !\Group\sa_exists()) {
+if(\Group\check_if_previous_groups_completed_task() and !\Student\level_is_rated() and !\Group\is_level_timeout()) {
     if(\Answer\is_available_answers())
         \Answer\request_rate();
     else

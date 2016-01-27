@@ -31,6 +31,13 @@
         overflow: hidden;
     }
 
+    form {
+        width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+        padding-top: 200px;
+    }
+
     #activity-header-frame,
     #activity-footer-frame {
         height: 20%;

@@ -72,15 +72,19 @@
     #answer-header-level {
         float: left;
         text-align: center;
+        width: 20%;
     }
 
     #answer-header-user {
         float: left;
+        width: 40%;
     }
 
     #answer-header-logout {
-        float: left;
+        float: right;
         text-align: right;
+        width: 10%;
+        cursor: pointer;
     }
 
     .topbar_item {
@@ -245,6 +249,10 @@
 
     </div>
 
+    <?php if($flow_data['ch'] == 1):?>
+        <style>
+
+        </style>
     <link rel="stylesheet" href="chat/client/embedded.css"/>
     <div id="rating-chat" class="ui-corner-all ui-shadow-inset">
         <div style="margin: .5em 0 0 .3em;">Please use this space to discuss with peers about their options before rating.</div>
@@ -257,6 +265,7 @@
             </li>
         </ul>
     </div>
+    <?php endif;?>
 
     <div style="clear:both"></div>
 
@@ -273,9 +282,9 @@
 
     </div>
 
-        <?php foreach($hidden_input_array as $hidden_input_name => $hidden_input_value):?>
-            <input type="hidden" name="<?=$hidden_input_name?>" value="<?=$hidden_input_value?>">
-        <?php endforeach?>
+    <?php foreach($hidden_input_array as $hidden_input_name => $hidden_input_value):?>
+    <input type="hidden" name="<?=$hidden_input_name?>" value="<?=$hidden_input_value?>">
+    <?php endforeach?>
 
     </form>
     <div id="countdown-padding"></div>

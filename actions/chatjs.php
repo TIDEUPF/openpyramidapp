@@ -18,8 +18,6 @@ header('Content-Type: application/javascript; charset=utf-8');
 $jsdata = [
     'username' => $sname,
     'room' => 'room_' . $fid . '_' . $peer_group_id . '_' . $activity_level,
-    'chat_url' => 'http://localhost:8000',
-    'chat_url' => 'http://sos.gti.upf.edu',
 ];
 
 foreach($jsdata as $jskey => $jsvalue) {

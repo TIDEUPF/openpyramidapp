@@ -33,15 +33,19 @@
     #answer-header-level {
         float: left;
         text-align: center;
+        width: 20%;
     }
 
     #answer-header-user {
         float: left;
+        width: 40%;
     }
 
     #answer-header-logout {
         float: right;
         text-align: right;
+        width: 10%;
+        cursor: pointer;
     }
 
     .topbar_item {

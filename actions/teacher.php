@@ -19,6 +19,7 @@ if(isset($_SESSION['user'])) {
 		$htst = $tst + 120;
 		$hrt = $rt + 120;
 		$expe = mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['expe']))));
+		$ch = (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['ch']))));
 		$fesname = '';//$fesname =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['fesname']))));
 		$fl = (int) $_POST['fl'];
 		$fsg = (int) $_POST['fsg'];
@@ -37,7 +38,7 @@ if(isset($_SESSION['user'])) {
 			$error = 'Levels and Responses cannot be 0';
 		} else {
 			$datestamp = time();
-			mysqli_query($link,"insert into flow values (null, '$teacher_id', '$fname', '$fdes', '$fcname', '$fesname', '$fsg', '$fl', '$min_pyramid', '$expe', '$rps', '$datestamp', $tst, $rt, $htst, $hrt, '{$qs}')");
+			mysqli_query($link,"insert into flow values (null, '$teacher_id', '$fname', '$fdes', '$fcname', '$fesname', '$fsg', '$fl', '$min_pyramid', '$expe', '$rps', '$datestamp', $tst, $rt, $htst, $hrt, '{$qs}', '{$ch}')");
 		}
 	}
 } else {
@@ -147,7 +148,7 @@ $tq = $default_teacher_question;
         <h4>Pyramid Details</h4>
 
 			<div class="form-group">
-				<label for="qs">Petition for your students:</label>
+				<label for="qs">Petition to your students:</label>
 				<input type="text" class="form-control" id="qs" name="qs" value="<?php echo htmlspecialchars($default_teacher_question) ?>" />
 			</div>
 
@@ -223,9 +224,18 @@ $tq = $default_teacher_question;
 		-->
 		
 		<div class="form-group">
-          <input type="submit" class="btn btn-info" value="Create Flow" name="cflow">
-        </div>
-		
+			<label for="ch">Chat:</label>
+			<select class="form-control" id="ch" name="ch">
+				<option value="1" selected="selected">Enabled</option>
+				<option value="0">Disabled</option>
+			</select>
+		</div>
+
+		<div class="form-group">
+			<input type="submit" class="btn btn-info" value="Create Flow" name="cflow">
+		</div>
+
+
 		</form>
 		
 		<br />
