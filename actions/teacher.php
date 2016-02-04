@@ -19,6 +19,7 @@ if(isset($_SESSION['user'])) {
 		$htst = $tst + 120;
 		$hrt = $rt + 120;
 		$expe = mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['expe']))));
+		$sync = (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['sync']))));
 		$fesname = '';//$fesname =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['fesname']))));
 		$fl = (int) $_POST['fl'];
 		$fsg = (int) $_POST['fsg'];
@@ -37,7 +38,7 @@ if(isset($_SESSION['user'])) {
 			$error = 'Levels and Responses cannot be 0';
 		} else {
 			$datestamp = time();
-			mysqli_query($link,"insert into flow values (null, '$teacher_id', '$fname', '$fdes', '$fcname', '$fesname', '$fsg', '$fl', '$min_pyramid', '$expe', '$rps', '$datestamp', $tst, $rt, $htst, $hrt, '{$qs}')");
+			mysqli_query($link,"insert into flow values (null, '$teacher_id', '$fname', '$fdes', '$fcname', '$fesname', '$fsg', '$fl', '$min_pyramid', '$expe', '$rps', '$datestamp', $tst, $rt, $htst, $hrt, '{$qs}', {$sync})");
 		}
 	}
 } else {
@@ -197,7 +198,6 @@ $tq = $default_teacher_question;
 				</select>
 			</div>
 
-
 		<div class="form-group">
           <label for="fsg">No. Students. per Group:</label>
 		  <select class="form-control" id="fsg" name="fsg">
@@ -205,13 +205,21 @@ $tq = $default_teacher_question;
 			<option value="3">3</option>
           </select>
         </div>
-		
+
 		<div class="form-group">
           <label for="fl">No. Levels:</label>
 		  <select class="form-control" id="fl" name="fl">
 			  <option value="2">2</option>
 			  <option value="3" selected="selected">3</option>
 			  <option value="4">4</option>
+          </select>
+        </div>
+
+		<div class="form-group">
+          <label for="sync">Mode:</label>
+		  <select class="form-control" id="sync" name="sync">
+			  <option value="0">Asynchronous</option>
+			  <option value="1" selected="selected">Syncronous</option>
           </select>
         </div>
 

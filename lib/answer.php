@@ -304,26 +304,6 @@ function is_available_answers() {
     return $result;
 }
 
-/*
-function get_user_rating($fid, $who_rated, $to_whom_rated, $lvl) {
-    global $link;
-
-    $gpr_result_1 = mysqli_query($link, "select * from flow_student_rating where fsr_fid = '$fid' and fsr_sid= '$who_rated' and fsr_to_whom_rated_id = '$to_whom_rated' and fsr_level = '$lvl'");
-    //this is to check whether peer has rated for a particular student, i.e. to_whom_rated = sid
-    if(mysqli_num_rows($gpr_result_1) > 0)
-    {
-        $gpr_data_1 = mysqli_fetch_assoc($gpr_result_1);
-        $result = $gpr_data_1['fsr_rating'];
-    }
-    else
-    {
-        $result = '';
-    }
-
-    return $result;
-}
-*/
-
 function get_selected_ids($full=false) {
     global $link, $sid, $fid, $levels, $sname, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 

@@ -43,7 +43,11 @@ function add_latecomer($pid, $activity_level, $peer_group_id, $pid, $sid) {
 }
 
 function upgrade_level($forced = false) {
-    global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids;
+    global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $flow_data;
+
+    //we never upgrade the level on a syncronous situation
+    if($flow_data['sync'] == 0)
+        return false;
 
     if(!$forced) {
         //the answer phase has ended

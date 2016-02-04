@@ -1,6 +1,16 @@
 <?php
 namespace Util;
 
+function get_sql_pyramid($params) {
+    global $fid, $pid;
+
+    $table_prefix = '';
+    $fid_prefix = '';
+    $pid_prefix = '';
+
+    $sql = "{$table_prefix}{$fid_prefix}fid='{$fid}' and {$table_prefix}{$pid_prefix}pid='{$pid}'";
+}
+
 function sanitize_array($data_array) {
     global $link;
 
