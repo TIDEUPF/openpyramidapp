@@ -100,7 +100,7 @@ function retry() {
 }
 
 function request($params) {
-    global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_group_id, $peer_array, $flow_data;
+    global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_group_id, $peer_array, $flow_data, $peer_toolbar_strlen;
 
     $timeout = get_answer_timeout();
     $petition = (empty($flow_data['question'])) ? 'Write a question' : $flow_data['question'];
@@ -108,8 +108,8 @@ function request($params) {
     $username_text = (count(\Group\get_status_bar_peers()) > 0) ? $sname . ' + ' . (count(\Group\get_status_bar_peers())-1) : $sname;
 
     $peers = implode(', ', \group\get_peers_sname());
-    if(strlen($peers) > 15)
-        $peers = substr($peers, 0, 15) . '...';
+    if(strlen($peers) > $peer_toolbar_strlen)
+        $peers = substr($peers, 0, $peer_toolbar_strlen) . '...';
 
     $vars = array(
         'username' 				    => $sname . ' + ' . (count(\Group\get_status_bar_peers())-1),
@@ -147,7 +147,7 @@ function request($params) {
 }
 
 function request_rate($params) {
-    global $link, $fid, $levels, $sname, $activity_level, $peer_group_id, $peer_array;
+    global $link, $fid, $levels, $sname, $peer_toolbar_strlen, $activity_level, $peer_group_id, $peer_array;
 
     $answer_text_array = array();
     $hidden_input_array = array();
@@ -181,8 +181,8 @@ function request_rate($params) {
     $hidden_input_array['page'] = "answer_rating";
 
     $peers = implode(', ', \group\get_peers_sname());
-    if(strlen($peers) > 15)
-        $peers = substr($peers, 0, 15) . '...';
+    if(strlen($peers) > $peer_toolbar_strlen)
+        $peers = substr($peers, 0, $peer_toolbar_strlen) . '...';
 
     $vars = array(
         'username'              => $sname . ' + ' . (count(\Group\get_status_bar_peers())-1),
@@ -376,6 +376,7 @@ function view_final_answer($params) {
     \View\page(array(
         'title' => 'Question',
         'body' => $body,
+        'nosocket' => true,
     ));
     exit;
 }

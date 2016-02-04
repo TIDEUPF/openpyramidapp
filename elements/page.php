@@ -9,10 +9,12 @@
         <link rel="stylesheet" href="vendors/jquery-bar-rating/themes/font-awesome.min.css">
         <link rel="stylesheet" href="vendors/jquery-bar-rating/themes/fontawesome-stars.css">
         <script src="vendors/jquery-bar-rating/jquery.barrating.min.js"></script>
-        <script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
+        <script src="https://cdn.socket.io/socket.io-1.4.4.js"></script>
         <script src="lib/actions.js"></script>
         <script>
-            var socket = io({'reconnection': true,'reconnectionDelay': 1000,'maxReconnectionAttempts':Infinity});
+            <?php if(!isset($nosocket)):?>
+            var socket = io({multiplex : false, 'reconnection': true,'reconnectionDelay': 9000,'maxReconnectionAttempts':Infinity});
+            <?php endif;?>
             var timeoutPeriod = 10000;
             function del_vali(){ if(confirm('Submit Answer?')) { return true; }else{ return false; } }
             function del_vali2(){ if(confirm('Rate Answer?')) { return true; }else{ return false; } }

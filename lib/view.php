@@ -3,7 +3,7 @@
 Namespace View;
 
 function element($path, $vars, $filter = true) {
-    global $device;
+    global $device, $flow_data;
 
     $current_path = __DIR__;
 
@@ -40,10 +40,15 @@ function element($path, $vars, $filter = true) {
 }
 
 function page($params) {
-    $html = element("page",array(
+    $opts = [
         'title' => $params['title'],
         'body' => $params['body'],
-    ), false);
+    ];
+
+    if(isset($params['nosocket']))
+        $opts['nosocket'] = true;
+
+    $html = element("page", $opts, false);
 
     header('Content-Type: text/html; charset=utf-8');
     echo $html;

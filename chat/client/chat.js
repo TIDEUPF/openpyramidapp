@@ -229,7 +229,7 @@ $(function() {
     });
 
     $inputMessage.on('input', function() {
-        updateTyping();
+        //updateTyping();
     });
 
     // Click events

@@ -38,7 +38,7 @@ if(isset($_SESSION['user'])) {
 			$error = 'Levels and Responses cannot be 0';
 		} else {
 			$datestamp = time();
-			mysqli_query($link,"insert into flow values (null, '$teacher_id', '$fname', '$fdes', '$fcname', '$fesname', '$fsg', '$fl', '$min_pyramid', '$expe', '$rps', '$datestamp', $tst, $rt, $htst, $hrt, '{$qs}', {$sync})");
+			mysqli_query($link,"insert into flow values (null, '$teacher_id', '$fname', '$fdes', '$fcname', '$fesname', '$fsg', '$fl', '$min_pyramid', '$expe', '$rps', '$datestamp', $tst, $rt, $htst, $hrt, '{$qs}')");
 		}
 	}
 } else {
@@ -198,6 +198,7 @@ $tq = $default_teacher_question;
 				</select>
 			</div>
 
+
 		<div class="form-group">
           <label for="fsg">No. Students. per Group:</label>
 		  <select class="form-control" id="fsg" name="fsg">
@@ -205,7 +206,7 @@ $tq = $default_teacher_question;
 			<option value="3">3</option>
           </select>
         </div>
-
+		
 		<div class="form-group">
           <label for="fl">No. Levels:</label>
 		  <select class="form-control" id="fl" name="fl">
@@ -230,6 +231,14 @@ $tq = $default_teacher_question;
         </div>
 		-->
 		
+		<div class="form-group">
+			<label for="ch">Chat:</label>
+			<select class="form-control" id="ch" name="ch">
+				<option value="1" selected="selected">Enabled</option>
+				<option value="0">Disabled</option>
+			</select>
+		</div>
+
 		<div class="form-group">
           <input type="submit" class="btn btn-info" value="Create Flow" name="cflow">
         </div>

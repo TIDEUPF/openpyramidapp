@@ -129,6 +129,21 @@ function check_if_previous_groups_completed_task()
     return false;
 }
 
+function check_if_sibling_groups_hardtimer_expired() {
+    global $link, $sid, $fid, $flow_data, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+
+    //if all the groups are timed out the level is complete
+    $time = time();
+    $max_start_time = $time - $flow_data['hardtimer_rating'];
+    $complete_query = mysqli_query($link, "select * from pyramid_groups where pg_start_timestamp <= '{$max_start_time}' and pg_level = '{$activity_level}' and pg_started = 1 and pg_fid = '$fid'");
+    $all_query = mysqli_query($link, "select * from pyramid_groups where pg_level = '{$activity_level}' and pg_fid = '$fid'");
+    if(mysqli_num_rows($complete_query) == mysqli_num_rows($all_query))
+        return true;
+
+    return false;
+}
+
+
 function get_previous_groups_rated_count() {
     global $link, $sid, $levels, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
@@ -187,6 +202,9 @@ function is_level_timeout() {
 
     if($activity_level == 0 and !is_level_zero_rating_started())
         return \Answer\is_timeout();
+
+    if(sa_exists())
+        return true;
 
     //hardtimer
     $time = time();
