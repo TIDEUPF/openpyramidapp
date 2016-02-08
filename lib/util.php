@@ -8,7 +8,18 @@ function get_sql_pyramid($params) {
     $fid_prefix = '';
     $pid_prefix = '';
 
-    $sql = "{$table_prefix}{$fid_prefix}fid='{$fid}' and {$table_prefix}{$pid_prefix}pid='{$pid}'";
+    if(isset($params['table'])) {
+        $table_prefix = $params['table'];
+    }
+
+    if(isset($params['prefix'])) {
+        $fid_prefix = $params['prefix'];
+        $pid_prefix = $params['prefix'];
+    }
+
+    $sql = " {$table_prefix}{$fid_prefix}fid='{$fid}' and {$table_prefix}{$pid_prefix}pid='{$pid}' ";
+
+    return $sql;
 }
 
 function sanitize_array($data_array) {
