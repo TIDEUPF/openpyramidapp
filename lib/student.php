@@ -24,6 +24,7 @@ function enforce_login() {
 function level_is_rated() {
     global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids;
 
+    \Util\
     $sa_result_4 = mysqli_query($link, "select * from flow_student_rating where fsr_fid = '$fid' and fsr_sid= '$sid' and fsr_level = '$activity_level'");
     if(mysqli_num_rows($sa_result_4) > 0) {
         return true;

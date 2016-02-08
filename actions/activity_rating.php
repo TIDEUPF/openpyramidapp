@@ -6,7 +6,8 @@ $loop_count_group = 1;
 for($activity_level = 0; $activity_level<$levels; $activity_level++)
 {
     //find level info
-    $sa_result_1 = mysqli_query($link, "select * from pyramid_groups where pg_fid = '$fid' and pg_level = '$activity_level'");
+    $pyramid_sql = get_sql_pyramid(['prefix'=>'pg']);
+    $sa_result_1 = mysqli_query($link, "select * from pyramid_groups where {$pyramid_sql} and pg_level = '$activity_level'");
     if(mysqli_num_rows($sa_result_1) > 0){
         while($sa_data_1 = mysqli_fetch_assoc($sa_result_1))
         {
@@ -22,8 +23,8 @@ for($activity_level = 0; $activity_level<$levels; $activity_level++)
 
     //if first level - here generally 2 by 2 student groups (but there can be groups of 3 also)
     if($activity_level == 0){
-
-        $res4 = mysqli_query($link, "select * from flow_student where sid = '$sid' and fid = '$fid'");
+        $pyramid_sql = get_sql_pyramid();
+        $res4 = mysqli_query($link, "select * from flow_student where sid = '$sid' and {$pyramid_sql}");
         //the user already submitted the question
         if(mysqli_num_rows($res4) > 0){
             /*
@@ -78,15 +79,16 @@ for($activity_level = 0; $activity_level<$levels; $activity_level++)
 
             if($sid != $rate_peer_id){//the other peers
                 $screen_output[$activity_level] .= '<h5><span class="label label-default">Group peer: '.$rate_peer_id.'</span></h5>';
-
-                $res5 = mysqli_query($link, "select * from flow_student where sid = '$rate_peer_id' and fid = '$fid'");// to get peer answer
+                $pyramid_sql = get_sql_pyramid();
+                $res5 = mysqli_query($link, "select * from flow_student where sid = '$rate_peer_id' and {$pyramid_sql}");// to get peer answer
                 if(mysqli_num_rows($res5) > 0) {//the peer already submitted the question
                     $data5 = mysqli_fetch_assoc($res5);
                     $peer_answer = $data5['fs_answer'];
                     //$peer_answer_id = $data5['fs_id'];
 
                     //check if rated
-                    $res6 = mysqli_query($link, "select * from flow_student_rating where fsr_fid = '$fid' and fsr_sid= '$sid' and fsr_to_whom_rated_id = '$rate_peer_id' and fsr_level = '$activity_level'");
+                    $pyramid_sql = get_sql_pyramid(['prefix'=>'fsr']);
+                    $res6 = mysqli_query($link, "select * from flow_student_rating where {$pyramid_sql} and fsr_sid= '$sid' and fsr_to_whom_rated_id = '$rate_peer_id' and fsr_level = '$activity_level'");
                     if(mysqli_num_rows($res6) > 0){//rated
                         $data6 = mysqli_fetch_assoc($res6);
                         $screen_output[$activity_level] .= '<span>'.$peer_answer.'</span><br /><span class="text-primary small">You rated: '.$data6['fsr_rating'].'</span>';
@@ -139,7 +141,8 @@ for($activity_level = 0; $activity_level<$levels; $activity_level++)
             $sa_rated = ""; unset($sa_rated_amount); unset($sa_rated_id);
             unset($pre_task_completed);
             //find previous level selected answers
-            $sa_result_1 = mysqli_query($link, "select * from pyramid_groups where pg_fid = '$fid' and pg_level = '$activity_level'");
+            $pyramid_sql = get_sql_pyramid(['prefix'=>'pg']);
+            $sa_result_1 = mysqli_query($link, "select * from pyramid_groups where {$pyramid_sql} and pg_level = '$activity_level'");
             if(mysqli_num_rows($sa_result_1) > 0){ //get current level pyramid group info
                 while($sa_data_1 = mysqli_fetch_assoc($sa_result_1))
                 {
@@ -157,7 +160,8 @@ for($activity_level = 0; $activity_level<$levels; $activity_level++)
 
             //check if groups completed previous task
             foreach($peer_group_combined_ids_temp as $pgcid_group_id_temp){
-                $sa_result_2 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level = '$activity_level_previous' and sa_group_id = '$pgcid_group_id_temp'");
+                $pyramid_sql = get_sql_pyramid(['prefix'=>'sa']);
+                $sa_result_2 = mysqli_query($link, "select * from selected_answers where {$pyramid_sql} and sa_level = '$activity_level_previous' and sa_group_id = '$pgcid_group_id_temp'");
                 if(mysqli_num_rows($sa_result_2) > 0){
                     $pre_task_completed[] = 1;
                 }
@@ -166,7 +170,8 @@ for($activity_level = 0; $activity_level<$levels; $activity_level++)
 
             //check if rated
             $rate_peer_id = $selected_a_id;
-            $sa_result_4 = mysqli_query($link, "select * from flow_student_rating where fsr_fid = '$fid' and fsr_sid= '$sid' and fsr_level = '$activity_level'");
+            $pyramid_sql = get_sql_pyramid(['prefix'=>'fsr']);
+            $sa_result_4 = mysqli_query($link, "select * from flow_student_rating where {$pyramid_sql} and fsr_sid= '$sid' and fsr_level = '$activity_level'");
             if(mysqli_num_rows($sa_result_4) > 0){
                 while($sa_data_4 = mysqli_fetch_assoc($sa_result_4)){
                     $sa_rated = "yes";
@@ -182,13 +187,15 @@ for($activity_level = 0; $activity_level<$levels; $activity_level++)
                 for($sar = 0; $sar<count($sa_rated_id); $sar++)
                 {
                     $sa_rated_id_temp = $sa_rated_id[$sar];
-                    $sa_data_3 = mysqli_fetch_assoc(mysqli_query($link, "select * from flow_student where fid = '$fid' and sid = '$sa_rated_id_temp'"));
+                    $pyramid_sql = get_sql_pyramid();
+                    $sa_data_3 = mysqli_fetch_assoc(mysqli_query($link, "select * from flow_student where {$pyramid_sql} and sid = '$sa_rated_id_temp'"));
                     $selected_qa = $sa_data_3['fs_answer'];
                     $screen_output[$activity_level] .= '<span>'.$selected_qa.'</span><br /><span class="text-primary small">You rated: '.$sa_rated_amount[$sar].'</span><br />';
                 }
 
                 //check if peers rated
-                $sa_result_5 = mysqli_query($link, "select * from flow_student_rating where fsr_fid = '$fid' and fsr_level = '$activity_level' and fsr_group_id = '$peer_group_id'");
+                $pyramid_sql = get_sql_pyramid(['prefix'=>'fsr']);
+                $sa_result_5 = mysqli_query($link, "select * from flow_student_rating where {$pyramid_sql} and fsr_level = '$activity_level' and fsr_group_id = '$peer_group_id'");
                 if(mysqli_num_rows($sa_result_5) != count($peer_array)){
                     //TODO:wait for others peers to rate
                     $screen_output[$activity_level] .= '<br /><b><span class="small text-warning">All peers have NOT rated yet.</b></span><br />';
@@ -201,12 +208,14 @@ for($activity_level = 0; $activity_level<$levels; $activity_level++)
                 $hidden_frm_cnt = 1;
                 $question_text_array = array();
                 foreach($peer_group_combined_ids_temp as $pgcid_group_id_temp){
-                    $sa_result_2 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level = '$activity_level_previous' and sa_group_id = '$pgcid_group_id_temp'");
+                    $pyramid_sql = get_sql_pyramid(['prefix'=>'sa']);
+                    $sa_result_2 = mysqli_query($link, "select * from selected_answers where {$pyramid_sql} and sa_level = '$activity_level_previous' and sa_group_id = '$pgcid_group_id_temp'");
                     if(mysqli_num_rows($sa_result_2) > 0){
                         $sa_data_2 = mysqli_fetch_assoc($sa_result_2);
                         $selected_a_id = $sa_data_2['sa_selected_id'];
                         //get answer from id
-                        $sa_data_3 = mysqli_fetch_assoc(mysqli_query($link, "select * from flow_student where fid = '$fid' and sid = '$selected_a_id'"));
+                        $pyramid_sql = get_sql_pyramid();
+                        $sa_data_3 = mysqli_fetch_assoc(mysqli_query($link, "select * from flow_student where {$pyramid_sql} and sid = '$selected_a_id'"));
                         $selected_qa = $sa_data_3['fs_answer'];
 
                         $screen_output[$activity_level] .= '<br /><span class=""><b>'.$pgcid_temp_count.'. '.$selected_qa.'</b></span><br />';
@@ -277,12 +286,14 @@ for($activity_level = 0; $activity_level<$levels; $activity_level++)
         $needed_results = $group_size * $st_count; //because now every student is rating two answers, need to occupy all answers
     }
 
-    $result_2= mysqli_query($link, "select * from flow_student_rating where fsr_fid = '$fid' and fsr_level = '$activity_level' and fsr_group_id = '$peer_group_id'");
+    $pyramid_sql = get_sql_pyramid(['prefix'=>'fsr']);
+    $result_2= mysqli_query($link, "select * from flow_student_rating where {$pyramid_sql} and fsr_level = '$activity_level' and fsr_group_id = '$peer_group_id'");
     if(mysqli_num_rows($result_2) != $needed_results){
         continue;
     }
     else{ //to sum the ratings
-        $result_3= mysqli_query($link, "SELECT fsr_to_whom_rated_id, SUM(fsr_rating) as sum FROM `flow_student_rating` where fsr_fid = '$fid' and fsr_level = '$activity_level' and fsr_group_id = '$peer_group_id' group by fsr_to_whom_rated_id order by SUM(fsr_rating) desc limit 1");
+        $pyramid_sql = get_sql_pyramid(['prefix'=>'fsr']);
+        $result_3= mysqli_query($link, "SELECT fsr_to_whom_rated_id, SUM(fsr_rating) as sum FROM `flow_student_rating` where {$pyramid_sql} and fsr_level = '$activity_level' and fsr_group_id = '$peer_group_id' group by fsr_to_whom_rated_id order by SUM(fsr_rating) desc limit 1");
         $data_t_2 = mysqli_fetch_assoc($result_3);
 
         $selected_id = $data_t_2['fsr_to_whom_rated_id'];
@@ -294,13 +305,16 @@ for($activity_level = 0; $activity_level<$levels; $activity_level++)
         //last level-- to show selected answers
         if($activity_level == $levels-1){
             //all users answered so proceed to show the final results
-            if( mysqli_num_rows(mysqli_query($link, "select * from pyramid_groups where pg_fid = '$fid'")) == mysqli_num_rows(mysqli_query($link, "select * from selected_answers where sa_fid = '$fid'")) ){
+            $pyramid_sql['pg'] = get_sql_pyramid(['prefix'=>'pg']);
+            $pyramid_sql['sa'] = get_sql_pyramid(['prefix'=>'sa']);
+            if( mysqli_num_rows(mysqli_query($link, "select * from pyramid_groups where {$pyramid_sql['pg']}")) == mysqli_num_rows(mysqli_query($link, "select * from selected_answers where {$pyramid_sql['sa']}")) ){
 
-                $result_11= mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level = '$activity_level'");
+                $result_11= mysqli_query($link, "select * from selected_answers where $pyramid_sql['sa'] and sa_level = '$activity_level'");
                 $screen_output[$levels] .= '<br /><h4><span class="label btn-success">Activity is completed!! &nbsp;- &nbsp; Final selections are:</span></h4><br />';
                 while($data_t_11 = mysqli_fetch_assoc($result_11)){
                     $qa_last_selected_id = $data_t_11['sa_selected_id'];
-                    $result_12= mysqli_query($link, "select * from flow_student where fid = '$fid' and sid = '$qa_last_selected_id'");
+                    $pyramid_sql = get_sql_pyramid();
+                    $result_12= mysqli_query($link, "select * from flow_student where {$pyramid_sql} and sid = '$qa_last_selected_id'");
                     $data_t_12 = mysqli_fetch_assoc($result_12);
                     $screen_output[$levels] .= '<br /><span class=""><B>'.$data_t_12['fs_answer'].'</B></span><br />';
                 }
