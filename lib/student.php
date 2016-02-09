@@ -22,7 +22,7 @@ function enforce_login() {
 }
 
 function level_is_rated() {
-    global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids;
+    global $link, $sid,  $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids;
 
     $sa_result_4 = mysqli_query($link, "select * from flow_student_rating where {$ps['fsr']} and fsr_sid= '$sid' and fsr_level = '$activity_level'");
     if(mysqli_num_rows($sa_result_4) > 0) {
@@ -33,9 +33,9 @@ function level_is_rated() {
 }
 
 function get_rating($answer_id) {
-    global $link, $sid, $fid, $activity_level, $peer_group_id;
+    global $link, $sid,  $fid, $ps, $activity_level, $peer_group_id;
 
-    $answer_rating_result = mysqli_query($link, "select * from flow_student_rating where fsr_fid = '$fid' and fsr_sid= '$sid' and fsr_level = '$activity_level' and fsr_group_id = '{$peer_group_id}' and fsr_to_whom_rated_id='{$answer_id}'");
+    $answer_rating_result = mysqli_query($link, "select * from flow_student_rating where {$ps['fsr']} and fsr_sid= '$sid' and fsr_level = '$activity_level' and fsr_group_id = '{$peer_group_id}' and fsr_to_whom_rated_id='{$answer_id}'");
     if(mysqli_num_rows($answer_rating_result) > 0) {
         $answer_rating_result_array = mysqli_fetch_assoc($link, $answer_rating_result);
 
@@ -45,7 +45,7 @@ function get_rating($answer_id) {
 }
 
 function timeout_view($params) {
-    global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_group_id;
+    global $link, $sid,  $fid, $ps, $sname, $levels, $activity_level, $peer_group_id;
 
     $vars = array(
         'username' 					=> $sname,

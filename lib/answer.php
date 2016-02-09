@@ -3,7 +3,7 @@
 namespace Answer;
 
 function is_submitted($params) {
-    global $link, $sid, $fid;
+    global $link, $sid, $ps;
 
     $res4 = mysqli_query($link, "select * from flow_student where sid = '$sid' and {$ps['e']}");
     //the user already submitted the answer
@@ -31,7 +31,7 @@ function get_user_answer($sid, $fid) {
 }
 
 function submit($params) {
-    global $link, $sid, $fid, $pid, $input_result, $answer_submit_required_percentage, $peer_array;
+    global $link, $sid, $fid, $ps, $pid, $input_result, $answer_submit_required_percentage, $peer_array;
 
     if(!empty($pid)) {
         if (\Answer\is_timeout())
@@ -100,7 +100,7 @@ function retry() {
 }
 
 function request($params) {
-    global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_group_id, $peer_array, $flow_data, $peer_toolbar_strlen;
+    global $link, $sid, $fid, $ps, $sname, $levels, $activity_level, $peer_group_id, $peer_array, $flow_data, $peer_toolbar_strlen;
 
     $timeout = get_answer_timeout();
     $petition = (empty($flow_data['question'])) ? 'Write a question' : $flow_data['question'];
@@ -128,6 +128,7 @@ function request($params) {
 
     $hidden_input_array['username'] = $sname;
     $hidden_input_array['fid'] = $fid;
+    $hidden_input_array['pid'] = $pid;
     $hidden_input_array['level'] = $level_text;
     $hidden_input_array['group_id'] = $peer_group_id;
     $hidden_input_array['page'] = "answer_form";
@@ -147,7 +148,7 @@ function request($params) {
 }
 
 function request_rate($params) {
-    global $link, $fid, $levels, $sname, $peer_toolbar_strlen, $activity_level, $peer_group_id, $peer_array;
+    global $link, $fid, $ps, $levels, $sname, $peer_toolbar_strlen, $activity_level, $peer_group_id, $peer_array;
 
     $answer_text_array = array();
     $hidden_input_array = array();
@@ -176,6 +177,7 @@ function request_rate($params) {
     $hidden_input_array['numofqustions'] = $i-1;
     $hidden_input_array['username'] = $sname;
     $hidden_input_array['fid'] = $fid;
+    $hidden_input_array['pid'] = $pid;
     $hidden_input_array['group_id'] = $peer_group_id;
     $hidden_input_array['level'] = \Pyramid\get_current_level();
     $hidden_input_array['page'] = "answer_rating";
@@ -207,7 +209,7 @@ function request_rate($params) {
 }
 
 function submit_rate() {
-    global $link, $sid, $fid, $timeout, $input_result, $activity_level;
+    global $link, $sid, $fid, $pid, $ps, $timeout, $input_result, $activity_level;
 
     if(!isset($_POST['rate']))
         return false;
@@ -269,7 +271,7 @@ function submit_rate() {
 }
 
 function skip_rating() {
-    global $link, $sid, $fid, $levels, $sname, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+    global $link, $sid, $fid, $pid, $ps, $levels, $sname, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
     $n_real_answers = count(get_selected_ids(false));
 
@@ -292,7 +294,7 @@ function skip_rating() {
 }
 
 function is_available_answers() {
-    global $link, $sid, $fid, $levels, $sname, $activity_level;
+    global $link, $sid, $fid, $ps, $levels, $sname, $activity_level;
 
     try {
         $result = count(get_selected_ids()) > 0;
@@ -305,7 +307,7 @@ function is_available_answers() {
 }
 
 function get_selected_ids($full=false) {
-    global $link, $sid, $fid, $levels, $sname, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+    global $link, $sid, $fid, $ps, $levels, $sname, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
     $result = [];
     $activity_level_previous = $activity_level-1;
@@ -342,7 +344,7 @@ function get_selected_ids($full=false) {
 }
 
 function view_final_answer($params) {
-    global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_group_id;
+    global $link, $sid, $fid, $pid, $ps, $sname, $levels, $activity_level, $peer_group_id;
 
     if(count($params['final_answer_array'])>1)
         $winning_text = 'The winning questions are';
@@ -362,6 +364,7 @@ function view_final_answer($params) {
 
     $hidden_input_array['username'] = $sname;
     $hidden_input_array['fid'] = $fid;
+    $hidden_input_array['pid'] = $pid;
     $hidden_input_array['level'] = \Pyramid\get_current_level();
     $hidden_input_array['page'] = "winning_answers";
     $hidden_input_array['group_id'] = $peer_group_id;
@@ -382,7 +385,7 @@ function view_final_answer($params) {
 }
 
 function get_answer_timeout() {
-    global $link, $sid, $fid, $pid, $ftimestamp, $answer_timeout, $answer_skip_timeout, $peer_array;
+    global $link, $sid, $fid, $ps, $pid, $ftimestamp, $answer_timeout, $answer_skip_timeout, $peer_array;
 
     $peer_array_sql = implode("','", \Util\sanitize_array($peer_array));
     $r_start = mysqli_query($link, "select * from pyramid_students where timestamp > 0 and {$ps['e']} order by `timestamp` asc limit 1");
@@ -419,7 +422,7 @@ function get_answer_timeout() {
 }
 
 function is_timeout() {
-    global $link, $sid, $fid, $ftimestamp, $answer_timeout, $peer_array, $activity_level, $peer_group_id, $flow_data;
+    global $link, $sid, $fid, $ps, $ftimestamp, $answer_timeout, $peer_array, $activity_level, $peer_group_id, $flow_data;
     //check for the minimum participants for timeout
     $answertimestamp = 0;
 

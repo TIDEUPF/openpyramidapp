@@ -3,7 +3,7 @@
 namespace Pyramid;
 
 function get_current_activity_level() {
-    global $link, $sid, $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids;
+    global $link, $sid,  $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids;
 
     $activity_level = 0;
 
@@ -20,10 +20,10 @@ function get_current_activity_level() {
 }
 
 function get_available_level() {
-    global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids;
+    global $link, $sid,  $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids;
 
     //get the lowest active level providing the timeout is not set
-    $available_result = mysqli_query($link, "select pg_level, pg_group_id from pyramid_groups where pg_fid = '$fid' and pg_timestamp = 0 order by pg_level asc limit 1");
+    $available_result = mysqli_query($link, "select pg_level, pg_group_id from pyramid_groups where {$ps['pg']} and pg_timestamp = 0 order by pg_level asc limit 1");
 
     if(mysqli_num_rows($available_result) > 0) {
         $available_data = mysqli_fetch_assoc($available_result);
@@ -43,7 +43,7 @@ function add_latecomer($pid, $activity_level, $peer_group_id, $pid, $sid) {
 }
 
 function upgrade_level($forced = false) {
-    global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $flow_data;
+    global $link, $sid,  $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $flow_data;
 
     //we never upgrade the level on a syncronous situation
     if($flow_data['sync'] == 0)
@@ -110,7 +110,7 @@ function upgrade_level($forced = false) {
 }
 
 function set_selected_answers() {
-    global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids;
+    global $link, $sid,  $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids;
 
     //to sum the ratings
     $ssa_result_1= mysqli_query($link, "SELECT fsr_to_whom_rated_id, skip, SUM(fsr_rating) as sum FROM `flow_student_rating` where {$ps['fsr']} and fsr_level = '$activity_level' and fsr_group_id = '$peer_group_id' group by fsr_to_whom_rated_id order by SUM(fsr_rating) desc limit 1");
@@ -130,16 +130,16 @@ function set_selected_answers() {
 }
 
 function set_selected_answers_for_previous_groups() {
-    global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids;
+    global $link, $sid,  $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids;
 
     $previous_groups_ids = explode(',', $peer_group_combined_ids);
     $previous_level = $activity_level - 1;
 
     foreach($previous_groups_ids as $fpgi) {
-        if(mysqli_num_rows(mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_group_id='{$fpgi}' and sa_level='{$previous_level}'")) > 0)
+        if(mysqli_num_rows(mysqli_query($link, "select * from selected_answers where {$ps['sa']} and sa_group_id='{$fpgi}' and sa_level='{$previous_level}'")) > 0)
             continue;
 
-        $ssa_result_1= mysqli_query($link, "SELECT fsr_to_whom_rated_id, skip, SUM(fsr_rating) as sum FROM `flow_student_rating` where fsr_fid = '$fid' and fsr_level = '$previous_level' and fsr_group_id = '$fpgi' group by fsr_to_whom_rated_id order by SUM(fsr_rating) desc limit 1");
+        $ssa_result_1= mysqli_query($link, "SELECT fsr_to_whom_rated_id, skip, SUM(fsr_rating) as sum FROM `flow_student_rating` where {$ps['fsr']} and fsr_level = '$previous_level' and fsr_group_id = '$fpgi' group by fsr_to_whom_rated_id order by SUM(fsr_rating) desc limit 1");
 
         if(mysqli_num_rows($ssa_result_1)> 0) {
             $ssa_data_1 = mysqli_fetch_assoc($ssa_result_1);
@@ -174,7 +174,7 @@ function set_selected_answers_for_previous_groups() {
 }
 /*
 function get_level_info() {
-    global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids;
+    global $link, $sid,  $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids;
     $sa_result_1 = mysqli_query($link, "select * from pyramid_groups where pg_fid = '$fid' and pg_level = '$activity_level'");
     if(mysqli_num_rows($sa_result_1) > 0){
         while($sa_data_1 = mysqli_fetch_assoc($sa_result_1))
@@ -195,7 +195,7 @@ function get_groups($params) {
 }
 
 function is_level_computed($params) {
-    global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+    global $link, $sid,  $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
     $pre_task_completed = array();
     $activity_level_previous = $activity_level-1;
@@ -215,9 +215,9 @@ function is_level_computed($params) {
 }
 
 function compute_level_rating() {
-    global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+    global $link, $sid,  $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
-    $result_3= mysqli_query($link, "SELECT fsr_to_whom_rated_id, SUM(fsr_rating) as sum FROM `flow_student_rating` where fsr_fid = '$fid' and fsr_level = '$activity_level' and fsr_group_id = '$peer_group_id' group by fsr_to_whom_rated_id order by SUM(fsr_rating) desc limit 1");
+    $result_3= mysqli_query($link, "SELECT fsr_to_whom_rated_id, SUM(fsr_rating) as sum FROM `flow_student_rating` where {$ps['fsr']} and fsr_level = '$activity_level' and fsr_group_id = '$peer_group_id' group by fsr_to_whom_rated_id order by SUM(fsr_rating) desc limit 1");
     $data_t_2 = mysqli_fetch_assoc($result_3);
 
     $selected_id = $data_t_2['fsr_to_whom_rated_id'];
@@ -226,12 +226,12 @@ function compute_level_rating() {
 }
 
 function is_complete() {
-    global $link, $sid, $fid, $levels, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+    global $link, $sid,  $fid, $ps, $levels, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
     //last level-- to show selected answers
     if($activity_level == $levels) {
         //all users answered so proceed to show the final results
-        if( mysqli_num_rows(mysqli_query($link, "select * from pyramid_groups where pg_fid = '$fid'")) == mysqli_num_rows(mysqli_query($link, "select * from selected_answers where sa_fid = '$fid'")) ) {
+        if( mysqli_num_rows(mysqli_query($link, "select * from pyramid_groups where {$ps['pg']}")) == mysqli_num_rows(mysqli_query($link, "select * from selected_answers where {$ps['sa']}")) ) {
             return true;
         }
     }
@@ -239,7 +239,7 @@ function is_complete() {
 }
 
 function is_final_level_complete() {
-    global $link, $sid, $fid, $levels, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+    global $link, $sid,  $fid, $ps, $levels, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
     $last_level = $activity_level -1;
     $is_final_level_completed = mysqli_num_rows(mysqli_query($link, "select * from selected_answers where {$ps['sa']} and sa_group_id='{$peer_group_id}' and sa_level='{$last_level}'")) > 0;
@@ -259,10 +259,10 @@ function get_current_level() {
 }
 
 function show_final_answer() {
-    global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+    global $link, $sid,  $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
     $activity_level_previous = $activity_level-1;
-    $result_11 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level = '$activity_level_previous' and skip = '0'");
+    $result_11 = mysqli_query($link, "select * from selected_answers where {$ps['sa']} and sa_level = '$activity_level_previous' and skip = '0'");
     $answers = array();
     while ($data_t_11 = mysqli_fetch_assoc($result_11)) {
         $qa_last_selected_id = $data_t_11['sa_selected_id'];
@@ -280,7 +280,7 @@ function show_final_answer() {
 }
 
 function get_current_flow() {
-    global $levels, $fname, $fdes, $fid, $link, $ftimestamp, $flow_data, $timeout, $answer_timeout, $pyramid_minsize;
+    global $levels, $fname, $fdes,  $fid, $ps, $link, $ftimestamp, $flow_data, $timeout, $answer_timeout, $pyramid_minsize;
     //get information the latest flow
     $res3 = mysqli_query($link, "select * from flow order by fid desc limit 1");
     if(mysqli_num_rows($res3) > 0){
@@ -315,7 +315,7 @@ function get_current_flow() {
 }
 
 function wait($params) {
-    global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_group_id, $peer_array, $peer_group_combined_ids;
+    global $link, $sid,  $fid, $ps, $sname, $levels, $activity_level, $peer_group_id, $peer_array, $peer_group_combined_ids;
 
     $initial_level = $activity_level;
     upgrade_level();
@@ -365,7 +365,7 @@ function wait($params) {
 }
 
 function wait_pyramid($params) {
-    global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_group_id, $peer_array, $peer_group_combined_ids;
+    global $link, $sid,  $fid, $ps, $sname, $levels, $activity_level, $peer_group_id, $peer_array, $peer_group_combined_ids;
 
     $initial_level = $activity_level;
     upgrade_level();
@@ -399,7 +399,7 @@ function wait_pyramid($params) {
 
 //remove users that didn't submit due the timeout in the previous level
 function set_previous_level_peer_active_group_ids() {
-    global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+    global $link, $sid,  $fid, $ps, $sname, $levels, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
     if(\Group\is_level_timeout())//redundant
         return false;
@@ -433,7 +433,7 @@ function set_previous_level_peer_active_group_ids() {
 }
 
 function available_students() {
-    global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+    global $link, $sid,  $fid, $ps, $sname, $levels, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
     $students = [];
     $result = mysqli_query($link, "select distinct * from flow_available_students where fid='$fid' and sid not in (select sid from pyramid_students where fid='$fid')");
@@ -446,9 +446,9 @@ function available_students() {
 
 //update the pyramid to add the latecomers
 function update_pyramid($fid, $pid) {
-    global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+    global $link, $sid,  $fid, $ps, $sname, $levels, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
-    $pyramid_result = mysqli_query($link, "select * from pyramid_groups where pg_fid = '{$fid}' and pg_pid ='$pid' order by pg_level asc");
+    $pyramid_result = mysqli_query($link, "select * from pyramid_groups where {$ps['pg']} order by pg_level asc");
     while($pyramid_row = mysqli_fetch_assoc($pyramid_result)) {
         $pyramid_row['pg_group'] = explode(',' , $pyramid_row['pg_group']);
         $pyramid_row['pg_latecomers'] = explode(',' , $pyramid_row['pg_latecomers']);
@@ -495,7 +495,7 @@ function update_pyramid($fid, $pid) {
 }
 
 function get_inactive_level_group_peers() {
-    global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+    global $link, $sid,  $fid, $ps, $sname, $levels, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
     //$peer_group_combined_ids_array = explode(',',$peer_group_combined_ids);
     $peer_array_sql = implode("','", \Util\sanitize_array($peer_array));
@@ -514,7 +514,7 @@ function get_inactive_level_group_peers() {
 }
 
 function remaining_pyramids() {
-    global $link, $pyramid_minsize, $fid, $flow_data;
+    global $link, $pyramid_minsize,  $fid, $ps, $flow_data;
 
     $result = mysqli_query($link, "select sid from pyramid_students where fid = '$fid'");
     $nflow_students = mysqli_num_rows($result);
@@ -571,7 +571,7 @@ function get_student_pyramid($fid, $sid) {
 }
 
 function create_pyramid($fid, $fl, $fsg) {
-    global $link, $fid, $flow_data, $pyramid_minsize;
+    global $link,  $fid, $ps, $flow_data, $pyramid_minsize;
 
     //find the last pid
     $pid = null;
