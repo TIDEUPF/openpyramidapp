@@ -1,7 +1,7 @@
 <?php
 namespace Util;
 
-function get_sql_pyramid($params) {
+function get_sql_pyramid($params= null) {
     global $fid, $pid;
 
     $table_prefix = '';
@@ -20,6 +20,16 @@ function get_sql_pyramid($params) {
     $sql = " {$table_prefix}{$fid_prefix}fid='{$fid}' and {$table_prefix}{$pid_prefix}pid='{$pid}' ";
 
     return $sql;
+}
+
+function sql_gen() {
+    global $ps;
+    $prefixes = ['sa', 'pg'];
+
+    $ps['e'] = get_sql_pyramid();
+    foreach($prefixes as $p) {
+        $ps[$p] = get_sql_pyramid(['prefix'=>$p]);
+    }
 }
 
 function sanitize_array($data_array) {

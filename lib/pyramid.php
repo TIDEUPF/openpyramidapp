@@ -564,6 +564,9 @@ function get_student_pyramid($fid, $sid) {
     $result_row = mysqli_fetch_assoc($result);
 
     $pid = (int)$result_row['pid'];
+
+    \Util\sql_gen();
+
     return $pid;
 }
 
