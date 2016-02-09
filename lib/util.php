@@ -24,7 +24,7 @@ function get_sql_pyramid($params= null) {
 
 function sql_gen() {
     global $ps;
-    $prefixes = ['sa', 'pg'];
+    $prefixes = ['sa', 'pg', 'fsr'];
 
     $ps['e'] = get_sql_pyramid();
     foreach($prefixes as $p) {

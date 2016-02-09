@@ -5,7 +5,7 @@ namespace Answer;
 function is_submitted($params) {
     global $link, $sid, $fid;
 
-    $res4 = mysqli_query($link, "select * from flow_student where sid = '$sid' and fid = '$fid'");
+    $res4 = mysqli_query($link, "select * from flow_student where sid = '$sid' and {$ps['e']}");
     //the user already submitted the answer
     if(mysqli_num_rows($res4) > 0)
         return true;
@@ -56,7 +56,7 @@ function submit($params) {
 
     if ($ans_input != '') {
         //why can't edit the answer once submitted? because should not rate while editing. wrong answer will be rated
-        if (mysqli_num_rows(mysqli_query($link, "select * from flow_student where sid = '$sid' and fid = '$fid'")) > 0) {
+        if (mysqli_num_rows(mysqli_query($link, "select * from flow_student where sid = '$sid' and {$ps['e']}")) > 0) {
             return true;
             //edit if already answered
             //mysqli_query($link,"update flow_student set fs_answer = '$ans_input' where sid = '$sid' and fid_ = '$fid'");
@@ -315,7 +315,7 @@ function get_selected_ids($full=false) {
 
     if($activity_level == 0) {
         foreach ($peer_array as $rate_peer_id) {
-            $res5 = mysqli_query($link, "select * from flow_student where sid = '$rate_peer_id' and fid = '$fid' {$skip_answers}");// to get peer answer
+            $res5 = mysqli_query($link, "select * from flow_student where sid = '$rate_peer_id' and {$ps['e']} {$skip_answers}");// to get peer answer
             if (mysqli_num_rows($res5) > 0) {//the peer already submitted the answer
                 $result[] = $rate_peer_id;
             }
@@ -326,7 +326,7 @@ function get_selected_ids($full=false) {
         }
     } else {
         foreach ($peer_group_combined_ids_temp as $pgcid_group_id_temp) {
-            $sa_result_2 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level = '$activity_level_previous' and sa_group_id = '$pgcid_group_id_temp' {$skip_answers}");
+            $sa_result_2 = mysqli_query($link, "select * from selected_answers where {$ps['sa']} and sa_level = '$activity_level_previous' and sa_group_id = '$pgcid_group_id_temp' {$skip_answers}");
             if (mysqli_num_rows($sa_result_2) > 0) {
                 $sa_data_2 = mysqli_fetch_assoc($sa_result_2);
                 $result[] = $sa_data_2['sa_selected_id'];
@@ -385,10 +385,10 @@ function get_answer_timeout() {
     global $link, $sid, $fid, $pid, $ftimestamp, $answer_timeout, $answer_skip_timeout, $peer_array;
 
     $peer_array_sql = implode("','", \Util\sanitize_array($peer_array));
-    $r_start = mysqli_query($link, "select * from pyramid_students where timestamp > 0 and fid = '$fid' and pid='{$pid}' order by `timestamp` asc limit 1");
+    $r_start = mysqli_query($link, "select * from pyramid_students where timestamp > 0 and {$ps['e']} order by `timestamp` asc limit 1");
     $pyramid = mysqli_fetch_assoc($r_start);
 
-    $r_submitted_answers = mysqli_query($link, "select * from flow_student where fid = '$fid' and sid in ('{$peer_array_sql}') order by `timestamp` asc");
+    $r_submitted_answers = mysqli_query($link, "select * from flow_student where {$ps['e']} and sid in ('{$peer_array_sql}') order by `timestamp` asc");
     $n_submitted_answers = mysqli_num_rows($r_submitted_answers);
 
     $answer_timeout_start = null;
@@ -434,7 +434,7 @@ function is_timeout() {
         return true;
 
     //rating has started(even if still is not submitted by anyone)
-    $result = mysqli_query($link, "select * from pyramid_groups where pg_fid='{$fid}' and pg_level='0' and pg_group_id='{$peer_group_id}' and pg_started=1");
+    $result = mysqli_query($link, "select * from pyramid_groups where {$ps['pg']} and pg_level='0' and pg_group_id='{$peer_group_id}' and pg_started=1");
     if(mysqli_num_rows($result) > 0)
         return true;
 
