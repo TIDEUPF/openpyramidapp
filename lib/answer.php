@@ -20,7 +20,7 @@ function is_submitted($params) {
 function get_user_answer($sid, $fid) {
     global $link;
 
-    $cua_result_1 = mysqli_query($link, "select * from flow_student where sid = '$sid' and fid = '$fid'");
+    $cua_result_1 = mysqli_query($link, "select * from flow_student where sid = '$sid' and {$ps['e']}");
     if(mysqli_num_rows($cua_result_1) > 0)
     {
         $cua_data_1 = mysqli_fetch_assoc($cua_result_1);
@@ -63,7 +63,7 @@ function submit($params) {
             //if(mysqli_affected_rows($link) > 0){ $success = 'Submitted.'; }
         } else {
             //insert new
-            mysqli_query($link, "insert into flow_student values (null, '$fid', '$sid', '$ans_input', 0, $answertimestamp)");
+            mysqli_query($link, "insert into flow_student values (null, '$fid', '$pid', '$sid', '$ans_input', 0, $answertimestamp)");
             /*if (mysqli_affected_rows($link) > 0) {
                 $success = 'Submitted.';
             } else {
@@ -156,7 +156,7 @@ function request_rate($params) {
 
     $answer_ids = get_selected_ids();
     foreach($answer_ids as $answer_id) {
-        $res5 = mysqli_query($link, "select * from flow_student where sid = '$answer_id' and fid = '$fid' and skip = 0");// to get peer answer
+        $res5 = mysqli_query($link, "select * from flow_student where sid = '$answer_id' and {$ps['e']} and skip = 0");// to get peer answer
         if(mysqli_num_rows($res5) > 0) {//the peer already submitted the answer
             $data5 = mysqli_fetch_assoc($res5);
             $peer_answer = $data5['fs_answer'];
@@ -442,7 +442,7 @@ function is_timeout() {
         return true;
 
     $peer_array_sql = implode("','", \Util\sanitize_array($peer_array));
-    $r_submitted_answers = mysqli_query($link, "select * from flow_student where fid = '$fid' and sid in ('{$peer_array_sql}') order by `timestamp` asc");
+    $r_submitted_answers = mysqli_query($link, "select * from flow_student where {$ps['e']} and sid in ('{$peer_array_sql}') order by `timestamp` asc");
     $n_submitted_answers = mysqli_num_rows($r_submitted_answers);
 
     //all student submitted

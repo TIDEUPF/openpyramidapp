@@ -58,7 +58,7 @@ else{
 				echo '<br /><span class="label btn-success">Selected answers are:</span><br />';
 				while ($data_t_11 = mysqli_fetch_assoc($result_11)) {
 					$qa_last_selected_id = $data_t_11['sa_selected_id'];
-					$result_12 = mysqli_query($link, "select * from flow_student where fid = '$fid' and sid = '$qa_last_selected_id'");
+					$result_12 = mysqli_query($link, "select * from flow_student where {$ps['e']} and sid = '$qa_last_selected_id'");
 					$data_t_12 = mysqli_fetch_assoc($result_12);
 					echo '<br /><span class="">' . $data_t_12['fs_answer'] . '</span><br />';
 				}

@@ -2,7 +2,7 @@
 
 include_once('../init.php');
 
-global $link, $fid, $pyramid_minsize, $flow_data;
+global $link, $fid, $pid, $pyramid_minsize, $flow_data;
 echo 'init passed';
 while(true) {
     sleep(1);
@@ -19,7 +19,7 @@ while(true) {
             $complete_peer_array = explode(',', $complete_result['pg_group']);
 
             //dummy insert to provide at least one answer to the engine
-            mysqli_query($link, "insert into flow_student values (null, '$fid','$complete_peer_array[0]', '', 1, $time)");
+            mysqli_query($link, "insert into flow_student values (null, '$fid', $pid, '$complete_peer_array[0]', '', 1, $time)");
             mysqli_query($link, "update pyramid_groups set pg_started = 1, pg_start_timestamp='{$time}' where pg_started = '0' and pg_fid='{$fid}' and pg_level='0' and pg_group_id='{$complete_result['pg_group_id']}'");
         }
     } else {
