@@ -18,7 +18,7 @@ function is_submitted($params) {
 }
 
 function get_user_answer($sid, $fid) {
-    global $link;
+    global $link, $ps;
 
     $cua_result_1 = mysqli_query($link, "select * from flow_student where sid = '$sid' and {$ps['e']}");
     if(mysqli_num_rows($cua_result_1) > 0)
@@ -41,7 +41,7 @@ function submit($params) {
     $answertimestamp = time();
 
     if(isset($_POST['skip'])) {
-        mysqli_query($link, "insert into flow_student values ('', '$fid', '$sid', '', 1, $answertimestamp)");
+        mysqli_query($link, "insert into flow_student values ('', '$fid', '$pid', '$sid', '', 1, $answertimestamp)");
         $input_result['updated'] = 'true';
         \Util\log(['activity' => 'skip_answer_form']);
         return true;
@@ -100,7 +100,7 @@ function retry() {
 }
 
 function request($params) {
-    global $link, $sid, $fid, $ps, $sname, $levels, $activity_level, $peer_group_id, $peer_array, $flow_data, $peer_toolbar_strlen;
+    global $link, $sid, $fid, $pid, $ps, $sname, $levels, $activity_level, $peer_group_id, $peer_array, $flow_data, $peer_toolbar_strlen;
 
     $timeout = get_answer_timeout();
     $petition = (empty($flow_data['question'])) ? 'Write a question' : $flow_data['question'];
@@ -148,7 +148,7 @@ function request($params) {
 }
 
 function request_rate($params) {
-    global $link, $fid, $ps, $levels, $sname, $peer_toolbar_strlen, $activity_level, $peer_group_id, $peer_array;
+    global $link, $fid, $ps, $pid, $levels, $sname, $peer_toolbar_strlen, $activity_level, $peer_group_id, $peer_array;
 
     $answer_text_array = array();
     $hidden_input_array = array();
@@ -254,7 +254,7 @@ function submit_rate() {
     $i=0;
     mysqli_query($link, "start transaction");
     foreach($rating_array as $rating) {
-        mysqli_query($link, "insert into flow_student_rating values ('', '$fid', '$sid', '{$rating['lvl']}', '{$rating['group_id']}', '{$rating['optradio']}', '{$rating['to_whom_rated_id']}', NOW(), 0, {$i}) on duplicate key update fsr_rating='{$rating['optradio']}'");
+        mysqli_query($link, "insert into flow_student_rating values ('', '$fid', '$pid', '$sid', '{$rating['lvl']}', '{$rating['group_id']}', '{$rating['optradio']}', '{$rating['to_whom_rated_id']}', NOW(), 0, {$i}) on duplicate key update fsr_rating='{$rating['optradio']}'");
         $i++;
         if(mysqli_affected_rows($link) <= 0) {
             //TODO: database inconsistency
@@ -277,7 +277,7 @@ function skip_rating() {
 
     //if there are no real answers just set a dummy selected answer
     if(!$n_real_answers) {
-        mysqli_query($link, "insert into selected_answers values ('$fid', '$activity_level', '$peer_group_id', '-1', '0', '1')");
+        mysqli_query($link, "insert into selected_answers values ('$fid', '$pid', $activity_level', '$peer_group_id', '-1', '0', '1')");
     }
 
     //number of skip answers supposed to be rated
@@ -285,7 +285,7 @@ function skip_rating() {
 
     mysqli_query($link, "start transaction");
     for($i=0;$i<$remaining_answers;$i++) {
-        mysqli_query($link, "insert into flow_student_rating values (null, '$fid', '$sid', '{$activity_level}', '$peer_group_id', '0', '-1', NOW(), 1, {$i})");
+        mysqli_query($link, "insert into flow_student_rating values (null, '$fid', '$pid', '$sid', '{$activity_level}', '$peer_group_id', '0', '-1', NOW(), 1, {$i})");
         if (mysqli_affected_rows($link) <= 0) {
             //TODO: database inconsistency
         }

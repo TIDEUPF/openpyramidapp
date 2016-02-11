@@ -14,10 +14,15 @@ Student\enforce_login();
 \Group\get_members();
 global $fid, $peer_group_id, $activity_level;
 
+if(($pid = \Pyramid\get_student_pyramid($fid, $sid)) === false)
+    $pid = -1;
+
 header('Content-Type: application/javascript; charset=utf-8');
 $jsdata = [
     'username' => $sname,
     'room' => 'room_' . $fid . '_' . $peer_group_id . '_' . $activity_level,
+    'fid' => $fid,
+    'pid' => $pid,
 ];
 
 foreach($jsdata as $jskey => $jsvalue) {

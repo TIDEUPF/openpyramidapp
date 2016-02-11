@@ -17,7 +17,7 @@ if(!\Pyramid\get_current_flow()) {
 
 //avoid race condition
 $remaining_pyramids = \Pyramid\remaining_pyramids();
-if(($pid = \Pyramid\get_student_pyramid($fid, $sid) === false)) {
+if(($pid = \Pyramid\get_student_pyramid($fid, $sid)) === false) {
     \Answer\submit();
     if ($remaining_pyramids and !\Answer\is_submitted()) {
         \Answer\request();

@@ -77,10 +77,12 @@ $(function() {
             addChatMessage({
                 username: username,
                 message: message,
-                room: room
+                room: room,
+                fid: fid,
+                pid: pid
             });
             // tell server to execute 'new message' and send along one parameter
-            socket.emit('new message', { message: message, room: room});
+            socket.emit('new message', { message: message, room: room, fid: fid, pid: pid});
             logSentMsg(message, room, username);
         }
     }

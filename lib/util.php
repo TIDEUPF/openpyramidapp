@@ -13,8 +13,8 @@ function get_sql_pyramid($params= null) {
     }
 
     if(isset($params['prefix'])) {
-        $fid_prefix = $params['prefix'];
-        $pid_prefix = $params['prefix'];
+        $fid_prefix = $params['prefix'] . '_';
+        $pid_prefix = $params['prefix'] . '_';
     }
 
     $sql = " {$table_prefix}{$fid_prefix}fid='{$fid}' and {$table_prefix}{$pid_prefix}pid='{$pid}' ";

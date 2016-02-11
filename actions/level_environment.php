@@ -9,7 +9,7 @@ global $fid;
 $reset_flow = !\Pyramid\get_current_flow();
 
 //without pyramid cannot apply the timers
-if(($pid = \Pyramid\get_student_pyramid($fid, $sid) === false)) {
+if(($pid = \Pyramid\get_student_pyramid($fid, $sid)) === false) {
     $output = array(
         'reset' => $reset_flow,
         'expired' => false,

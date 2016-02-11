@@ -8,7 +8,7 @@ function get_group_name() {
 }
 
 function get_members($params) {
-    global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+    global $link, $sid, $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
     $sa_result_1 = mysqli_query($link, "select * from pyramid_groups where {$ps['pg']} and pg_level = '$activity_level'");
     if(mysqli_num_rows($sa_result_1) > 0){ //get current level pyramid group info
@@ -26,10 +26,10 @@ function get_members($params) {
 }
 
 function get_next_level_groups($params) {
-    global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+    global $link, $sid, $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
     $next_activity_level = $activity_level + 1;
-    $sa_result_1 = mysqli_query($link, "select * from pyramid_groups where pg_fid = '$fid' and pg_level = '$next_activity_level'");
+    $sa_result_1 = mysqli_query($link, "select * from pyramid_groups where {$ps['pg']} and pg_level = '$next_activity_level'");
     if(mysqli_num_rows($sa_result_1) > 0){ //get current level pyramid group info
         while($sa_data_1 = mysqli_fetch_assoc($sa_result_1))
         {
@@ -76,7 +76,7 @@ function get_needed_results_to_end_level($full_requirements = false, $level = nu
 
 function check_if_group_finished_level()
 {
-    global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+    global $link, $sid, $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
     if(!($activity_level == 0 and !\Answer\is_submitted())) {
         $cgfl_result_1 = mysqli_query($link, "select * from flow_student_rating where {$ps['fsr']} and fsr_level = '$activity_level' and fsr_group_id = '$peer_group_id'");
@@ -100,7 +100,7 @@ function check_if_group_finished_level()
 
 function check_if_previous_groups_completed_task()
 {
-    global $link, $sid, $fid, $flow_data, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+    global $link, $sid, $fid, $ps, $flow_data, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
     $activity_level_previous = $activity_level-1;
 
@@ -122,7 +122,7 @@ function check_if_previous_groups_completed_task()
     $time = time();
     $max_start_time = $time - $flow_data['hardtimer_rating'];
     $complete_query = mysqli_query($link, "select * from pyramid_groups where pg_start_timestamp <= '{$max_start_time}' and pg_group_id in ({$peer_group_combined_ids}) and pg_level = '{$activity_level_previous}' and pg_started = 1 and {$ps['pg']}");
-    $all_query = mysqli_query($link, "select * from pyramid_groups where pg_group_id in ({$peer_group_combined_ids}) and pg_level = '{$activity_level_previous}' and pg_fid = '$fid'");
+    $all_query = mysqli_query($link, "select * from pyramid_groups where pg_group_id in ({$peer_group_combined_ids}) and pg_level = '{$activity_level_previous}' and {$ps['pg']}");
     if(mysqli_num_rows($complete_query) == mysqli_num_rows($all_query))
         return true;
 
@@ -130,13 +130,13 @@ function check_if_previous_groups_completed_task()
 }
 
 function check_if_sibling_groups_hardtimer_expired() {
-    global $link, $sid, $fid, $flow_data, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+    global $link, $sid, $fid, $ps, $flow_data, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
     //if all the groups are timed out the level is complete
     $time = time();
     $max_start_time = $time - $flow_data['hardtimer_rating'];
     $complete_query = mysqli_query($link, "select * from pyramid_groups where pg_start_timestamp <= '{$max_start_time}' and pg_level = '{$activity_level}' and pg_started = 1 and {$ps['pg']}");
-    $all_query = mysqli_query($link, "select * from pyramid_groups where pg_level = '{$activity_level}' and pg_fid = '$fid'");
+    $all_query = mysqli_query($link, "select * from pyramid_groups where pg_level = '{$activity_level}' and {$ps['pg']}");
     if(mysqli_num_rows($complete_query) == mysqli_num_rows($all_query))
         return true;
 
@@ -145,7 +145,7 @@ function check_if_sibling_groups_hardtimer_expired() {
 
 
 function get_previous_groups_rated_count() {
-    global $link, $sid, $levels, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+    global $link, $sid, $levels, $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
     if($activity_level >= $levels) {
         $final_level = $levels - 1;
@@ -161,14 +161,14 @@ function get_previous_groups_rated_count() {
 
     $activity_level_previous = $activity_level-1;
     $sql1 = implode(" or ", $sql1_ids);
-    $cipgct_result_1 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level = '$activity_level_previous' and ($sql1) ");
+    $cipgct_result_1 = mysqli_query($link, "select * from selected_answers where {$ps['sa']} and sa_level = '$activity_level_previous' and ($sql1) ");
     $cipgct_result_1_count = mysqli_num_rows($cipgct_result_1);
 
     return $cipgct_result_1_count;
 }
 
 function get_next_groups_rated_count() {
-    global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+    global $link, $sid, $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
     $n_groups = get_next_level_groups();
 
@@ -185,7 +185,7 @@ function get_next_groups_rated_count() {
 }
 
 function is_level_zero_rating_started() {
-    global $link, $activity_level, $fid, $peer_group_id;
+    global $link, $activity_level, $fid, $ps, $peer_group_id;
 
     $gcal_result_1 = mysqli_query($link, "select * from pyramid_groups where pg_group_id = '{$peer_group_id}' and pg_level = 0 and pg_started = 1 and {$ps['pg']}");
     if (mysqli_num_rows($gcal_result_1) > 0)
@@ -208,7 +208,7 @@ function is_level_timeout() {
 
     //hardtimer
     $time = time();
-    $level_start_time = get_level_start_timestamp($fid, $activity_level, $peer_group_id);
+    $level_start_time = get_level_start_timestamp();
     if($level_start_time > 0 and $time > $level_start_time + $flow_data['hardtimer_rating'])
         return true;
 
@@ -226,9 +226,9 @@ function is_level_timeout() {
 }
 
 function is_level_minimun_required_answers_to_set_timestamps_reached() {
-    global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_group_id;
+    global $link, $sid, $fid, $ps, $sname, $levels, $activity_level, $peer_group_id;
 
-    $submitted_group_answers_query = mysqli_query($link, "select * from flow_student_rating where fsr_fid='{$fid}' and fsr_level='{$activity_level}' and fsr_group_id='{$peer_group_id}'");
+    $submitted_group_answers_query = mysqli_query($link, "select * from flow_student_rating where {$ps['fsr']} and fsr_level='{$activity_level}' and fsr_group_id='{$peer_group_id}'");
     $submitted_group_answers_count = mysqli_num_rows($submitted_group_answers_query);
 
     if($submitted_group_answers_count >= get_needed_results_to_end_level())
@@ -239,10 +239,10 @@ function is_level_minimun_required_answers_to_set_timestamps_reached() {
 
 function set_level_timeout_timestamp()
 {
-    global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_group_id;
+    global $link, $sid, $fid, $ps, $sname, $levels, $activity_level, $peer_group_id;
 
     $timestamp = time();
-    mysqli_query($link, "update pyramid_groups set pg_timestamp='{$timestamp}' where pg_fid='{$fid}' and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}'");
+    mysqli_query($link, "update pyramid_groups set pg_timestamp='{$timestamp}' where {$ps['pg']} and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}'");
 
     return $timestamp;
 }
@@ -271,7 +271,7 @@ function get_time_left() {
 }
 
 function get_level_timeout_timestamp($fid, $activity_level, $peer_group_id) {
-    global $link, $peer_group_id, $activity_level, $fid;
+    global $link, $peer_group_id, $activity_level, $fid, $ps;
 
     if(!\Answer\is_timeout()) {
         $answer_user_timeout = \Answer\get_answer_timeout();
@@ -287,15 +287,15 @@ function get_level_timeout_timestamp($fid, $activity_level, $peer_group_id) {
     }
 }
 
-function get_level_start_timestamp($fid, $activity_level, $peer_group_id) {
-    global $link, $peer_group_id, $activity_level, $fid;
+function get_level_start_timestamp() {
+    global $link, $peer_group_id, $activity_level, $ps;
 
     if(!\Answer\is_timeout()) {
         $answer_user_timeout = \Answer\get_answer_timeout();
         return $answer_user_timeout['start_timestamp'];
     }
 
-    $submitted_group_answers_timestamp_query = mysqli_query($link, "select * from pyramid_groups where pg_start_timestamp > 0 and pg_fid='{$fid}' and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}' limit 1");
+    $submitted_group_answers_timestamp_query = mysqli_query($link, "select * from pyramid_groups where pg_start_timestamp > 0 and {$ps['pg']} and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}' limit 1");
     if(mysqli_num_rows($submitted_group_answers_timestamp_query) > 0) {
         $submitted_group_answers_timestamp_row_array = mysqli_fetch_assoc($submitted_group_answers_timestamp_query);
         return $submitted_group_answers_timestamp_row_array['pg_start_timestamp'];
@@ -305,7 +305,7 @@ function get_level_start_timestamp($fid, $activity_level, $peer_group_id) {
 }
 
 function get_status_bar_peers() {
-    global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_group_id, $peer_array, $peer_group_combined_ids;
+    global $link, $sid, $fid, $ps, $sname, $levels, $activity_level, $peer_group_id, $peer_array, $peer_group_combined_ids;
 
     if(empty($peer_array) and $activity_level == $levels) {
         $top_level = $levels-1;
@@ -325,7 +325,7 @@ function get_status_bar_peers() {
         return $peer_array;
     else {
         $top_level = $activity_level-1;
-        $result = mysqli_query($link, "select * from pyramid_groups where pg_fid='{$fid}' and pg_level='{$top_level}' and pg_group_id in ({$peer_group_combined_ids})");
+        $result = mysqli_query($link, "select * from pyramid_groups where {$ps['pg']} and pg_level='{$top_level}' and pg_group_id in ({$peer_group_combined_ids})");
         $sid_string_array = array();
         while($result_array = mysqli_fetch_assoc($result)) {
             $sid_string_array[] = $result_array['pg_group'];
@@ -338,7 +338,7 @@ function get_status_bar_peers() {
 }
 
 function get_status_bar_groups_count() {
-    global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_group_id, $peer_array, $peer_group_combined_ids;
+    global $link, $sid, $fid, $ps, $sname, $levels, $activity_level, $peer_group_id, $peer_array, $peer_group_combined_ids;
 
     if($activity_level == $levels) {
         $top_level = $levels-1;
@@ -385,9 +385,9 @@ function get_sname_list($sid_array) {
 }
 
 function sa_exists() {
-    global $link, $sid, $fid, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids;
+    global $link, $sid, $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids;
 
-    $gcal_result_2 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level = '$activity_level' and sa_group_id = '$peer_group_id'");
+    $gcal_result_2 = mysqli_query($link, "select * from selected_answers where {$ps['sa']} and sa_level = '$activity_level' and sa_group_id = '$peer_group_id'");
     if (mysqli_num_rows($gcal_result_2) > 0) {
         return true;
     }
