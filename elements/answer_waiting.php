@@ -44,7 +44,7 @@
     #answer-header-logout {
         float: right;
         text-align: right;
-        width: 10%;
+        width: 20%;
         cursor: pointer;
     }
 

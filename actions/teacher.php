@@ -9,7 +9,7 @@ if(isset($_SESSION['user'])) {
 	
 	$student_count = mysqli_num_rows(mysqli_query($link, "select * from students"));
 	
-	if(isset($_POST['cflow'])){
+	if(isset($_POST['cflow'])) {
 		$fname = mysqli_real_escape_string($link, stripslashes(trim(strip_tags($_POST['fname']))));
 		$fdes =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['fdes']))));
 		$fcname =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['fcname']))));
@@ -20,25 +20,43 @@ if(isset($_SESSION['user'])) {
 		$hrt = $rt + 120;
 		$expe = mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['expe']))));
 		$sync = (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['sync']))));
+		$multi_py = (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['multi_py']))));
+		$ch = (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['ch']))));
 		$fesname = '';//$fesname =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['fesname']))));
 		$fl = (int) $_POST['fl'];
 		$fsg = (int) $_POST['fsg'];
 
 		//80 per cent of expected students
-		$min_pyramid = floor($expe*0.8);
+		if($multi_py) {
+			$multi_pyramid_max_size = 20;
+			$multi_pyramid_min_size = 4;
+			$pyramid_size = max(min($multi_pyramid_max_size, floor($expe / 2)), $multi_pyramid_min_size);
+			if($pyramid_size > 4)
+				$min_pyramid = floor($pyramid_size * 0.8);
+			else
+				$min_pyramid = $pyramid_size;
+		} else {
+			$pyramid_size = $expe;
+
+			//assume everyone participating for experiments <=8
+			if($expe > 8)
+				$min_pyramid = floor($expe * 0.8);
+			else
+				$min_pyramid = $expe;
+		}
 
 		//number of levels
-		$max_levels = floor(log(floor($min_pyramid/$fsg), $fsg));
+		$max_levels = floor(log(floor($min_pyramid/$fsg), 2)) + 1;
 		if($fl > $max_levels)
 			$fl = $max_levels;
 
-		$rps = 1;//$rps = (int) $_POST['rps'];
+		$rps = 1;//TODO: legacy var
 
 		if($fl < 1 || $rps < 1 || $fsg < 1)	{
 			$error = 'Levels and Responses cannot be 0';
 		} else {
 			$datestamp = time();
-			mysqli_query($link,"insert into flow values (null, '$teacher_id', '$fname', '$fdes', '$fcname', '$fesname', '$fsg', '$fl', '$min_pyramid', '$expe', '$rps', '$datestamp', $tst, $rt, $htst, $hrt, '{$qs}')");
+			mysqli_query($link,"insert into flow values (null, '$teacher_id', '$fname', '$fdes', '$fcname', '$fesname', '$fsg', '$fl', '$pyramid_size', '$min_pyramid', '$expe', '$rps', '$datestamp', $tst, $rt, $htst, $hrt, '{$qs}', '{$ch}', '{$sync}', '{$multi_py}')");
 		}
 	}
 } else {
@@ -234,6 +252,14 @@ $tq = $default_teacher_question;
 		<div class="form-group">
 			<label for="ch">Chat:</label>
 			<select class="form-control" id="ch" name="ch">
+				<option value="1" selected="selected">Enabled</option>
+				<option value="0">Disabled</option>
+			</select>
+		</div>
+
+		<div class="form-group">
+			<label for="multi_py">Multiple pyramids:</label>
+			<select class="form-control" id="multi_py" name="multi_py">
 				<option value="1" selected="selected">Enabled</option>
 				<option value="0">Disabled</option>
 			</select>

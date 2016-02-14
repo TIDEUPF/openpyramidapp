@@ -11,6 +11,7 @@ $(function() {
     var $window = $(window);
     var $usernameInput = $('.usernameInput'); // Input for username
     var $messages = $('.messages'); // Messages area
+    var $mobile_bottom_chat_message = $('#mobile-bottom-chat-message');
     var $inputMessage = $('.inputMessage'); // Input message input box
     var $chat_write = $(''); // Input message input box
 
@@ -117,6 +118,18 @@ $(function() {
             .append($usernameDiv, $messageBodyDiv);
 
         addMessageElement($messageDiv, options);
+
+        if(data.username != username) {
+            $mobile_bottom_chat_message.empty();
+            $mobile_bottom_chat_message.append(
+                $('<span class="username"/>')
+                    .text(data.username)
+                    .css('color', getUsernameColor(data.username))
+                ,
+                $('<span class="messageBody">')
+                    .text(data.message)
+            );
+        }
     }
 
     // Adds the visual chat typing message
@@ -175,7 +188,7 @@ $(function() {
         if (connected) {
             if (!typing) {
                 typing = true;
-                socket.emit('typing');
+                //socket.emit('typing');
             }
             lastTypingTime = (new Date()).getTime();
 

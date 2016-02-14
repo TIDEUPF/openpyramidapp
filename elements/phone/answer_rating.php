@@ -1,6 +1,6 @@
 <style>
     button.ui-btn {
-        width: 300px !important;
+        /*width: 300px !important;*/
         margin: auto !important;
     }
 
@@ -28,10 +28,9 @@
 
     #answer-middle-frame {
         box-sizing: border-box;
-        height: 60%;
         width: 45%;
         float: left;
-        overflow: hidden;
+        overflow: scroll;
     }
 
     #rating-chat {
@@ -44,12 +43,7 @@
 
     #answer-header-frame,
     #answer-footer-frame {
-        height: 20%;
         overflow: hidden;
-    }
-
-    #answer-header-level {
-        float: right;
     }
 
     #answer-header-group {
@@ -61,29 +55,30 @@
     }
 
     #answer-next-button {
-        margin-top: 1.5em;
+        margin-top: 0.5em;
+        margin-bottom: 1em;
     }
 
     #answer-header-text {
-        font-size: 1.35em;
+        font-size: 1.2em;
         margin-top: 0.5em;
     }
 
     #answer-header-level {
         float: left;
         text-align: center;
-        width: 20%;
+        width: 30%;
     }
 
     #answer-header-user {
         float: left;
-        width: 40%;
+        width: 33%;
     }
 
     #answer-header-logout {
         float: right;
         text-align: right;
-        width: 10%;
+        width: 20%;
         cursor: pointer;
     }
 
@@ -112,11 +107,12 @@
     }
 
     #countdown {
-        /*display: none;*/
+        display: none;
         position: relative;
         bottom: 0px;
         left: 0px;
-        height: 30px;
+        height: 20px;
+        width: 100%;
         right: 0px;
 
         text-align: center;
@@ -125,7 +121,7 @@
         padding-top: 0px;
         color: white;
         text-shadow: 0 /*{a-page-shadow-x}*/ 1px /*{a-page-shadow-y}*/ 0 /*{a-page-shadow-radius}*/ #000000 /*{a-page-shadow-color}*/;
-        font-size: 120%;
+        font-size: 100%;
         /*transition-property: all;*/
         /*transition-duration: 1s;*/
         /*z-index: 1000;*/
@@ -135,7 +131,7 @@
         height: 0em;
         /*transition-property: all;*/
         /*transition-duration: 1s;*/
-        /*display: none;*/
+        display: none;
     }
 
     .question-number {
@@ -147,21 +143,22 @@
         text-shadow: none;
         color: #E4E4E4;
         font-weight: bold;
+        float: left;
     }
 
     #submit-confirmation {
         display: none;
         position: fixed;
-        width: 200px;
+        width: 10em;
         top: 50%;
         left: 50%;
-        z-index: 1000;
-        padding: 30px;
+        z-index: 2000;
+        padding: 0.5em;
         border: 2px solid grey;
         border-radius: 4px;
         background-color: #D3D3D3;
-        margin-left: -132px;
-        margin-top: -32px;
+        margin-left: -5em;
+        margin-top: -9em;
     }
 
     #submit-confirmation button {
@@ -175,42 +172,8 @@
         text-align: center;
         font-size: 110%;
         margin-bottom: 20px;
-        margin-top: -10px;
     }
 
-    #chat-write {
-        display: block;
-        position:relative;
-        outline: 0;
-        top: 37px;
-        left: 383px;
-        width: 0px;
-        height: 0px;
-        z-index: 1001;
-        border: 0px;
-        background-color: rgba(0,0,0,0.0);
-    }
-
-    #chat-write::after {
-        content: "";
-        position: relative;
-        display: block;
-        width: 22px;
-        height: 22px;
-
-        cursor: pointer;
-
-        background-position: center center;
-        background-repeat: no-repeat;
-
-        background-color: rgba(0,0,0,.3) /*{global-icon-disc};;;;;*/;
-        background-position: center center;
-        background-repeat: no-repeat;
-        -webkit-border-radius: 1em;
-        border-radius: 1em;
-    }
-
-    /*
     #chat-write {
         display: inline-block;
         border: none;
@@ -222,7 +185,6 @@
         box-shadow: none;
         webkit-box-shadow: none;
     }
-    */
 
     li.chat.page div.ui-input-text {
         display: inline-block;
@@ -235,7 +197,20 @@
         /*margin: auto !important;*/
     }
 
+    #answer-header-user {
+        max-height: 2em;
+        overflow: hidden;
+        line-height: 1em;
+    }
 
+    #answer-middle-frame {
+        width: 100%;
+        float: none;
+    }
+
+    #pre-submit-warning {
+        display: none;
+    }
 </style>
 <div id="answer-frame">
     <form method="post" action="student.php" data-ajax="false">
@@ -253,18 +228,22 @@
             <div id="answer-header-logout" class="topbar_item">Logout</div>
             <div style="clear:both"></div>
         </div>
-        <div>
-            <!--<div id="answer-header-text"><?=$header_text?></div>-->
-            <div id="answer-header-text">Rating is individual. Please rate all options!</div>
-        </div>
+
+        <!--<div id="countdown-padding"></div>-->
+        <div id="countdown"><span id="countdown-text"></span></div>
 
     </div>
 
     <div id="answer-middle-frame">
+        <div id="answer-header-text">Please rate all options!</div>
         <?php foreach($answer_text_array as $i=> $answer_data):?>
         <div class="answer-rating-widget">
             <fieldset data-role="controlgroup" data-type="horizontal">
-                <legend><span class="question-number"><?=($i+1)?></span><?=htmlspecialchars($answer_data['answer_text'])?></legend>
+                <div>
+                    <span class="question-number"><?=($i+1)?></span>
+                    <legend><?=htmlspecialchars($answer_data['answer_text'])?></legend>
+                </div>
+                <div style="clear:both"></div>
 
                 <select id="id-answer-rating-<?=($i+1)?>" class="rating-widget" name="optradio<?=($i+1)?>" data-role="none" answer_sid="<?=$hidden_input_array['to_whom_rated_id'.($i+1)]?>" answer_text="<?=htmlspecialchars($answer_data['answer_text'])?>">
                 <?php for($i=0;$i<=5;$i++):?>
@@ -281,25 +260,83 @@
             </div>
         <?php endif;?>
 
+        <div id="answer-footer-frame">
+
+            <div>
+                <div id="answer-waiting-group"><?=$answer_waiting_message?></div>
+                <div id="pre-submit-warning" style="font-size: 1.35em; margin-top:20px;">Please note that when you submit rating, you will no longer be able to edit rating values. Also you will be removed from the discussion thread for this level.</div>
+                <div id="answer-next-button"><button id="answer-next-button-ui" class="ui-btn"><?= $answer_rate_submit?></button></div>
+            </div>
+
+        </div>
+
     </div>
 
     <?php if($flow_data['ch'] == 1):?>
-        <style>
-
-        </style>
     <link rel="stylesheet" href="chat/client/embedded.css"/>
     <div id="rating-chat" class="ui-corner-all ui-shadow-inset">
-        <div style="margin: .5em 0 0 .3em;">Please use this space to discuss with peers about their options before rating.</div>
+        <div id="rating-chat-instructions" style="margin: .5em 0 0 .3em;">Please use this space to discuss with peers about their options before rating.</div>
         <ul class="pages">
             <li class="chat page">
+                <a id="chat-popup-close" href="#" class="ui-icon-arrow-d"></a>
                 <div class="chatArea">
                     <ul class="messages"></ul>
                 </div>
-                <a id="chat-write" href="#" class="ui-icon-edit"></a>
-                <input type="text" class="inputMessage" placeholder="Send a message to your peers..."/>
             </li>
         </ul>
     </div>
+        <style>
+            #chat-popup-close {
+                /*display: none;*/
+                display: block;
+                position: relative;
+                margin-top: 3px;
+                left: 47%;
+                width 22px;
+                height: 22px;
+                z-index: 1002;
+                border: 0px;
+                background-color: rgba(0,0,0,0.0);
+            }
+
+            #chat-popup-close::after {
+                content: "";
+                position: absolute;
+                display: block;
+                width: 22px;
+                height: 22px;
+
+                cursor: pointer;
+
+                background-position: center center;
+                background-repeat: no-repeat;
+
+                background-color: rgba(0,0,0,.3) /*{global-icon-disc};;;;;*/;
+                background-position: center center;
+                background-repeat: no-repeat;
+                -webkit-border-radius: 1em;
+                border-radius: 1em;
+            }
+
+            #rating-chat {
+                display: none;
+                position: fixed;
+                bottom: 3em;
+                left: 0px;
+                height: 300px;
+                width: 100%;
+                z-index: 1002;
+            }
+
+            #rating-chat .inputMessage {
+                display: none;
+
+            }
+
+            #rating-chat-instructions {
+                display: none;
+            }
+        </style>
     <?php endif;?>
 
     <div style="clear:both"></div>
@@ -307,23 +344,162 @@
     <script src="jslib/chatvars.js"></script>
     <script src="chat/client/chat.js"></script>
 
-    <div id="answer-footer-frame">
-
-        <div>
-            <div id="answer-waiting-group"><?=$answer_waiting_message?></div>
-            <div style="font-size: 1.35em; margin-top:20px;">Please note that when you submit rating, you will no longer be able to edit rating values. Also you will be removed from the discussion thread for this level.</div>
-            <div id="answer-next-button"><button id="answer-next-button-ui" class="ui-btn"><?= $answer_rate_submit?></button></div>
-        </div>
-
-    </div>
-
     <?php foreach($hidden_input_array as $hidden_input_name => $hidden_input_value):?>
     <input type="hidden" name="<?=$hidden_input_name?>" value="<?=$hidden_input_value?>">
     <?php endforeach?>
 
     </form>
-    <div id="countdown-padding"></div>
-    <div id="countdown"><span id="countdown-text"></span></div>
+
+    <?php if($flow_data['ch'] == 1):?>
+    <style>
+
+        #chat-popup-show {
+            position:fixed;
+            bottom: 2em;
+            right: 2em;
+            height: 0px;
+            width: 0px;
+            z-index: 1001;
+            border: 0px;
+            background-color: rgba(0,0,0,0.0);
+        }
+
+        #chat-popup-show::after {
+            content: "";
+            position: absolute;
+            display: block;
+            width: 22px;
+            height: 22px;
+
+            cursor: pointer;
+
+            background-position: center center;
+            background-repeat: no-repeat;
+
+            background-color: rgba(0,0,0,.3) /*{global-icon-disc};;;;;*/;
+            background-position: center center;
+            background-repeat: no-repeat;
+            -webkit-border-radius: 1em;
+            border-radius: 1em;
+        }
+
+        #mobile-bottom-chat-input {
+            position:fixed;
+            bottom: 0px;
+            left: 0px;
+            /*height: 3em;*/
+            width: 100%;
+            z-index: 1000;
+        }
+
+        #mobile-bottom-chat-message {
+            display: none;
+            position: fixed;
+            bottom: 3em;
+            left: 0px;
+            height: 2em;
+            width: 100%;
+            z-index: 1000;
+            background-color: #D8FFF4;
+            padding: 0.5em 0;
+        }
+
+        #mobile-bottom-chat-input input,
+        #mobile-bottom-chat-input .ui-corner-all {
+            border-radius: 0px !important;
+            -webkit-border-radius: 0px !important;
+        }
+
+        #mobile-bottom-chat-input .ui-input-text {
+            margin: 0px;
+        }
+
+        #chat-padding {
+            /*height: 2.7em;*/
+        }
+
+        ul.pages,
+        li.chat.page,
+        div.chatArea,
+        ul.messages {
+            height: inherit;
+        }
+
+        li.chat.page {
+            display: block;
+        }
+
+        div.chatArea {
+            padding-bottom: 0px;
+        }
+        ul.messages {
+            box-sizing: border-box;
+        }
+
+    </style>
+    <div id="chat-padding"></div>
+    <div id="mobile-bottom-chat-message">
+    </div>
+    <div id="mobile-bottom-chat-input">
+        <input type="text" class="inputMessage" placeholder="Send a message to your peers..."/>
+    </div>
+    <a id="chat-popup-show" href="#" class="ui-icon-arrow-u"></a>
+    <script>
+        var chat_last_message_text;
+        var last_message_cancel = null;
+
+        $(function() {
+            window.resize_middle_frame = function() {
+                console.log("resize");
+                $('#answer-middle-frame').height(
+                    ($(window).height() - ($('#mobile-bottom-chat-input').outerHeight(true) + $('#answer-header-frame').outerHeight(true) ) )
+                );
+
+                $('#rating-chat').css(
+                    'height',
+                    ($(window).height() - ($('#mobile-bottom-chat-input').outerHeight(true) + $('#answer-header-frame').outerHeight(true) ) ) + 'px'
+                );
+
+                $('.messages').css(
+                    'height',
+                    ($('#rating-chat').height() - $('#chat-popup-close').outerHeight(true) ) + 'px'
+                );
+
+            }
+
+            resize_middle_frame();
+
+            $(window).resize(function() {
+                resize_middle_frame();
+            });
+
+            $('#chat-popup-show, #chat-popup-close').click(function() {
+                $('#rating-chat').toggle();
+            });
+
+            chat_last_message_text = $('#mobile-bottom-chat-message').text();
+
+            setInterval(function(){
+                var lastest_chat_last_message_text = $('#mobile-bottom-chat-message').text();
+                if(lastest_chat_last_message_text != chat_last_message_text) {
+                    chat_last_message_text = lastest_chat_last_message_text;
+                    show_last_message_popup();
+                }
+            }, 500);
+
+            function show_last_message_popup() {
+                $('#mobile-bottom-chat-message').show();
+                try {
+                    clearTimeout(last_message_cancel);
+                } catch(e) {}
+
+                last_message_cancel = setTimeout(function() {
+                    $('#mobile-bottom-chat-message').hide();
+                }, 5000);
+            }
+        });
+    </script>
+    <?php endif;?>
 
 </div>
 <script>
@@ -368,7 +544,7 @@
     }
 
     function show_countdown(time_left) {
-        var countdown_height = 30;
+        var countdown_height = 20;
         countdown_started = true;
         this.time_left = time_left - 5;
         if(!countdown_interval)
@@ -383,7 +559,11 @@
         if(countdown_bottom < 0)
             countdown_bottom = 0;
 
-        $('#countdown').css('bottom', -countdown_bottom+'px');
+        //$('#countdown').css('bottom', -countdown_bottom+'px');
+
+        $('#countdown-padding')
+         .show()
+         .css('height', '2em');
 
         $('#countdown')
             .show()
@@ -391,13 +571,10 @@
             .css('padding-top', '6px')
             .css('background-color', '#000');
 
+        resize_middle_frame();
+
         logTimerActivation();
 
-        /*
-        $('#countdown-padding')
-            .show()
-            .css('height', '2em');
-            */
     }
 
     function update_countdown() {

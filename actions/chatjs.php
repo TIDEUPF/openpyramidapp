@@ -7,15 +7,17 @@ $sid = $_SESSION['student'];
 Student\enforce_login();
 \Pyramid\get_current_flow();
 
+global $fid;
+if(($pid = \Pyramid\get_student_pyramid($fid, $sid)) === false) {
+    //TODO: error
+}
+
 //$activity_level
 \Pyramid\get_current_activity_level();
 
 //$peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp
 \Group\get_members();
-global $fid, $peer_group_id, $activity_level;
-
-if(($pid = \Pyramid\get_student_pyramid($fid, $sid)) === false)
-    $pid = -1;
+global $peer_group_id, $activity_level;
 
 header('Content-Type: application/javascript; charset=utf-8');
 $jsdata = [

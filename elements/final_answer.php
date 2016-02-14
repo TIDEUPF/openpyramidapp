@@ -68,7 +68,7 @@
     #answer-header-logout {
         float: right;
         text-align: right;
-        width: 10%;
+        width: 20%;
         cursor: pointer;
     }
 
@@ -107,6 +107,17 @@
                     </fieldset>
                 </div>
             <?php endforeach;?>
+
+            <?php if(!empty($other_answer_array)): ?>
+            <div id="answer-header-text">Other pyramid results</div>
+            <?php foreach($other_answer_array as $i=>$answer_text):?>
+                <div class="answer-rating-widget">
+                    <fieldset data-role="controlgroup" data-type="horizontal">
+                        <legend><?=htmlspecialchars($answer_text)?></legend>
+                    </fieldset>
+                </div>
+            <?php endforeach;?>
+            <?php endif; ?>
 
         </div>
 

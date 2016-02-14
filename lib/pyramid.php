@@ -45,7 +45,7 @@ function add_latecomer($pid, $activity_level, $peer_group_id, $pid, $sid) {
 */
 
 function upgrade_level($forced = false) {
-    global $link, $sid, $fid, $pid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $flow_data;
+    global $link, $sid, $fid, $pid, $ps, $activity_level, $levels, $peer_array, $peer_group_id, $peer_group_combined_ids, $flow_data;
 
     //we never upgrade the level on a syncronous situation
     if($flow_data['sync'] == 0)
@@ -87,13 +87,17 @@ function upgrade_level($forced = false) {
             return true;
         } else {
             if(!set_selected_answers()) {
-                mysqli_query($link, "insert into selected_answers values ('$fid', '$pid', $activity_level', '$peer_group_id', '-1', '0', '1')");
+                $time = time();
+                mysqli_query($link, "insert into selected_answers values ('$fid', '$pid', '$activity_level', '$peer_group_id', '-1', '0', '1', FROM_UNIXTIME({$time}))");
                 \Util\log(['activity' => 'level_finished_with_no_rates']);
             }
         }
     }
 
     if($upgrade or $forced) {
+        if($activity_level + 1 == $levels)
+            return false;
+
         $activity_level++;
         \Group\get_members();
         $time = time();
@@ -120,7 +124,8 @@ function set_selected_answers() {
         $selected_id = $ssa_data_1['fsr_to_whom_rated_id'];
         $selected_id_rating_sum = $ssa_data_1['sum'];
         $skip = $ssa_data_1['skip'];
-        mysqli_query($link, "insert into selected_answers values ('$fid', '$pid', '$activity_level', '$peer_group_id', '$selected_id', '$selected_id_rating_sum', '$skip')");
+        $time = time();
+        mysqli_query($link, "insert into selected_answers values ('$fid', '$pid', '$activity_level', '$peer_group_id', '$selected_id', '$selected_id_rating_sum', '$skip', FROM_UNIXTIME({$time}))");
         \Util\log(['activity' => 'selected_answer', 'answer' => $selected_id, 'rating' => $selected_id_rating_sum]);
         return true;
     }
@@ -133,6 +138,7 @@ function set_selected_answers_for_previous_groups() {
 
     $previous_groups_ids = explode(',', $peer_group_combined_ids);
     $previous_level = $activity_level - 1;
+    $time = time();
 
     foreach($previous_groups_ids as $fpgi) {
         if(mysqli_num_rows(mysqli_query($link, "select * from selected_answers where {$ps['sa']} and sa_group_id='{$fpgi}' and sa_level='{$previous_level}'")) > 0)
@@ -146,13 +152,13 @@ function set_selected_answers_for_previous_groups() {
             $selected_id = $ssa_data_1['fsr_to_whom_rated_id'];
             $selected_id_rating_sum = $ssa_data_1['sum'];
             $skip = $ssa_data_1['skip'];
-            mysqli_query($link, "insert into selected_answers values ('$fid', '$pid', '$previous_level', '$fpgi', '$selected_id', '$selected_id_rating_sum', '$skip')");
+            mysqli_query($link, "insert into selected_answers values ('$fid', '$pid', '$previous_level', '$fpgi', '$selected_id', '$selected_id_rating_sum', '$skip', FROM_UNIXTIME({$time}))");
             \Util\log(['activity' => 'selected_answer', 'answer' => $selected_id, 'rating' => $selected_id_rating_sum]);
 
-            mysqli_query($link, "insert into selected_answers values ('$fid', '$pid', '$previous_level', '$fpgi', '$selected_id', '$selected_id_rating_sum', '$skip')");
+            mysqli_query($link, "insert into selected_answers values ('$fid', '$pid', '$previous_level', '$fpgi', '$selected_id', '$selected_id_rating_sum', '$skip', FROM_UNIXTIME({$time}))");
             return true;
         } else {
-            mysqli_query($link, "insert into selected_answers values ('$fid', '$pid', '$previous_level', '$fpgi', '-1', '-1', '1')");
+            mysqli_query($link, "insert into selected_answers values ('$fid', '$pid', '$previous_level', '$fpgi', '-1', '-1', '1', FROM_UNIXTIME({$time}))");
         }
     }
 
@@ -164,7 +170,7 @@ function set_selected_answers_for_previous_groups() {
         $selected_id = $ssa_data_1['fsr_to_whom_rated_id'];
         $selected_id_rating_sum = $ssa_data_1['sum'];
         $skip = $ssa_data_1['skip'];
-        mysqli_query($link, "insert into selected_answers values ('$fid', '$pid', '$activity_level', '$peer_group_id', '$selected_id', '$selected_id_rating_sum', '$skip')");
+        mysqli_query($link, "insert into selected_answers values ('$fid', '$pid', '$activity_level', '$peer_group_id', '$selected_id', '$selected_id_rating_sum', '$skip', FROM_UNIXTIME({$time}))");
         \Util\log(['activity' => 'selected_answer', 'answer' => $selected_id, 'rating' => $selected_id_rating_sum]);
         return true;
     }
@@ -204,20 +210,59 @@ function compute_level_rating() {
 
     $selected_id = $data_t_2['fsr_to_whom_rated_id'];
     $selected_id_rating_sum = $data_t_2['sum'];
-    mysqli_query($link,"insert into selected_answers values ('$fid', '$pid', '$activity_level', '$peer_group_id', '$selected_id', '$selected_id_rating_sum')");
+    $time = time();
+    mysqli_query($link,"insert into selected_answers values ('$fid', '$pid', '$activity_level', '$peer_group_id', '$selected_id', '$selected_id_rating_sum', FROM_UNIXTIME({$time}))");
 }
 
 function is_complete() {
     global $link, $sid,  $fid, $ps, $levels, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
     //last level-- to show selected answers
-    if($activity_level == $levels) {
+    if($activity_level + 1 >= $levels) {
+        $final_level = $levels - 1;
+
         //all users answered so proceed to show the final results
-        if( mysqli_num_rows(mysqli_query($link, "select * from pyramid_groups where {$ps['pg']}")) == mysqli_num_rows(mysqli_query($link, "select * from selected_answers where {$ps['sa']}")) ) {
+        if( mysqli_num_rows(mysqli_query($link, "select * from pyramid_groups where {$ps['pg']} and pg_level = '{$final_level}'")) <= mysqli_num_rows(mysqli_query($link, "select * from selected_answers where {$ps['sa']} and sa_level = '{$final_level}'")) ) {
             return true;
         }
     }
     return false;
+}
+
+function get_remainings_pyramids_answers() {
+    global $link, $sid,  $fid, $pid, $ps, $levels, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+
+    $answers = [];
+
+    $sql = <<<SQL
+select max(pg_level) as level, pg_pid as pid,
+(
+	select count(*) from pyramid_groups as r
+	where r.pg_fid = m.pg_fid and r.pg_level =
+	(
+		select pg_level from pyramid_groups as q
+		where q.pg_fid = m.pg_fid
+		and q.pg_pid = m.pg_pid
+		order by pg_level desc limit 1
+	)
+	and r.pg_pid = m.pg_pid
+) as ngroups
+from pyramid_groups as m where pg_fid='{$fid}' and pg_pid <> '{$pid}' group by pg_pid order by m.pg_level desc
+SQL;
+
+    $result = mysqli_query($link, $sql);
+
+    while($pg = mysqli_fetch_assoc($result)) {
+        $sa_sql = "select skip, (select fs_answer from flow_student where sid = sa_selected_id and fid = sa_fid) as answer from selected_answers where sa_fid='{$fid}' and sa_pid = '{$pg['pid']}' and sa_level = '{$pg['level']}'";
+        $sa_result = mysqli_query($link, $sa_sql);
+        if(mysqli_num_rows($sa_result) >= $pg['ngroups']) {
+            while($sa_row = mysqli_fetch_assoc($sa_result)) {
+                $answers[] = $sa_row['answer'];
+            }
+        }
+    }
+
+    return $answers;
 }
 
 function is_final_level_complete() {
@@ -241,14 +286,14 @@ function get_current_level() {
 }
 
 function show_final_answer() {
-    global $link, $sid,  $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+    global $link, $sid,  $fid, $ps, $activity_level, $levels, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
-    $activity_level_previous = $activity_level-1;
-    $result_11 = mysqli_query($link, "select * from selected_answers where {$ps['sa']} and sa_level = '$activity_level_previous' and skip = '0'");
+    $final_level = $levels - 1;
+    $result_11 = mysqli_query($link, "select * from selected_answers where {$ps['sa']} and sa_level = '$final_level' and skip = '0'");
     $answers = array();
     while ($data_t_11 = mysqli_fetch_assoc($result_11)) {
         $qa_last_selected_id = $data_t_11['sa_selected_id'];
-        $result_12 = mysqli_query($link, "select * from flow_student where {$ps['e']} and sid = '$qa_last_selected_id'");
+        $result_12 = mysqli_query($link, "select * from flow_student where fid = '$fid' and sid = '$qa_last_selected_id'");
         $data_t_12 = mysqli_fetch_assoc($result_12);
         $answers[] = $data_t_12['fs_answer'];
     }
@@ -256,13 +301,15 @@ function show_final_answer() {
     if(empty($answers))
         $answers[] = 'There were no answers';
 
+    $other_answers = get_remainings_pyramids_answers();
+
     \Util\log(['activity' => 'final_answers', 'answers' => $answers]);
 
-    \Answer\view_final_answer(array('final_answer_array' => $answers));
+    \Answer\view_final_answer(array('final_answer_array' => $answers, 'other_answers' => $other_answers));
 }
 
 function get_current_flow() {
-    global $levels, $fname, $fdes,  $fid, $ps, $link, $ftimestamp, $flow_data, $timeout, $answer_timeout, $pyramid_minsize;
+    global $levels, $fname, $fdes,  $fid, $ps, $link, $ftimestamp, $flow_data, $timeout, $answer_timeout, $pyramid_size, $pyramid_minsize;
     //get information the latest flow
     $res3 = mysqli_query($link, "select * from flow order by fid desc limit 1");
     if(mysqli_num_rows($res3) > 0){
@@ -273,6 +320,7 @@ function get_current_flow() {
         $fdes = $data3["fdes"];
         $fid = $data3["fid"];
         $ftimestamp = (int)$data3["timestamp"];
+        $pyramid_size = (int)$data3["pyramid_size"];
         $pyramid_minsize = (int)$data3["pyramid_minsize"];
         $timeout = (int)$data3["rating_timeout"];
         $answer_timeout = (int)$data3["question_timeout"];
@@ -318,10 +366,13 @@ function wait($params) {
         ),
     );
 
-    if(count($peer_array) != count(get_inactive_level_group_peers())) {
+    //if we wait another group all peers are inactive
+    $n_inactive_peers = count(get_inactive_level_group_peers());
+    if(count($peer_array) != $n_inactive_peers and $n_inactive_peers > 0) {
         $vars['inactive_peers_count'] = max(count(get_inactive_level_group_peers()), 1);
     } else {
         $array_size = \Group\get_status_bar_groups_count();
+        //TODO: fix last level count
         $rated_count = \Group\get_previous_groups_rated_count();
         $vars['inactive_groups_count'] = max($array_size - $rated_count, 1);
     }
@@ -395,7 +446,7 @@ function set_previous_level_peer_active_group_ids() {
     $peer_array_sql = implode("','", \Util\sanitize_array($peer_array));
 
     if($previous_activity_level == -1)
-        $submitted_group_answers_query = mysqli_query($link, "select distinct sid as active_sid from flow_student where {$ps['e']} and sid in ('{$peer_array_sql}')");
+        $submitted_group_answers_query = mysqli_query($link, "select distinct sid as active_sid from flow_student where fid = '$fid' and sid in ('{$peer_array_sql}')");
     else
         $submitted_group_answers_query = mysqli_query($link, "select distinct fsr_sid as active_sid from flow_student_rating where {$ps['fsr']} and fsr_level='{$previous_activity_level}' and fsr_group_id in ('{$peer_group_combined_ids_sql}')");
 
@@ -428,9 +479,9 @@ function available_students() {
 
 //update the pyramid to add the latecomers
 function update_pyramid($fid, $pid) {
-    global $link, $sid, $fid, $ps, $sname, $levels, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+    global $link;
 
-    $pyramid_result = mysqli_query($link, "select * from pyramid_groups where {$ps['pg']} order by pg_level asc");
+    $pyramid_result = mysqli_query($link, "select * from pyramid_groups where pg_fid='$fid' and pg_pid='$pid' order by pg_level asc");
     while($pyramid_row = mysqli_fetch_assoc($pyramid_result)) {
         $pyramid_row['pg_group'] = explode(',' , $pyramid_row['pg_group']);
         $pyramid_row['pg_latecomers'] = explode(',' , $pyramid_row['pg_latecomers']);
@@ -478,7 +529,7 @@ function get_inactive_level_group_peers() {
     $peer_array_sql = implode("','", \Util\sanitize_array($peer_array));
 
     if($activity_level == 0 and !\Student\level_is_rated())
-        $inactive_peers_result = mysqli_query($link, "select distinct sid from students where sid in ('{$peer_array_sql}') and sid not in (select distinct sid as active_sid from flow_student where {$ps['e']} and sid in ('{$peer_array_sql}'))");
+        $inactive_peers_result = mysqli_query($link, "select distinct sid from students where sid in ('{$peer_array_sql}') and sid not in (select distinct sid as active_sid from flow_student where fid = '$fid' and sid in ('{$peer_array_sql}'))");
     else
         $inactive_peers_result = mysqli_query($link, "select distinct sid from students where sid in ('{$peer_array_sql}') and sid not in (select distinct fsr_sid as active_sid from flow_student_rating where {$ps['fsr']} and fsr_level='{$activity_level}' and fsr_group_id = '$peer_group_id')");
 
@@ -491,12 +542,19 @@ function get_inactive_level_group_peers() {
 }
 
 function remaining_pyramids() {
-    global $link, $pyramid_minsize, $fid, $ps, $flow_data;
+    global $link, $pyramid_size, $fid, $ps, $flow_data;
 
     $result = mysqli_query($link, "select sid from pyramid_students where fid = '$fid'");
     $nflow_students = mysqli_num_rows($result);
 
-    if($flow_data['expected_students'] - $nflow_students >= $pyramid_minsize)
+    if((int)$flow_data['multi_py'] == 0) {
+        if($nflow_students > 0)
+            return false;
+
+        return true;
+    }
+
+    if($flow_data['expected_students'] - $nflow_students >= $pyramid_size)
         return true;
 
     return false;
@@ -535,8 +593,10 @@ function get_student_pyramid($fid, $sid) {
 
     $result = mysqli_query($link,"select * from pyramid_students where fid='$fid' and sid='$sid' limit 1");
 
-    if(!mysqli_num_rows($result))
-        return false;
+    if(!mysqli_num_rows($result)) {
+        $pid = false;
+        return $pid;
+    }
 
     $result_row = mysqli_fetch_assoc($result);
 
@@ -547,8 +607,8 @@ function get_student_pyramid($fid, $sid) {
     return $pid;
 }
 
-function create_pyramid($fid, $fl, $fsg) {
-    global $link,  $fid, $ps, $flow_data, $pyramid_minsize;
+function create_pyramid($fid, $fl, $fsg, $new_pyramid_size) {
+    global $link,  $fid, $ps, $flow_data;
 
     //find the last pid
     $pid = null;
@@ -562,7 +622,7 @@ function create_pyramid($fid, $fl, $fsg) {
     }
 
     //select available flow students
-    $result = mysqli_query($link, "select * from flow_available_students where fid='$fid' and sid not in(select sid from pyramid_students where fid = '$fid') limit {$pyramid_minsize}");
+    $result = mysqli_query($link, "select * from flow_available_students where fid='$fid' and sid not in(select sid from pyramid_students where fid = '$fid') limit {$new_pyramid_size}");
 
     if(!mysqli_num_rows($result))
         $students = [];

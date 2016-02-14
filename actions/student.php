@@ -13,11 +13,11 @@ if(!\Pyramid\get_current_flow()) {
 
 \Pyramid\flow_add_student($fid, $sid);
 
-\Util\log(['activity' => 'page_load']);
-
 //avoid race condition
 $remaining_pyramids = \Pyramid\remaining_pyramids();
 if(($pid = \Pyramid\get_student_pyramid($fid, $sid)) === false) {
+    \Util\log(['activity' => 'page_load']);
+    \Util\log_submit();
     \Answer\submit();
     if ($remaining_pyramids and !\Answer\is_submitted()) {
         \Answer\request();
@@ -28,11 +28,15 @@ if(($pid = \Pyramid\get_student_pyramid($fid, $sid)) === false) {
     }
 }
 
+\Util\log(['activity' => 'page_load']);
+
 //$activity_level
 \Pyramid\get_current_activity_level();
 
 //$peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp
 \Group\get_members();
+
+\Util\log_submit();
 
 //check if the group has completed the level and upgrade the level
 \Pyramid\upgrade_level();

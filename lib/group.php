@@ -21,8 +21,14 @@ function get_members($params) {
                 $peer_group_combined_ids = $sa_data_1['pg_combined_group_ids'];
             }
         }
+        $peer_group_combined_ids_temp = explode(",",$peer_group_combined_ids);
+    } else {
+        //avoid database corruption
+        $peer_array = null;
+        $peer_group_id = null;
+        $peer_group_combined_ids = null;
+        $peer_group_combined_ids_temp = [];
     }
-    $peer_group_combined_ids_temp = explode(",",$peer_group_combined_ids);
 }
 
 function get_next_level_groups($params) {
@@ -84,7 +90,7 @@ function check_if_group_finished_level()
     } else {
         $peer_array_sql = implode("','", \Util\sanitize_array($peer_array));
 
-        $cgfl_result_1 = mysqli_query($link, "select * from flow_student where {$ps['e']} and sid in ('{$peer_array_sql}')");
+        $cgfl_result_1 = mysqli_query($link, "select * from flow_student where fid = '$fid' and sid in ('{$peer_array_sql}')");
         $cgfl_result_1_count = mysqli_num_rows($cgfl_result_1);
     }
 
