@@ -11,7 +11,7 @@ if(isset($_SESSION['user'])) {
 	$result = mysqli_query($link,"select * from pyramid_students where fid='$fid' order by pid desc limit 1");
 
 	if(!mysqli_num_rows($result))
-		$npid = 0;
+		$npid = null;
 	else {
 		$result_row = mysqli_fetch_assoc($result);
 		$npid = (int)$result_row['pid'];
@@ -47,12 +47,12 @@ q
 		<a href="teacher.php">&lt;&lt;Back</a>
 		<br />
 
-		<?php if($npid == 0): ?>
-		<?php echo '<br /><span class="label btn-success">No pyramid created.</span><br />'; ?>
+		<?php if($npid === null): ?>
+			<?php echo '<br /><span class="label btn-success">No pyramid created.</span><br />'; ?>
 		<?php else:?>
 			<?php for($i=0;$i<=$npid;$i++):?>
 			<?php
-			$res2 = mysqli_query($link, "select fname, pg_level, pg_group, pg_group_id, pid from pyramid_groups, flow where pg_fid = '$fid' and pg_fid = fid  and pid = '{$i}' order by pg_level ASC");
+			$res2 = mysqli_query($link, "select fname, pg_level, pg_group, pg_group_id, pg_pid from pyramid_groups, flow where pg_fid = fid and pg_fid = '$fid' and pg_pid = '{$i}' order by pg_level ASC");
 			if(mysqli_num_rows($res2) > 0) {
 				$py_created = true;
 			} else {
@@ -63,13 +63,13 @@ q
 				echo '<br /><span class="label btn-success">The pyramid number <?=$i?> still is not created.</span><br />';
 			} else {
 
-				if (mysqli_num_rows(mysqli_query($link, "select * from pyramid_groups where pg_fid = '$fid'")) == mysqli_num_rows(mysqli_query($link, "select * from selected_answers where sa_fid = '$fid'"))) {
+				if (mysqli_num_rows(mysqli_query($link, "select * from pyramid_groups where pg_fid = '$fid' and pg_pid = '{$i}'")) == mysqli_num_rows(mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_pid = '{$i}'"))) {
 
 					$res3 = mysqli_query($link, "select * from flow where fid = '$fid'");
 					$data3 = mysqli_fetch_assoc($res3);
 					$activity_level = $data3['levels'];
 					$activity_level = $activity_level - 1;
-					$result_11 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level = '$activity_level'");
+					$result_11 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_pid = '{$i}' and sa_level = '$activity_level'");
 					echo '<br /><span class="label btn-success">Selected answers are:</span><br />';
 					while ($data_t_11 = mysqli_fetch_assoc($result_11)) {
 						$qa_last_selected_id = $data_t_11['sa_selected_id'];
@@ -116,7 +116,7 @@ q
 						$grp_cnt = 0;
 					}
 
-					$res3 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level='$level' and sa_group_id='$pg_group_id'");
+					$res3 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_pid = '{$i}' and sa_level='$level' and sa_group_id='$pg_group_id'");
 					if (mysqli_num_rows($res3) > 0) { //the group has selected an answer
 
 						$data3 = mysqli_fetch_assoc($res3);
