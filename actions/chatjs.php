@@ -22,7 +22,7 @@ global $peer_group_id, $activity_level;
 header('Content-Type: application/javascript; charset=utf-8');
 $jsdata = [
     'username' => $sname,
-    'room' => 'room_' . $fid . '_' . $peer_group_id . '_' . $activity_level,
+    'room' => 'room_' . $fid . '_' . $peer_group_id . '_' . $activity_level . '_' . $pid,
     'fid' => $fid,
     'pid' => $pid,
 ];

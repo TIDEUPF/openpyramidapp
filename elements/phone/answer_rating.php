@@ -353,6 +353,50 @@
     <?php if($flow_data['ch'] == 1):?>
     <style>
 
+        #chat-phone-write {
+            position:fixed;
+            bottom: 2em;
+            right: 4.1em;
+            height: 0px;
+            width: 0px;
+            z-index: 1001;
+            border: 0px;
+            background-color: rgba(0,0,0,0.0);
+        }
+
+        #chat-popup-show-padding {
+            position:fixed;
+            bottom: 0em;
+            right: 0em;
+            height: 3em;
+            width: 2.5em;
+            z-index: 1001;
+            border: 0px;
+            background-color: rgba(0,0,0,0.0);
+        }
+
+        #chat-phone-write {
+            position:fixed;
+            bottom: 2em;
+            right: 4.1em;
+            height: 0px;
+            width: 0px;
+            z-index: 1001;
+            border: 0px;
+            background-color: rgba(0,0,0,0.0);
+        }
+
+        #chat-popup-show-padding {
+            position:fixed;
+            bottom: 0em;
+            right: 0em;
+            height: 3em;
+            width: 2.5em;
+            z-index: 1001;
+            border: 0px;
+            background-color: rgba(0,0,0,0.0);
+        }
+
         #chat-popup-show {
             position:fixed;
             bottom: 2em;
@@ -364,7 +408,8 @@
             background-color: rgba(0,0,0,0.0);
         }
 
-        #chat-popup-show::after {
+        #chat-popup-show::after,
+        #chat-phone-write::after {
             content: "";
             position: absolute;
             display: block;
@@ -401,7 +446,7 @@
             width: 100%;
             z-index: 1000;
             background-color: #D8FFF4;
-            padding: 0.5em 0;
+            padding: 0.5em 0.5em;
         }
 
         #mobile-bottom-chat-input input,
@@ -443,6 +488,9 @@
     <div id="mobile-bottom-chat-input">
         <input type="text" class="inputMessage" placeholder="Send a message to your peers..."/>
     </div>
+    <a id="chat-phone-write-padding" href="#"></a>
+    <a id="chat-phone-write" href="#" class="ui-icon-edit"></a>
+    <a id="chat-popup-show-padding" href="#"></a>
     <a id="chat-popup-show" href="#" class="ui-icon-arrow-u"></a>
     <script>
         var chat_last_message_text;
@@ -471,6 +519,24 @@
 
             $(window).resize(function() {
                 resize_middle_frame();
+            });
+
+            $('#chat-popup-show-padding').click(function(e) {
+                e.stopPropagation();
+                e.preventDefault();
+                $('#rating-chat').toggle();
+            });
+
+            $('#chat-phone-write').click(function(e) {
+                e.stopPropagation();
+                e.preventDefault();
+                sendMessage();
+            });
+
+            $('#chat-phone-write-padding').click(function(e) {
+                e.stopPropagation();
+                e.preventDefault();
+                sendMessage();
             });
 
             $('#chat-popup-show, #chat-popup-close').click(function() {
