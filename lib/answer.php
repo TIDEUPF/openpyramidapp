@@ -277,6 +277,8 @@ function submit_rate() {
 function skip_rating() {
     global $link, $sid, $fid, $pid, $ps, $levels, $sname, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
+    //TODO: in asynchronous mode we select the first two questions
+
     $n_real_answers = count(get_selected_ids(false));
     $time = time();
 
@@ -335,8 +337,9 @@ function get_selected_ids($full=false) {
         foreach ($peer_group_combined_ids_temp as $pgcid_group_id_temp) {
             $sa_result_2 = mysqli_query($link, "select * from selected_answers where {$ps['sa']} and sa_level = '$activity_level_previous' and sa_group_id = '$pgcid_group_id_temp' {$skip_answers}");
             if (mysqli_num_rows($sa_result_2) > 0) {
-                $sa_data_2 = mysqli_fetch_assoc($sa_result_2);
-                $result[] = $sa_data_2['sa_selected_id'];
+                while($sa_data_2 = mysqli_fetch_assoc($sa_result_2)) {
+                    $result[] = $sa_data_2['sa_selected_id'];
+                }
             }
         }
         if(empty($result)) {//no answers from the other peer, user must wait

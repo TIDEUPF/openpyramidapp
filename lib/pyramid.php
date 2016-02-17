@@ -87,7 +87,9 @@ function upgrade_level($forced = false) {
             return true;
         } else {
             if(!set_selected_answers()) {
+                //the conditions to select an question are not meet
                 $time = time();
+                //TODO: select 2 answers if asychronous
                 mysqli_query($link, "insert into selected_answers values ('$fid', '$pid', '$activity_level', '$peer_group_id', '-1', '0', '1', FROM_UNIXTIME({$time}))");
                 \Util\log(['activity' => 'level_finished_with_no_rates']);
             }
@@ -115,19 +117,28 @@ function upgrade_level($forced = false) {
 function set_selected_answers() {
     global $link, $sid, $fid, $pid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids;
 
+    //TODO: asynchronous set the proper number of selected questions
+    $n_selected_answers = 1;
+
     //to sum the ratings
-    $ssa_result_1= mysqli_query($link, "SELECT fsr_to_whom_rated_id, skip, SUM(fsr_rating) as sum FROM `flow_student_rating` where {$ps['fsr']} and fsr_level = '$activity_level' and fsr_group_id = '$peer_group_id' group by fsr_to_whom_rated_id order by SUM(fsr_rating) desc limit 1");
+    $ssa_result_1= mysqli_query($link, "SELECT fsr_to_whom_rated_id, skip, SUM(fsr_rating) as sum FROM `flow_student_rating` where {$ps['fsr']} and fsr_level = '$activity_level' and fsr_group_id = '$peer_group_id' group by fsr_to_whom_rated_id order by SUM(fsr_rating) desc limit {$n_selected_answers}");
 
     if(mysqli_num_rows($ssa_result_1)> 0) {
-        $ssa_data_1 = mysqli_fetch_assoc($ssa_result_1);
-
-        $selected_id = $ssa_data_1['fsr_to_whom_rated_id'];
-        $selected_id_rating_sum = $ssa_data_1['sum'];
-        $skip = $ssa_data_1['skip'];
-        $time = time();
-        mysqli_query($link, "insert into selected_answers values ('$fid', '$pid', '$activity_level', '$peer_group_id', '$selected_id', '$selected_id_rating_sum', '$skip', FROM_UNIXTIME({$time}))");
-        \Util\log(['activity' => 'selected_answer', 'answer' => $selected_id, 'rating' => $selected_id_rating_sum]);
+        while($ssa_data_1 = mysqli_fetch_assoc($ssa_result_1)) {
+            $selected_id = $ssa_data_1['fsr_to_whom_rated_id'];
+            $selected_id_rating_sum = $ssa_data_1['sum'];
+            $skip = $ssa_data_1['skip'];
+            $time = time();
+            mysqli_query($link, "insert into selected_answers values ('$fid', '$pid', '$activity_level', '$peer_group_id', '$selected_id', '$selected_id_rating_sum', '$skip', FROM_UNIXTIME({$time}))");
+            \Util\log(['activity' => 'selected_answer', 'answer' => $selected_id, 'rating' => $selected_id_rating_sum]);
+        }
         return true;
+    } else {
+        //TODO: force random selection
+        $answers = \Answer\get_selected_ids();
+        $n_answers = count($answers);
+
+        $n_answers % rand_mt(0,9999);
     }
 
     return false;
@@ -136,6 +147,7 @@ function set_selected_answers() {
 function set_selected_answers_for_previous_groups() {
     global $link, $sid, $fid, $pid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids;
 
+    $n_selected_answers = 1;
     $previous_groups_ids = explode(',', $peer_group_combined_ids);
     $previous_level = $activity_level - 1;
     $time = time();
@@ -144,38 +156,22 @@ function set_selected_answers_for_previous_groups() {
         if(mysqli_num_rows(mysqli_query($link, "select * from selected_answers where {$ps['sa']} and sa_group_id='{$fpgi}' and sa_level='{$previous_level}'")) > 0)
             continue;
 
-        $ssa_result_1= mysqli_query($link, "SELECT fsr_to_whom_rated_id, skip, SUM(fsr_rating) as sum FROM `flow_student_rating` where {$ps['fsr']} and fsr_level = '$previous_level' and fsr_group_id = '$fpgi' group by fsr_to_whom_rated_id order by SUM(fsr_rating) desc limit 1");
+        $ssa_result_1= mysqli_query($link, "SELECT fsr_to_whom_rated_id, skip, SUM(fsr_rating) as sum FROM `flow_student_rating` where {$ps['fsr']} and fsr_level = '$previous_level' and fsr_group_id = '$fpgi' group by fsr_to_whom_rated_id order by SUM(fsr_rating) desc limit {$n_selected_answers}");
 
         if(mysqli_num_rows($ssa_result_1)> 0) {
-            $ssa_data_1 = mysqli_fetch_assoc($ssa_result_1);
-
-            $selected_id = $ssa_data_1['fsr_to_whom_rated_id'];
-            $selected_id_rating_sum = $ssa_data_1['sum'];
-            $skip = $ssa_data_1['skip'];
-            mysqli_query($link, "insert into selected_answers values ('$fid', '$pid', '$previous_level', '$fpgi', '$selected_id', '$selected_id_rating_sum', '$skip', FROM_UNIXTIME({$time}))");
-            \Util\log(['activity' => 'selected_answer', 'answer' => $selected_id, 'rating' => $selected_id_rating_sum]);
-
-            mysqli_query($link, "insert into selected_answers values ('$fid', '$pid', '$previous_level', '$fpgi', '$selected_id', '$selected_id_rating_sum', '$skip', FROM_UNIXTIME({$time}))");
-            return true;
+            while($ssa_data_1 = mysqli_fetch_assoc($ssa_result_1)) {
+                $selected_id = $ssa_data_1['fsr_to_whom_rated_id'];
+                $selected_id_rating_sum = $ssa_data_1['sum'];
+                $skip = $ssa_data_1['skip'];
+                mysqli_query($link, "insert into selected_answers values ('$fid', '$pid', '$previous_level', '$fpgi', '$selected_id', '$selected_id_rating_sum', '$skip', FROM_UNIXTIME({$time}))");
+                \Util\log(['activity' => 'selected_answer', 'answer' => $selected_id, 'rating' => $selected_id_rating_sum]);
+            }
+            //return true;
         } else {
+            //TODO: select by random
             mysqli_query($link, "insert into selected_answers values ('$fid', '$pid', '$previous_level', '$fpgi', '-1', '-1', '1', FROM_UNIXTIME({$time}))");
         }
     }
-
-    $ssa_result_1= mysqli_query($link, "SELECT fsr_to_whom_rated_id, skip, SUM(fsr_rating) as sum FROM `flow_student_rating` where {$ps['fsr']} and fsr_level = '$activity_level' and fsr_group_id = '$peer_group_id' group by fsr_to_whom_rated_id order by SUM(fsr_rating) desc limit 1");
-
-    if(mysqli_num_rows($ssa_result_1)> 0) {
-        $ssa_data_1 = mysqli_fetch_assoc($ssa_result_1);
-
-        $selected_id = $ssa_data_1['fsr_to_whom_rated_id'];
-        $selected_id_rating_sum = $ssa_data_1['sum'];
-        $skip = $ssa_data_1['skip'];
-        mysqli_query($link, "insert into selected_answers values ('$fid', '$pid', '$activity_level', '$peer_group_id', '$selected_id', '$selected_id_rating_sum', '$skip', FROM_UNIXTIME({$time}))");
-        \Util\log(['activity' => 'selected_answer', 'answer' => $selected_id, 'rating' => $selected_id_rating_sum]);
-        return true;
-    }
-
-    return false;
 }
 
 function get_groups($params) {
@@ -205,13 +201,15 @@ function is_level_computed($params) {
 function compute_level_rating() {
     global $link, $sid, $fid, $pid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
-    $result_3= mysqli_query($link, "SELECT fsr_to_whom_rated_id, SUM(fsr_rating) as sum FROM `flow_student_rating` where {$ps['fsr']} and fsr_level = '$activity_level' and fsr_group_id = '$peer_group_id' group by fsr_to_whom_rated_id order by SUM(fsr_rating) desc limit 1");
-    $data_t_2 = mysqli_fetch_assoc($result_3);
+    $n_selected_answers = 1;
+    $result_3= mysqli_query($link, "SELECT fsr_to_whom_rated_id, SUM(fsr_rating) as sum FROM `flow_student_rating` where {$ps['fsr']} and fsr_level = '$activity_level' and fsr_group_id = '$peer_group_id' group by fsr_to_whom_rated_id order by SUM(fsr_rating) desc limit {$n_selected_answers}");
 
-    $selected_id = $data_t_2['fsr_to_whom_rated_id'];
-    $selected_id_rating_sum = $data_t_2['sum'];
-    $time = time();
-    mysqli_query($link,"insert into selected_answers values ('$fid', '$pid', '$activity_level', '$peer_group_id', '$selected_id', '$selected_id_rating_sum', FROM_UNIXTIME({$time}))");
+    while($data_t_2 = mysqli_fetch_assoc($result_3)) {
+        $selected_id = $data_t_2['fsr_to_whom_rated_id'];
+        $selected_id_rating_sum = $data_t_2['sum'];
+        $time = time();
+        mysqli_query($link, "insert into selected_answers values ('$fid', '$pid', '$activity_level', '$peer_group_id', '$selected_id', '$selected_id_rating_sum', FROM_UNIXTIME({$time}))");
+    }
 }
 
 function is_complete() {

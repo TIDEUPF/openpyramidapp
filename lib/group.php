@@ -155,7 +155,7 @@ function get_previous_groups_rated_count() {
 
     if($activity_level >= $levels) {
         $final_level = $levels - 1;
-        $cipgct_result_1 = mysqli_query($link, "select * from selected_answers where {$ps['sa']} and sa_level = '$final_level'");
+        $cipgct_result_1 = mysqli_query($link, "select distinct sa_group_id from selected_answers where {$ps['sa']} and sa_level = '$final_level'");
         return mysqli_num_rows($cipgct_result_1);
     }
 
@@ -167,24 +167,7 @@ function get_previous_groups_rated_count() {
 
     $activity_level_previous = $activity_level-1;
     $sql1 = implode(" or ", $sql1_ids);
-    $cipgct_result_1 = mysqli_query($link, "select * from selected_answers where {$ps['sa']} and sa_level = '$activity_level_previous' and ($sql1) ");
-    $cipgct_result_1_count = mysqli_num_rows($cipgct_result_1);
-
-    return $cipgct_result_1_count;
-}
-
-function get_next_groups_rated_count() {
-    global $link, $sid, $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
-
-    $n_groups = get_next_level_groups();
-
-    foreach($n_groups['peer_group_combined_ids_temp'] as $temp_id)
-    {
-        $sql1_ids[] = "sa_group_id = ".$temp_id;
-    }
-
-    $sql1 = implode(" or ", $sql1_ids);
-    $cipgct_result_1 = mysqli_query($link, "select * from selected_answers where {$ps['sa']} and sa_level = '$activity_level' and ($sql1) ");
+    $cipgct_result_1 = mysqli_query($link, "select distinct sa_group_id from selected_answers where {$ps['sa']} and sa_level = '$activity_level_previous' and ($sql1) ");
     $cipgct_result_1_count = mysqli_num_rows($cipgct_result_1);
 
     return $cipgct_result_1_count;

@@ -119,14 +119,15 @@ q
 					$res3 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_pid = '{$i}' and sa_level='$level' and sa_group_id='$pg_group_id'");
 					if (mysqli_num_rows($res3) > 0) { //the group has selected an answer
 
-						$data3 = mysqli_fetch_assoc($res3);
-						$selected_id = $data3['sa_selected_id'];
+						while($data3 = mysqli_fetch_assoc($res3)) {
+							$selected_id = $data3['sa_selected_id'];
 
-						$res4 = mysqli_query($link, "select * from flow_student where fid = '$fid' and sid = '$selected_id'");
-						if (mysqli_num_rows($res4) > 0) {
-							$data4 = mysqli_fetch_assoc($res4);
-							$answer = $data4['fs_answer'];
-							echo '  <span class="label btn-success">Selected group answer:</span>  '. $answer;
+							$res4 = mysqli_query($link, "select * from flow_student where fid = '$fid' and sid = '$selected_id'");
+							if (mysqli_num_rows($res4) > 0) {
+								$data4 = mysqli_fetch_assoc($res4);
+								$answer = $data4['fs_answer'];
+								echo '  <span class="label btn-success">Selected group answer:</span>  ' . $answer;
+							}
 						}
 					} else {
 						//echo '<tr> <td><span class="label btn-success">The group did not select an answer.</span></td></tr>';
