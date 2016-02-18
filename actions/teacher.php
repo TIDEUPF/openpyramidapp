@@ -22,6 +22,8 @@ if(isset($_SESSION['user'])) {
 		$sync = (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['sync']))));
 		$multi_py = (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['multi_py']))));
 		$ch = (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['ch']))));
+		$n_selected_answers = (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['n_selected_answers']))));
+		$random_selection = (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['random_selection']))));
 		$fesname = '';//$fesname =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['fesname']))));
 		$fl = (int) $_POST['fl'];
 		$fsg = (int) $_POST['fsg'];
@@ -56,7 +58,7 @@ if(isset($_SESSION['user'])) {
 			$error = 'Levels and Responses cannot be 0';
 		} else {
 			$datestamp = time();
-			mysqli_query($link,"insert into flow values (null, '$teacher_id', '$fname', '$fdes', '$fcname', '$fesname', '$fsg', '$fl', '$pyramid_size', '$min_pyramid', '$expe', '$rps', '$datestamp', $tst, $rt, $htst, $hrt, '{$qs}', '{$ch}', '{$sync}', '{$multi_py}')");
+			mysqli_query($link,"insert into flow values (null, '$teacher_id', '$fname', '$fdes', '$fcname', '$fesname', '$fsg', '$fl', '$pyramid_size', '$min_pyramid', '$expe', '$rps', '$datestamp', $tst, $rt, $htst, $hrt, '{$qs}', '{$ch}', '{$sync}', '{$multi_py}, {$n_selected_answers}, {$random_selection}')");
 		}
 	}
 } else {
@@ -259,6 +261,22 @@ $tq = $default_teacher_question;
 
 		<div class="form-group">
 			<label for="multi_py">Multiple pyramids:</label>
+			<select class="form-control" id="multi_py" name="multi_py">
+				<option value="1" selected="selected">Enabled</option>
+				<option value="0">Disabled</option>
+			</select>
+		</div>
+
+		<div class="form-group">
+			<label for="multi_py">Number of selected answers per group:</label>
+			<select class="form-control" id="multi_py" name="multi_py">
+				<option value="1" selected="selected">1</option>
+				<option value="2">2</option>
+			</select>
+		</div>
+
+		<div class="form-group">
+			<label for="multi_py">Random answer select in case of no ratings submitted:</label>
 			<select class="form-control" id="multi_py" name="multi_py">
 				<option value="1" selected="selected">Enabled</option>
 				<option value="0">Disabled</option>

@@ -19,11 +19,12 @@ if(($pid = \Pyramid\get_student_pyramid($fid, $sid)) === false) {
 \Group\get_members();
 global $peer_group_id, $activity_level;
 
+$location_id = hash('crc32b', $_SERVER['REQUEST_URI']);
+
 header('Content-Type: application/javascript; charset=utf-8');
 $jsdata = [
     'username' => $sname,
-    //TODO: filter by url
-    'room' => 'room_' . $fid . '_' . $peer_group_id . '_' . $activity_level . '_' . $pid,
+    'room' => 'room_' . $fid . '_' . $peer_group_id . '_' . $activity_level . '_' . $pid . '_' . $location_id,
     'fid' => $fid,
     'pid' => $pid,
 ];

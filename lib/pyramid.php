@@ -115,7 +115,7 @@ function upgrade_level($forced = false) {
 }
 
 function set_selected_answers() {
-    global $link, $sid, $fid, $pid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids;
+    global $link, $sid, $fid, $pid, $random_selection, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids;
 
     //TODO: asynchronous set the proper number of selected questions
     $n_selected_answers = 1;
@@ -133,12 +133,25 @@ function set_selected_answers() {
             \Util\log(['activity' => 'selected_answer', 'answer' => $selected_id, 'rating' => $selected_id_rating_sum]);
         }
         return true;
-    } else {
+    } elseif($random_selection){
         //TODO: force random selection
         $answers = \Answer\get_selected_ids();
-        $n_answers = count($answers);
+        $n_selected = 0;
+        for($i=0; $i<$n_selected_answers and !empty($answers); $i++) {
+            $i_selected = count($answers) % rand_mt(0, 9999);
+            $selected_id = $answers[$i_selected];
+            unset($answers[$i_selected]);
+            array_values($answers);
 
-        $n_answers % rand_mt(0,9999);
+            $selected_id_rating_sum = 0;
+            $skip = 0;
+            $time = time();
+            mysqli_query($link, "insert into selected_answers values ('$fid', '$pid', '$activity_level', '$peer_group_id', '$selected_id', '$selected_id_rating_sum', '$skip', FROM_UNIXTIME({$time}))");
+            \Util\log(['activity' => 'selected_answer', 'answer' => $selected_id, 'rating' => $selected_id_rating_sum]);
+        }
+
+        if($n_selected > 0)
+            return true;
     }
 
     return false;
