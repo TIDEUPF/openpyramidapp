@@ -4,11 +4,16 @@ Student\enforce_login();
 
 $sname = Student\get_username();
 $sid = $_SESSION['student'];
-global $fid;
+global $fid, $flow_data;
 
 // $levels, $fname, $fdes, $fid, $fid_timestamp
 if(!\Pyramid\get_current_flow()) {
     //flow changed
+}
+
+if((int)$flow_data['sync'] == 0) {
+    include __DIR__. '/student_async.php';
+    exit;
 }
 
 \Pyramid\flow_add_student($fid, $sid);

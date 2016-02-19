@@ -152,7 +152,7 @@ function request($params) {
 }
 
 function request_rate($params) {
-    global $link, $fid, $ps, $pid, $levels, $sname, $peer_toolbar_strlen, $activity_level, $peer_group_id, $peer_array;
+    global $link, $fid, $flow_data, $pid, $levels, $sname, $peer_toolbar_strlen, $activity_level, $peer_group_id, $peer_array;
 
     $answer_text_array = array();
     $hidden_input_array = array();
@@ -200,6 +200,18 @@ function request_rate($params) {
         'rating_labels'         => array('Not rated', 'Awful', 'Bad', 'Good', 'Great', 'Awesome'),
         'hidden_input_array'    => $hidden_input_array,
     );
+
+    $location_id = hash('crc32b', $_SERVER['SCRIPT_NAME']);
+    $room = 'room_' . $fid . '_' . $peer_group_id . '_' . $activity_level . '_' . $pid . '_' . $location_id;
+    $messages_result = mysqli_query($link, "select * from chat where fid = '$fid' and room = '{$room}'");// to get peer answer
+    $messages = [];
+    while($message_row = mysqli_fetch_assoc($messages_result))
+        $messages[] = $message_row;
+
+    $vars['messages'] = $messages;
+
+    if (\Student\level_is_rated() and $flow_data['sync'] == 0)//the peer already submitted the answer
+        $vars['async_rated'] = "You submitted rating in this level successfully. Please come back tomorrow to see which questions have been selected for the next pyramid level.";
 
     if(isset($params['error']))
         $vars['error'] = $params['error'];
@@ -355,14 +367,20 @@ function view_final_answer($params) {
     global $link, $sid, $fid, $pid, $ps, $sname, $levels, $activity_level, $peer_group_id;
 
     if(count($params['final_answer_array'])>1)
-        $winning_text = 'The winning questions are';
+        $winning_text = 'Winning questions from this Pyramid';
     else
-        $winning_text = 'The winning question is';
+        $winning_text = 'Winning question from this Pyramid';
+
+    if(count($params['other_answers'])>1)
+        $other_header_text = 'Winning questions from other Pyramids';
+    else
+        $other_header_text = 'Winning question from other Pyramid';
 
     $vars = array(
         'username' 					=> $sname . ' + ' . (count(\Group\get_status_bar_peers())-1),
         'level' 					=> 'Level ' . \Pyramid\get_current_level() .'/' . $levels,
         'header_text' 			    => $winning_text,
+        'other_header_text' 	    => $other_header_text,
         'final_answer_array' 		=> $params['final_answer_array'],
         'other_answer_array' 		=> $params['other_answers'],
         'hidden_input_array' 		=> array(
@@ -382,6 +400,10 @@ function view_final_answer($params) {
 
     if(isset($params['error']))
         $vars['error'] = $params['error'];
+
+    $feedback_result = mysqli_query($link, "select * from feedback where fid='{$fid}' and sid='{$sid}' and feedback > 0");
+    if(mysqli_num_rows($feedback_result) > 0)
+        $vars['no_feedback'] = true;
 
     $body = \View\element("final_answer", $vars);
 
@@ -500,4 +522,36 @@ function submit_error() {
     global $input_result;
 
     return !empty($input_result['error']);
+}
+
+function answer_submitted_wait($params) {
+    global $link, $sid,  $fid, $ps, $sname, $levels, $activity_level, $peer_group_id, $peer_array, $peer_group_combined_ids;
+
+    $initial_level = $activity_level;
+
+    $vars = array(
+        'username' 					=> $sname,
+        'level' 				    => 'Level 1' . '/' . $levels,
+        'answer_text' 			=> 'Write a question',
+        'answer_submit_button' 	=> 'Submit your question',
+        'hidden_input_array' 		=> array(
+            'a_lvl' 			=> $activity_level,
+            'a_peer_group_id'	=> $peer_group_id,
+        ),
+    );
+
+    $hidden_input_array['username'] = $sname;
+    $hidden_input_array['fid'] = $fid;
+    $hidden_input_array['level'] = 1;
+    $hidden_input_array['page'] = "question_submitted_message";
+
+    $vars['hidden_input_array'] = array_merge($vars['hidden_input_array'], $hidden_input_array);
+
+    $body = \View\element("answer_submitted", $vars);
+
+    \View\page(array(
+        'title' => 'Question',
+        'body' => $body,
+    ));
+    exit;
 }

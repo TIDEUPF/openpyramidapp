@@ -58,7 +58,7 @@ if(isset($_SESSION['user'])) {
 			$error = 'Levels and Responses cannot be 0';
 		} else {
 			$datestamp = time();
-			mysqli_query($link,"insert into flow values (null, '$teacher_id', '$fname', '$fdes', '$fcname', '$fesname', '$fsg', '$fl', '$pyramid_size', '$min_pyramid', '$expe', '$rps', '$datestamp', $tst, $rt, $htst, $hrt, '{$qs}', '{$ch}', '{$sync}', '{$multi_py}, {$n_selected_answers}, {$random_selection}')");
+			mysqli_query($link,"insert into flow values (null, '$teacher_id', '$fname', '$fdes', '$fcname', '$fesname', '$fsg', '$fl', '$pyramid_size', '$min_pyramid', '$expe', '$rps', '$datestamp', $tst, $rt, $htst, $hrt, '{$qs}', '{$ch}', '{$sync}', '{$multi_py}', '{$n_selected_answers}', '{$random_selection}')");
 		}
 	}
 } else {
@@ -268,16 +268,16 @@ $tq = $default_teacher_question;
 		</div>
 
 		<div class="form-group">
-			<label for="multi_py">Number of selected answers per group:</label>
-			<select class="form-control" id="multi_py" name="multi_py">
+			<label for="n_selected_answers">Number of selected answers per group:</label>
+			<select class="form-control" id="n_selected_answers" name="n_selected_answers">
 				<option value="1" selected="selected">1</option>
 				<option value="2">2</option>
 			</select>
 		</div>
 
 		<div class="form-group">
-			<label for="multi_py">Random answer select in case of no ratings submitted:</label>
-			<select class="form-control" id="multi_py" name="multi_py">
+			<label for="random_selection">Random answer select in case of no ratings submitted:</label>
+			<select class="form-control" id="random_selection" name="random_selection">
 				<option value="1" selected="selected">Enabled</option>
 				<option value="0">Disabled</option>
 			</select>

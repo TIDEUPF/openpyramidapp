@@ -84,3 +84,19 @@ function log($data) {
 
     mysqli_query($link, "insert into activity_log values (null, '$user_id', null, '$sname', '{$data['activity']}', '$activity_level', '$peer_group_id', '{$data_json}', FROM_UNIXTIME('$date'), '{$data['origin']}')");
 }
+
+function filter_email($email_array) {
+    if(empty($email_array) or !is_array($email_array))
+        return $email_array;
+
+    $filtered = [];
+    foreach($email_array as $email) {
+        if(filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $email_split = explode('@', $email);
+            $filtered[] = $email_split[0];
+        } else {
+            $filtered[] = $email;
+        }
+    }
+    return $filtered;
+}

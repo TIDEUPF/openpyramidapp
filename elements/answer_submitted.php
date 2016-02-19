@@ -12,7 +12,11 @@
     #answer-middle-frame,
     #answer-footer-frame > div{
         padding: 0 1em 0 1em;
-        margin-top: 0.5em;
+    }
+
+    #answer-header-frame > #topbar {
+        padding: 0.5em 1em 0.25em 1em;
+        background-color: #DFE5EC;
     }
 
     #answer-middle-frame {
@@ -29,15 +33,19 @@
     #answer-header-level {
         float: left;
         text-align: center;
+        width: 20%;
     }
 
     #answer-header-user {
         float: left;
+        width: 40%;
     }
 
     #answer-header-logout {
         float: right;
         text-align: right;
+        width: 20%;
+        cursor: pointer;
     }
 
     .topbar_item {
@@ -57,23 +65,22 @@
     }
 
     #answer-header-text {
+        text-align: center;
         font-size: 1.35em;
         margin-top: 0.5em;
-        /*padding-left: 1.0em;*/
     }
 
-    #pre-header {
-        padding-left: 1.0em;
+    #answer_submitted {
+        padding: 10px;
+        text-align: center;
+        font-size: 120%;
+        position: relative;
+        top: 30%;
+        margin-top: 50px;
     }
-
-    #answer-header-frame > #topbar {
-        padding: 0.5em 1em 0.25em 1em;
-        background-color: #DFE5EC;
-    }
-
 </style>
 <div id="answer-frame">
-    <form method="post" action="student.php" data-ajax="false">
+    <form method="post">
         <div id="answer-header-frame">
 
             <div id="topbar">
@@ -82,24 +89,15 @@
                 <div id="answer-header-logout" class="topbar_item">Logout</div>
                 <div style="clear:both"></div>
             </div>
-            <div id="pre-header">
-                <div id="answer-header-text">Activity description</div>
+
+            <div id="answer_submitted">
+                Your question was submitted successfully! Please login (using the same userID) to the activity tomorrow to see rating and discussion level.
             </div>
 
         </div>
         <div id="answer-middle-frame">
 
             <div>
-
-                In this activity, you have to propose a question to ask from the teacher individually. Then you rate questions suggested by your peers in every level. Finally you all will be selecting the highest rated question/s to be submitted for the teacher to answer. When all members finish rating at one level, the next level options will appear.
-
-                <br>
-                <?php if(!empty($late_user)): ?>
-                    <br>You joined the activity late! You may have missed initial steps, but still you will be added to a Pyramid. You can contribute by discussing and rating other peers options provided.
-                <?php endif; ?>
-                <br>
-                <!--<i>En aquesta activitat has de proposar una pregunta per al professor, després hauràs de puntuar les preguntes del teu grup. Quan tots hagueu puntuat les preguntes apareixerà el següent nivell.</i>-->
-
 
 
             </div>
@@ -109,7 +107,6 @@
         <div id="answer-footer-frame">
 
             <div>
-                <div id="answer-submit-button"><button type="submit" name="next" class="ui-btn">Start the activity</button></div>
                 <div id="answer-submitted-message"></div>
                 <div id="answer-rating-ready"></div>
             </div>
@@ -129,4 +126,10 @@
     $('#answer-header-logout').on('click', function(e) {
         window.location="logout.php";
     });
+
+    timeoutPeriod = 10000;
+    setTimeout("refreshp();",timeoutPeriod);
+    function refreshp(){
+        window.location.href = window.location.href;
+    }
 </script>

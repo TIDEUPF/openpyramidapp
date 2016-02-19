@@ -37,7 +37,7 @@ function get_rating($answer_id) {
 
     $answer_rating_result = mysqli_query($link, "select * from flow_student_rating where {$ps['fsr']} and fsr_sid= '$sid' and fsr_level = '$activity_level' and fsr_group_id = '{$peer_group_id}' and fsr_to_whom_rated_id='{$answer_id}'");
     if(mysqli_num_rows($answer_rating_result) > 0) {
-        $answer_rating_result_array = mysqli_fetch_assoc($link, $answer_rating_result);
+        $answer_rating_result_array = mysqli_fetch_assoc($answer_rating_result);
 
         return $answer_rating_result_array['fsr_rating'];
     }

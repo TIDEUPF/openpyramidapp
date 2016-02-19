@@ -304,14 +304,14 @@ function get_status_bar_peers() {
             $sid_string_array[] = $result_array['pg_group'];
         }
         $full_sid_string = implode(',', $sid_string_array);
-        return explode(',', $full_sid_string);
+        return \Util\filter_email(explode(',', $full_sid_string));
     }
 
     if($activity_level == 0)
-        return $peer_array;
+        return \Util\filter_email($peer_array);
 
     if(\Group\check_if_previous_groups_completed_task())
-        return $peer_array;
+        return \Util\filter_email($peer_array);
     else {
         $top_level = $activity_level-1;
         $result = mysqli_query($link, "select * from pyramid_groups where {$ps['pg']} and pg_level='{$top_level}' and pg_group_id in ({$peer_group_combined_ids})");
@@ -320,10 +320,10 @@ function get_status_bar_peers() {
             $sid_string_array[] = $result_array['pg_group'];
         }
         $full_sid_string = implode(',', $sid_string_array);
-        return explode(',', $full_sid_string);
+        return \Util\filter_email(explode(',', $full_sid_string));
     }
 
-    return $peer_array;
+    return \Util\filter_email($peer_array);
 }
 
 function get_status_bar_groups_count() {

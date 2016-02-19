@@ -280,7 +280,11 @@
             <li class="chat page">
                 <a id="chat-popup-close" href="#" class="ui-icon-arrow-d"></a>
                 <div class="chatArea">
-                    <ul class="messages"></ul>
+                    <ul class="messages">
+                        <?php foreach($messages as $message): ?>
+                            <li class="message" style="display: list-item;"><span class="username" style="color: rgb(56, 36, 170);"><?=htmlspecialchars($message['sid'])?></span><span class="messageBody"><?=htmlspecialchars($message['message'])?></span></li>
+                        <?php endforeach; ?>
+                    </ul>
                 </div>
             </li>
         </ul>

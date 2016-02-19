@@ -51,14 +51,10 @@
 
     #answer-header-text,
     #answer-header-text-other {
-        font-size: 1.65em;
-        margin-top: 1.5em;
-        margin-bottom: 0.75em;
+        font-size: 1.35em;
+        margin-top: 1.0em;
+        margin-bottom: 0.25em;
         margin-left: 1em;
-    }
-
-    #answer-header-text-other {
-        margin-top: 2.5em;
     }
 
     #answer-header-level {
@@ -120,8 +116,13 @@
 
     #feedback-form {
         display: table;
-        font-size: 220%;
-        margin: 3em auto;
+        font-size: 160%;
+        margin: 1em auto;
+    }
+
+    .winner-answers {
+        margin-top: 0.5em;
+        margin-bottom: 0.5em;
     }
 </style>
 <div id="answer-frame">

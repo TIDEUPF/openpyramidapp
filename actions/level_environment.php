@@ -3,7 +3,7 @@ Student\enforce_login();
 
 $sname = Student\get_username();
 $sid = $_SESSION['student'];
-global $fid;
+global $fid, $link, $ps;
 
 // $levels, $fname, $fdes, $fid, $fid_timestamp
 $reset_flow = !\Pyramid\get_current_flow();
@@ -18,6 +18,28 @@ if(($pid = \Pyramid\get_student_pyramid($fid, $sid)) === false) {
         'a_lvl' => 0,
         'rating' => false,
     );
+
+    header('Connection: close');
+    header('Content-type: application/json');
+    echo json_encode($output);
+    exit;
+}
+
+if((int)$flow_data['sync'] == 0) {
+    $output = array(
+        'reset' => $reset_flow,
+        'expired' => false,
+        'countdown_started' => false,
+        'time_left' => 9999999,
+        'a_lvl' => 0,
+        'rating' => false,
+    );
+
+    $client_level = (int)$_REQUEST['level'] - 1;
+    $result = mysqli_query($link, "select * from selected_answers where {$ps['sa']} and sa_level = {$client_level}");
+    if (mysqli_num_rows($result) > 0) {
+         $output['expired'] = true;
+    }
 
     header('Connection: close');
     header('Content-type: application/json');

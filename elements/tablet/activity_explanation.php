@@ -36,8 +36,10 @@
     }
 
     #answer-header-logout {
+        width: 15%;
         float: right;
         text-align: right;
+        cursor: pointer;
     }
 
     #answer-submit-button {
@@ -99,7 +101,11 @@
 
                 In this activity, you have to propose a question to ask from the teacher individually. Then you rate questions suggested by your peers in every level. Finally you all will be selecting the highest rated question/s to be submitted for the teacher to answer. When all members finish rating at one level, the next level options will appear.
 
-                <br><br>
+                <br>
+                <?php if(!empty($late_user)): ?>
+                    <br>You joined the activity late! You may have missed initial steps, but still you will be added to a Pyramid. You can contribute by discussing and rating other peers options provided.
+                <?php endif; ?>
+                <br>
                 <!--<i>En aquesta activitat has de proposar una pregunta per al professor, després hauràs de puntuar les preguntes del teu grup. Quan tots hagueu puntuat les preguntes apareixerà el següent nivell.</i>
 -->
 

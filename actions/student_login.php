@@ -31,11 +31,17 @@ if(!isset($_SESSION['student'])) {
                     //header("location: student_activity.php"); exit(0);
                 //}
                 //else{
-                    $sname = strtolower($uname);
-                    $sname[0] = strtoupper($sname[0]);
-                    $sname = str_replace(array('*', "'", ',', ' ', '"', '(', ')', '<', '>', '=', ';', '-', '#', '/', '$', '%', '\\', '`'), '', $sname);
-                    $uname = str_replace(array('*', "'", ',', ' ', '"', '(', ')', '<', '>', '=', ';', '-', '#', '/', '$', '%', '\\', '`'), '', $uname);
-                    mysqli_query($link,"insert into students values ('$uname', '$sname', NOW() )");
+            $sname = strtolower($uname);
+            $sname[0] = strtoupper($sname[0]);
+            $sname = str_replace(array('*', "'", ',', ' ', '"', '(', ')', '<', '>', '=', ';', '-', '#', '/', '$', '%', '\\', '`'), '', $sname);
+            $uname = str_replace(array('*', "'", ',', ' ', '"', '(', ')', '<', '>', '=', ';', '-', '#', '/', '$', '%', '\\', '`'), '', $uname);
+
+            if(filter_var($sname, FILTER_VALIDATE_EMAIL)) {
+                $email_split = explode('@', $sname);
+                $sname = $email_split[0];
+            }
+
+            mysqli_query($link,"insert into students values ('$uname', '$sname', NOW() )");
                     if(mysqli_affected_rows($link) > 0) {
                         $_SESSION['student'] = $uname;
                         $_SESSION['sname'] = $sname;
@@ -92,14 +98,33 @@ if(!isset($_SESSION['student'])) {
         'body' => $login_form,
     ));
 } else {//successfull login
+    global $flow_data;
 
+    $late_user = false;
+    $first_time_user = false;
     //register the user in the current flow
     if($fid = \Pyramid\get_current_flow()) {
+
+        //late user
+        if((int)$flow_data['sync'] == 0) {
+            $gcal_result_1 = mysqli_query($link, "select * from pyramid_groups where pg_level = 0 and pg_started = 1 and pg_fid='{$fid}'");
+            if (mysqli_num_rows($gcal_result_1) > 0) {
+                $late_user = true;
+            }
+        }
+
+        //first time user
+        $user_flow_result = mysqli_query($link, "select * from flow_available_students where fid='{$fid}' and sid='{$_SESSION['student']}'");
+        if (!(mysqli_num_rows($user_flow_result) > 0)) {
+            $first_time_user = true;
+        }
+
         \Pyramid\flow_add_student($fid, $_SESSION['student']);
     }
 
     $vars = [];
     $vars['hidden_input_array'] = [];
+    $vars['late_user'] = $late_user;
 
     $hidden_input_array['username'] = $_SESSION['sname'];
     $hidden_input_array['fid'] = $fid;
@@ -108,14 +133,16 @@ if(!isset($_SESSION['student'])) {
 
     $vars['hidden_input_array'] = array_merge($vars['hidden_input_array'], $hidden_input_array);
 
-    //show activity explanation
-    $activity_explanation_view = View\element("activity_explanation", $vars);
+    if($first_time_user) {
+        //show activity explanation
+        $activity_explanation_view = View\element("activity_explanation", $vars);
 
-    \View\page(array(
-        'title' => 'Activity explanation',
-        'body' => $activity_explanation_view,
-    ));
-
-    //header("location: student.php");
+        \View\page(array(
+            'title' => 'Activity explanation',
+            'body' => $activity_explanation_view,
+        ));
+    } else {
+        header("location: student.php");
+    }
     exit;
 }

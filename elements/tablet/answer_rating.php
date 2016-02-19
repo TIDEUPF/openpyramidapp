@@ -235,8 +235,26 @@
         /*margin: auto !important;*/
     }
 
+    #async_rated {
+        background-color: #ACF97B;
+        text-align: center;
+    }
 
+    /*
+    .messages::-webkit-scrollbar-thumb {
+        background-color: #828282;
+    }
+
+    .messages::-webkit-scrollbar {
+        width: 5px;
+        background-color: #FDFDFD;
+    }
+*/
 </style>
+
+<link rel="stylesheet" href="vendors/perfect-scrollbar/css/perfect-scrollbar.min.css">
+<script src="vendors/perfect-scrollbar/js/min/perfect-scrollbar.jquery.min.js"></script>
+
 <div id="answer-frame">
     <form method="post" action="student.php" data-ajax="false">
         <div id="submit-confirmation">
@@ -253,9 +271,12 @@
             <div id="answer-header-logout" class="topbar_item">Logout</div>
             <div style="clear:both"></div>
         </div>
+        <?php if(isset($async_rated)): ?>
+            <div id="async_rated"><?=htmlspecialchars($async_rated)?></div>
+        <?php endif; ?>
         <div>
-            <!--<div id="answer-header-text"><?=$header_text?></div>-->
-            <div id="answer-header-text">Rating is individual. Please rate all options!</div>
+        <!--<div id="answer-header-text"><?=$header_text?></div>-->
+        <div id="answer-header-text">Rating is individual. Please rate all options!</div>
         </div>
 
     </div>
@@ -293,20 +314,27 @@
         <ul class="pages">
             <li class="chat page">
                 <div class="chatArea">
-                    <ul class="messages"></ul>
+                    <ul class="messages">
+                        <?php foreach($messages as $message): ?>
+                        <li class="message" style="display: list-item;"><span class="username" style="color: rgb(56, 36, 170);"><?=htmlspecialchars($message['sid'])?></span><span class="messageBody"><?=htmlspecialchars($message['message'])?></span></li>
+                        <?php endforeach; ?>
+                    </ul>
                 </div>
                 <a id="chat-write" href="#" class="ui-icon-edit"></a>
-                <input type="text" class="inputMessage" placeholder="Send a message to your peers..."/>
+                <input type="text" class="inputMessage" placeholder="Discuss with with your peers!!!"/>
             </li>
         </ul>
     </div>
+
     <?php endif;?>
 
     <div style="clear:both"></div>
 
     <script src="jslib/chatvars.js"></script>
     <script src="chat/client/chat.js"></script>
-
+        <script>
+            $('.messages').perfectScrollbar();
+        </script>
     <div id="answer-footer-frame">
 
         <div>
@@ -435,7 +463,10 @@
             method: 'post',
             dataType: 'json',
             success: level_status_actions,
-            timeout: polling_interval*1000
+            timeout: polling_interval*1000,
+            data: {
+                level: $('[name="level"]').val()
+            }
         });
     }
 
