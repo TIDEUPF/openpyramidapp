@@ -117,12 +117,26 @@
     #feedback-form {
         display: table;
         font-size: 160%;
-        margin: 1em auto;
+        margin: 0.7em auto;
     }
 
     .winner-answers {
         margin-top: 0.5em;
         margin-bottom: 0.5em;
+    }
+
+    #pre-feedback-form {
+        margin-top: 0.5em;
+        text-align: center;
+        color: red;
+        font-size: 120%;
+    }
+
+    #feedback-form span {
+        text-decoration: underline;
+        cursor: pointer;
+        color: #547cff;
+        font-weight: bolder;
     }
 </style>
 <div id="answer-frame">
@@ -145,7 +159,7 @@
 
             <ul class="winner-answers">
             <?php foreach($final_answer_array as $i=>$answer_text):?>
-                <li><?=htmlspecialchars($answer_text)?></li>
+                <li><?=htmlspecialchars($answer_text, ENT_COMPAT | ENT_HTML401 | ENT_IGNORE)?></li>
             <?php endforeach;?>
             </ul>
 
@@ -153,7 +167,7 @@
             <div id="answer-header-text-other"><?=$other_header_text?></div>
             <ul class="winner-answers">
             <?php foreach($other_answer_array as $i=>$answer_text):?>
-                <li><?=htmlspecialchars($answer_text)?></li>
+                <li><?=htmlspecialchars($answer_text, ENT_COMPAT | ENT_HTML401 | ENT_IGNORE)?></li>
             <?php endforeach;?>
             </ul>
             <?php endif; ?>
@@ -162,8 +176,9 @@
 
         <div id="answer-footer-frame">
             <?php if(empty($no_feedback)): ?>
-            <!--<div id="feedback-form"><a target="_blank" href="<?=htmlspecialchars("https://docs.google.com/forms/d/1uCVSLTNyWZAarg1RTxEjg5FVgNG2QSHouZKiC4BMLyA/viewform")?>">Feedback form</a></div>
-            --><div id="feedback-form"><a target="_blank" href="https://google.com">Feedback form</a></div>
+                <div id="pre-feedback-form">Please make sure to submit your feedback by clicking the below link!</div>
+            <div id="feedback-form"><span goto="<?=htmlspecialchars("https://docs.google.com/forms/d/1xNvjBcpp4vsS1J-jxTfbO21gqLDQwZ4Vjc1XDnb_6Dw/viewform")?>">Feedback form</span></div>
+            <!--<div id="feedback-form"><a target="_blank" href="https://google.com">Feedback form</a></div>-->
             <?php endif; ?>
             <div>
                 <div id="answer-waiting-group"><?=$answer_waiting_message?></div>
@@ -186,6 +201,7 @@
         window.location="logout.php";
     });
 
+    /*
     $('#feedback-form').mousedown(function(event) {
         if(event.which == 3 || event.which == 1 || event.which == 2) { // right click
             clearTimeout(cancel_timeout);
@@ -202,6 +218,36 @@
             method: 'post',
             dataType: 'json',
             timeout: 20000,
+        });
+    }
+    */
+
+    $('#feedback-form span').on('contextmenu', function() {
+        return false;
+    });
+
+    $('#feedback-form span').mousedown(function(event) {
+        if(event.buttons == 3 || event.buttons == 1 || event.buttons == 2 || event.buttons == 4) {
+            event.preventDefault();
+            clearTimeout(cancel_timeout);
+            cancel_timeout = setTimeout("refreshp();",timeoutPeriod);
+            feedback_clicked();
+        }
+    });
+
+    function gotoform() {
+        var form_url = $('#feedback-form span').attr('goto');
+        $('#feedback-form, #pre-feedback-form').hide();
+        window.location.href = form_url;
+    }
+
+    var feedback_clicked = function () {
+        $.ajax({
+            url: 'feedback_clicked.php',
+            method: 'post',
+            dataType: 'json',
+            success: gotoform,
+            timeout: 20000
         });
     }
 

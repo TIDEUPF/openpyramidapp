@@ -9,8 +9,24 @@ function init_cfg() {
     $default_teacher_question = 'Please submit the question';
 
     $device = 'tablet';
-    if($detect->isMobile() and !$detect->isTablet())
-        $device = 'phone';
+    $ajax = false;
+    if (php_sapi_name() != "cli") {
+        $headers = apache_request_headers();
+    } else {
+        $headers = [];
+    }
+
+    if(isset($headers['X-Requested-With'])) {
+        if($headers['X-Requested-With'] == 'XMLHttpRequest') {
+            $ajax = true;
+        }
+    }
+
+    //detection not needed for ajax
+    if(!$ajax and php_sapi_name() != "cli") {
+        if ($detect->isMobile() and !$detect->isTablet())
+            $device = 'phone';
+    }
 
     $answer_required_percentage = 78;
     $answer_submit_required_percentage = 80;

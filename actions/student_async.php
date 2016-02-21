@@ -26,6 +26,7 @@ $remaining_pyramids = \Pyramid\remaining_pyramids();
 //ask the question
 if(($pid = \Pyramid\get_student_pyramid($fid, $sid)) === false) {
     \Answer\submit();
+    \Util\log_submit();
 
     //rating has started(even if still is not submitted by anyone)
     $result = mysqli_query($link, "select * from pyramid_groups where pg_fid = {$fid} and pg_level='0' and pg_started=1");
@@ -64,6 +65,7 @@ if(\Pyramid\is_complete()) {
 //new data entered
 if(\Answer\is_new_data()) {
     if(\Answer\submit_error()) {
+        \Util\log(['activity' => 'error_on_submit']);
         //TODO: implement retry
         \Answer\retry();
         exit;
@@ -78,7 +80,7 @@ if(\Pyramid\is_complete()) {
 
 if(\Answer\is_available_answers())
     \Answer\request_rate();
-//else
-//    tell the user to come next day
+else
+    \Pyramid\no_questions_available();
 
 exit;

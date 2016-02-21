@@ -142,6 +142,11 @@ function request($params) {
     if(isset($params['error']))
         $vars['error'] = $params['error'];
 
+    if((int)$flow_data['sync'] == 0) {
+        $vars['username'] = $sname;
+        $vars['answer_skip_timeout'] = 99999;
+    }
+
     $body = \View\element("answer_form", $vars);
 
     \View\page(array(
@@ -152,7 +157,7 @@ function request($params) {
 }
 
 function request_rate($params) {
-    global $link, $fid, $flow_data, $pid, $levels, $sname, $peer_toolbar_strlen, $activity_level, $peer_group_id, $peer_array;
+    global $link, $fid, $device, $flow_data, $pid, $levels, $sname, $peer_toolbar_strlen, $activity_level, $peer_group_id, $peer_array;
 
     $answer_text_array = array();
     $hidden_input_array = array();
@@ -210,8 +215,13 @@ function request_rate($params) {
 
     $vars['messages'] = $messages;
 
-    if (\Student\level_is_rated() and $flow_data['sync'] == 0)//the peer already submitted the answer
-        $vars['async_rated'] = "You submitted rating in this level successfully. Please come back tomorrow to see which questions have been selected for the next pyramid level.";
+    if (\Student\level_is_rated() and (int)$flow_data['sync'] == 0) {//the peer already submitted the answer
+        if($device == 'phone') {
+            $vars['async_rated'] = "Submitted rating can be discussed and modified till today midnight. Login tomorrow to see selected questions at the next level!";
+        } else {
+            $vars['async_rated'] = "You submitted rating in this level successfully. You still can further discuss or modify your rating till today midnight. Make sure you login tomorrow to see which questions have been selected for the next pyramid level to continue!";
+        }
+    }
 
     if(isset($params['error']))
         $vars['error'] = $params['error'];
@@ -325,11 +335,17 @@ function is_available_answers() {
     return $result;
 }
 
-function get_selected_ids($full=false) {
+function get_selected_ids($full=false, $current_level = false) {
     global $link, $sid, $fid, $ps, $levels, $sname, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
     $result = [];
-    $activity_level_previous = $activity_level-1;
+
+    if($current_level) {
+        $activity_level_previous = $activity_level;
+    } else {
+        $activity_level_previous = $activity_level - 1;
+    }
+
     $skip_answers = ' and skip = \'0\'';
     if($full)
         $skip_answers = '';
@@ -346,6 +362,10 @@ function get_selected_ids($full=false) {
             //throw new \Exception ("peer answer not submitted");
         }
     } else {
+        //FIXME: ugly fix for async
+        if($current_level) {
+            $activity_level_previous = $activity_level - 1;
+        }
         foreach ($peer_group_combined_ids_temp as $pgcid_group_id_temp) {
             $sa_result_2 = mysqli_query($link, "select * from selected_answers where {$ps['sa']} and sa_level = '$activity_level_previous' and sa_group_id = '$pgcid_group_id_temp' {$skip_answers}");
             if (mysqli_num_rows($sa_result_2) > 0) {

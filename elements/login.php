@@ -142,6 +142,11 @@
         margin-top: 35px;
     }
 
+    #contact {
+        text-align: center;
+        margin-top: 30px;
+    }
+
     <?php if (strlen(strstr($_SERVER['HTTP_USER_AGENT'], 'Gecko')) > 0):?>
     <?php endif;?>
 </style>
@@ -172,7 +177,7 @@
                 <li><?php echo htmlspecialchars("Please do remember the e-mail or username you're using for this app! You will need to use it when accessing to participate in other levels of the pyramid. If you use another username you will be added with a different pyramid and affect your activity progress.")?></li>
                 <li><?php echo htmlspecialchars("For more information on how the app works, you can watch the following video. ")?></li>
             </ul>
-
+            <div id="contact"><a href="mailto:ssp.clfp@upf.edu?Subject=Pyramid%20App">Contact address: ssp.clfp@upf.edu</a></div>
             <div id="video">
                 <iframe width="560" height="315" src="https://www.youtube.com/embed/-l-pIwflqrc?rel=0" frameborder="0" allowfullscreen></iframe>
             </div>

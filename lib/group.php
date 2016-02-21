@@ -31,6 +31,28 @@ function get_members($params) {
     }
 }
 
+function get_members_from_group_id() {
+    global $link, $sid, $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+
+    $sa_result_1 = mysqli_query($link, "select * from pyramid_groups where {$ps['pg']} and pg_level = '$activity_level' and pg_group_id='{$peer_group_id}'");
+
+    if(mysqli_num_rows($sa_result_1) > 0) {
+        $sa_data_1 = mysqli_fetch_assoc($sa_result_1);
+        $peer_array_temp = explode(",",$sa_data_1['pg_group']);
+        $peer_array = $peer_array_temp;
+        $peer_group_id = $sa_data_1['pg_group_id'];
+        $peer_group_combined_ids = $sa_data_1['pg_combined_group_ids'];
+        $peer_group_combined_ids_temp = explode(",",$peer_group_combined_ids);
+    } else {
+        //avoid database corruption
+        $peer_array = null;
+        $peer_group_id = null;
+        $peer_group_combined_ids = null;
+        $peer_group_combined_ids_temp = [];
+    }
+
+}
+
 function get_next_level_groups($params) {
     global $link, $sid, $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 

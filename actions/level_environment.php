@@ -35,6 +35,9 @@ if((int)$flow_data['sync'] == 0) {
         'rating' => false,
     );
 
+    if($reset_flow)
+        $output['reset'] = true;
+
     $client_level = (int)$_REQUEST['level'] - 1;
     $result = mysqli_query($link, "select * from selected_answers where {$ps['sa']} and sa_level = {$client_level}");
     if (mysqli_num_rows($result) > 0) {

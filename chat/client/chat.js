@@ -36,6 +36,12 @@ $(function() {
     //join the user to a room
     joinRoom(room);
 
+    //color existing messages
+    $('li.message').each(function() {
+        var $username_element = $(this).find('.username');
+        $username_element.css('color', getUsernameColor($username_element.text()));
+    });
+
     function addParticipantsMessage (data) {
         var message = '';
         if (data.numUsers === 1) {
@@ -87,6 +93,8 @@ $(function() {
             logSentMsg(message, room, username);
         }
     }
+
+    window.sendMessage = sendMessage;
 
     // Log a message
     function log (message, options) {

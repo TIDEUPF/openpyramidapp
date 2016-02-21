@@ -147,6 +147,7 @@
         text-shadow: none;
         color: #E4E4E4;
         font-weight: bold;
+        float: left;
     }
 
     #submit-confirmation {
@@ -236,20 +237,17 @@
     }
 
     #async_rated {
-        background-color: #ACF97B;
-        text-align: center;
+         background-color: #ACF97B;
+         text-align: center;
+     }
+
+    form {
+        min-width: 710px;
     }
 
-    /*
-    .messages::-webkit-scrollbar-thumb {
-        background-color: #828282;
+    html {
+        overflow-x: auto;
     }
-
-    .messages::-webkit-scrollbar {
-        width: 5px;
-        background-color: #FDFDFD;
-    }
-*/
 </style>
 
 <link rel="stylesheet" href="vendors/perfect-scrollbar/css/perfect-scrollbar.min.css">
@@ -285,9 +283,12 @@
         <?php foreach($answer_text_array as $i=> $answer_data):?>
         <div class="answer-rating-widget">
             <fieldset data-role="controlgroup" data-type="horizontal">
-                <legend><span class="question-number"><?=($i+1)?></span><?=htmlspecialchars($answer_data['answer_text'])?></legend>
-
-                <select id="id-answer-rating-<?=($i+1)?>" class="rating-widget" name="optradio<?=($i+1)?>" data-role="none" answer_sid="<?=$hidden_input_array['to_whom_rated_id'.($i+1)]?>" answer_text="<?=htmlspecialchars($answer_data['answer_text'])?>">
+                <div>
+                    <span class="question-number"><?=($i+1)?></span>
+                    <legend><?=htmlspecialchars($answer_data['answer_text'], ENT_COMPAT | ENT_HTML401 | ENT_IGNORE)?></legend>
+                </div>
+                <div style="clear:both"></div>
+                <select id="id-answer-rating-<?=($i+1)?>" class="rating-widget" name="optradio<?=($i+1)?>" data-role="none" answer_sid="<?=$hidden_input_array['to_whom_rated_id'.($i+1)]?>" answer_text="<?=htmlspecialchars($answer_data['answer_text'], ENT_COMPAT | ENT_HTML401 | ENT_IGNORE)?>">
                 <?php for($i=0;$i<=5;$i++):?>
                 <option value="<?=$i?>" <?php if($answer_data['selected'] == $i) echo 'selected="selected"';?>><?=$rating_labels[$i]?></option>
                 <?endfor;?>
@@ -316,7 +317,7 @@
                 <div class="chatArea">
                     <ul class="messages">
                         <?php foreach($messages as $message): ?>
-                        <li class="message" style="display: list-item;"><span class="username" style="color: rgb(56, 36, 170);"><?=htmlspecialchars($message['sid'])?></span><span class="messageBody"><?=htmlspecialchars($message['message'])?></span></li>
+                        <li class="message" style="display: list-item;"><span class="username" style="color: rgb(56, 36, 170);"><?=htmlspecialchars($message['sid'], ENT_COMPAT | ENT_HTML401 | ENT_IGNORE)?></span><span class="messageBody"><?=htmlspecialchars($message['message'], ENT_COMPAT | ENT_HTML401 | ENT_IGNORE)?></span></li>
                         <?php endforeach; ?>
                     </ul>
                 </div>

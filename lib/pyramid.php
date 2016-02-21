@@ -134,19 +134,20 @@ function set_selected_answers() {
         return true;
     } elseif($random_selection){
         //TODO: force random selection
-        $answers = \Answer\get_selected_ids();
+        $answers = \Answer\get_selected_ids(false, true);
         $n_selected = 0;
         for($i=0; $i<$n_selected_answers and !empty($answers); $i++) {
-            $i_selected = count($answers) % rand_mt(0, 9999);
+            $i_selected = mt_rand(1, 9999) % count($answers);
             $selected_id = $answers[$i_selected];
             unset($answers[$i_selected]);
-            array_values($answers);
+            $answers = array_values($answers);
 
             $selected_id_rating_sum = 0;
             $skip = 0;
             $time = time();
             mysqli_query($link, "insert into selected_answers values ('$fid', '$pid', '$activity_level', '$peer_group_id', '$selected_id', '$selected_id_rating_sum', '$skip', FROM_UNIXTIME({$time}))");
-            \Util\log(['activity' => 'selected_answer', 'answer' => $selected_id, 'rating' => $selected_id_rating_sum]);
+            \Util\log(['activity' => 'selected_answer_random', 'answer' => $selected_id, 'rating' => $selected_id_rating_sum]);
+            $n_selected++;
         }
 
         if($n_selected > 0)
@@ -257,13 +258,13 @@ select max(pg_level) as level, pg_pid as pid,
 	)
 	and r.pg_pid = m.pg_pid
 ) as ngroups
-from pyramid_groups as m where pg_fid='{$fid}' and pg_pid <> '{$pid}' group by pg_pid order by m.pg_level desc
+from pyramid_groups as m where pg_fid='{$fid}' and pg_pid <> '{$pid}' group by pg_pid order by m.pg_pid desc, m.pg_group_id desc
 SQL;
 
     $result = mysqli_query($link, $sql);
 
     while($pg = mysqli_fetch_assoc($result)) {
-        $sa_sql = "select skip, (select fs_answer from flow_student where sid = sa_selected_id and fid = sa_fid) as answer from selected_answers where sa_fid='{$fid}' and sa_pid = '{$pg['pid']}' and sa_level = '{$pg['level']}'";
+        $sa_sql = "select skip, (select fs_answer from flow_student where sid = sa_selected_id and fid = sa_fid order by fs_id asc) as answer from selected_answers where sa_fid='{$fid}' and sa_pid = '{$pg['pid']}' and sa_level = '{$pg['level']}' and skip = 0 order by sa_pid asc, sa_group_id asc";
         $sa_result = mysqli_query($link, $sa_sql);
         if(mysqli_num_rows($sa_result) >= $pg['ngroups']) {
             while($sa_row = mysqli_fetch_assoc($sa_result)) {
@@ -309,7 +310,7 @@ function show_final_answer() {
     }
 
     if(empty($answers))
-        $answers[] = 'There were no answers';
+        $answers[] = 'Sorry, there were no questions rated in this pyramid.';
 
     $other_answers = get_remainings_pyramids_answers();
 
@@ -434,6 +435,39 @@ function wait_pyramid($params) {
     $vars['hidden_input_array'] = array_merge($vars['hidden_input_array'], $hidden_input_array);
 
     $body = \View\element("pyramid_waiting", $vars);
+
+    \View\page(array(
+        'title' => 'Question',
+        'body' => $body,
+    ));
+    exit;
+}
+
+function no_questions_available($params) {
+    global $link, $sid,  $fid, $ps, $sname, $levels, $activity_level, $peer_group_id, $peer_array, $peer_group_combined_ids;
+
+    $initial_level = $activity_level;
+    upgrade_level();
+
+    $vars = array(
+        'username' 					=> $sname,
+        'level' 				    => 'Level '. \Pyramid\get_current_level() . '/' . $levels,
+        'answer_text' 			=> 'Write a question',
+        'answer_submit_button' 	=> 'Submit your question',
+        'hidden_input_array' 		=> array(
+            'a_lvl' 			=> $activity_level,
+            'a_peer_group_id'	=> $peer_group_id,
+        ),
+    );
+
+    $hidden_input_array['username'] = $sname;
+    $hidden_input_array['fid'] = $fid;
+    $hidden_input_array['level'] = 1;
+    $hidden_input_array['page'] = "no_available_questions";
+
+    $vars['hidden_input_array'] = array_merge($vars['hidden_input_array'], $hidden_input_array);
+
+    $body = \View\element("noquestions_available", $vars);
 
     \View\page(array(
         'title' => 'Question',
