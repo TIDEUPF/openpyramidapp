@@ -4,10 +4,10 @@ include_once('../init.php');
 
 global $link, $fid, $pid, $pyramid_minsize, $levels, $flow_data, $activity_level, $peer_group_id, $n_selected_answers, $random_selection;
 
-$init_day = 1456099202;//Monday, 22-Feb-16 00:00:02 UTC
+$init_day = 1456095602;//Monday, 22-Feb-16 00:00:02 UTC
 $day_duration = 24 * 60 * 60;
 
-$init_day = 1456077904-300;
+$init_day = 1456186813-600;
 $day_duration = 5 * 60;
 
 $level_timestamps = [
@@ -43,7 +43,7 @@ while(true) {
             $n_pid = $pid_row['pid'];
 
             $n_users_to_add = $nflow_students / ($n_pid + 1);
-            $n_users_to_add = floor($n_users_to_add) > 0 ? $n_users_to_add : 1;
+            $n_users_to_add = floor($n_users_to_add) > 0 ? floor($n_users_to_add) : 1;
 
             $start_pid = mt_rand(0, 9999);
             $nleft_to_assign = $nflow_students;
@@ -66,9 +66,11 @@ while(true) {
 
     if($time <= $level_timestamps[0]) {
         //do nothing and wait for users to submit questions
+        echo "question stage\n";
         continue;
     } elseif($time <= $level_timestamps[1]) {
         //create the pyramids, must be executed once
+        echo "group formation stage\n";
 
         $result = mysqli_query($link, "select * from pyramid_groups where pg_fid='$fid' and pg_level = 0 and pg_started = 1");
         if(mysqli_num_rows($result)>0)
@@ -115,7 +117,7 @@ while(true) {
                     $n_pid = $pid_row['pid'];
 
                     $n_users_to_add = $nflow_students / ($n_pid + 1);
-                    $n_users_to_add = floor($n_users_to_add) > 0 ? $n_users_to_add : 1;
+                    $n_users_to_add = floor($n_users_to_add) > 0 ? floor($n_users_to_add) : 1;
 
                     $start_pid = mt_rand(0, 9999);
                     $nleft_to_assign = $nflow_students;
@@ -141,6 +143,7 @@ while(true) {
 
     } elseif($time <= $level_timestamps[2]) {
         //select the answers and enable the level
+        echo "selection answers 1 stage\n";
 
         $result = mysqli_query($link, "select * from pyramid_groups where pg_fid='$fid' and pg_level = 1 and pg_started = 1");
         if(mysqli_num_rows($result)>0)
@@ -168,6 +171,7 @@ while(true) {
         continue;
     } elseif($time <= $level_timestamps[3]) {
         //select the answers and enable the level
+        echo "selection answers 2 stage\n";
         $activity_level = 1;
 
         $result = mysqli_query($link, "select * from pyramid_groups where pg_fid='$fid' and pg_level = 2 and pg_started = 1");
@@ -195,6 +199,7 @@ while(true) {
         continue;
     } else {
         //final day, select the final result
+        echo "final stage\n";
         $activity_level = $levels - 1;
         $previous_level = $activity_level - 1;
         $result = mysqli_query($link, "select * from selected_answers where sa_fid='$fid' and sa_level = {$activity_level}");

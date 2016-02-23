@@ -123,6 +123,7 @@ function set_selected_answers() {
     $ssa_result_1= mysqli_query($link, "SELECT fsr_to_whom_rated_id, skip, SUM(fsr_rating) as sum FROM `flow_student_rating` where {$ps['fsr']} and fsr_level = '$activity_level' and fsr_group_id = '$peer_group_id' group by fsr_to_whom_rated_id order by SUM(fsr_rating) desc limit {$n_selected_answers}");
 
     if(mysqli_num_rows($ssa_result_1)> 0) {
+        //takes into account skipped answers
         while($ssa_data_1 = mysqli_fetch_assoc($ssa_result_1)) {
             $selected_id = $ssa_data_1['fsr_to_whom_rated_id'];
             $selected_id_rating_sum = $ssa_data_1['sum'];
@@ -134,6 +135,7 @@ function set_selected_answers() {
         return true;
     } elseif($random_selection){
         //TODO: force random selection
+        //doesn't take into account skipped answers
         $answers = \Answer\get_selected_ids(false, true);
         $n_selected = 0;
         for($i=0; $i<$n_selected_answers and !empty($answers); $i++) {

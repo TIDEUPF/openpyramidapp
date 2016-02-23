@@ -273,7 +273,8 @@
 
             <div>
                 <div id="answer-waiting-group"><?=$answer_waiting_message?></div>
-                <div id="pre-submit-warning" style="font-size: 1.35em; margin-top:20px;">Please note that when you submit rating, you will no longer be able to edit rating values. Also you will be removed from the discussion thread for this level.</div>
+                <!--<div id="pre-submit-warning" style="font-size: 1.35em; margin-top:20px;">Please note that when you submit rating, you will no longer be able to edit rating values. Also you will be removed from the discussion thread for this level.</div>-->
+                <div id="pre-submit-warning" style="font-size: 1.35em; margin-top:20px;">Submit rating here! But you still can continue discussion and modify rating accordingly.</div>
                 <div id="answer-next-button"><button id="answer-next-button-ui" class="ui-btn"><?= $answer_rate_submit?></button></div>
             </div>
 
