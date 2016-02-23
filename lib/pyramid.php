@@ -120,7 +120,7 @@ function set_selected_answers() {
     global $link, $sid, $fid, $pid, $random_selection, $n_selected_answers, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids;
 
     //to sum the ratings
-    $ssa_result_1= mysqli_query($link, "SELECT fsr_to_whom_rated_id, skip, SUM(fsr_rating) as sum FROM `flow_student_rating` where {$ps['fsr']} and fsr_level = '$activity_level' and fsr_group_id = '$peer_group_id' group by fsr_to_whom_rated_id order by SUM(fsr_rating) desc limit {$n_selected_answers}");
+    $ssa_result_1= mysqli_query($link, "SELECT fsr_to_whom_rated_id, skip, SUM(fsr_rating) as sum FROM `flow_student_rating` where {$ps['fsr']} and fsr_level = '$activity_level' and fsr_group_id = '$peer_group_id' group by fsr_to_whom_rated_id order by SUM(fsr_rating) desc, flow_student_rating_id asc limit {$n_selected_answers}");
 
     if(mysqli_num_rows($ssa_result_1)> 0) {
         //takes into account skipped answers
