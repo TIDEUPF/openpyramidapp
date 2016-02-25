@@ -7,14 +7,22 @@ global $link, $fid, $pid, $pyramid_minsize, $levels, $flow_data, $activity_level
 $init_day = 1456095602;//Monday, 22-Feb-16 00:00:02 UTC
 $day_duration = 24 * 60 * 60;
 
-$init_day = 1456186813-600;
+$init_day = 1456405190-300;
 $day_duration = 5 * 60;
-
+require_once 'Mail.php';
+include_once 'Mail/mime.php';
+\Util\get_users_email();
 $level_timestamps = [
     $init_day + 1*$day_duration,
     $init_day + 2*$day_duration,
     $init_day + 3*$day_duration,
     $init_day + 4*$day_duration,
+];
+$email_sent = [
+    false,
+    false,
+    false,
+    false,
 ];
 
 echo "init passed\n";
@@ -76,6 +84,7 @@ while(true) {
         if(mysqli_num_rows($result)>0)
             continue;
 
+        $created=false;
         //available users
         $result_avail = mysqli_query($link, "select distinct * from flow_available_students where fid='$fid' and sid not in (select sid from pyramid_students where fid = '$fid')");
         $nflow_students = mysqli_num_rows($result_avail);
@@ -94,6 +103,7 @@ while(true) {
                 try {
                     \Pyramid\create_pyramid($fid, $flow_data['levels'], $flow_data['nostupergrp'], $new_pyramid_size);
                     \Util\log(['activity' => 'new_pyramid']);
+                    $created=true;
                     echo "created a new pyramid\n";
                 } catch (Exception $e) {
 
@@ -138,6 +148,17 @@ while(true) {
             }
 
             mysqli_query($link, "commit");
+
+            $step = 1;
+            try {
+                if ($created and !$email_sent[$step]) {
+                    $email_sent[$step] = true;
+                    $recipients = \Util\get_users_email();
+                    $html = \Util\get_html($step);
+                    if (!empty($recipients))
+                        \Util\notification_mail($recipients, $html);
+                }
+            } catch(Exception $e) {}
             continue;
         }
 
@@ -168,8 +189,19 @@ while(true) {
         mysqli_query($link, "update pyramid_groups set pg_started = 1, pg_start_timestamp='{$time}' where pg_started = '0' and pg_fid='{$fid}' and pg_level='1'");
         mysqli_query($link, "commit");
 
+        $step = 2;
+        try {
+            if ($created and !$email_sent[$step]) {
+                $email_sent[$step] = true;
+                $recipients = \Util\get_users_email();
+                $html = \Util\get_html($step);
+                if (!empty($recipients))
+                    \Util\notification_mail($recipients, $html);
+            }
+        } catch(Exception $e) {}
+
         continue;
-    } elseif($time <= $level_timestamps[3]) {
+    } /*elseif($time <= $level_timestamps[3]) {
         //select the answers and enable the level
         echo "selection answers 2 stage\n";
         $activity_level = 1;
@@ -196,8 +228,19 @@ while(true) {
         mysqli_query($link, "update pyramid_groups set pg_started = 1, pg_start_timestamp='{$time}' where pg_started = '0' and pg_fid='{$fid}' and pg_level='2'");
         mysqli_query($link, "commit");
 
+        $step = 3;
+        try {
+            if ($created and !$email_sent[$step]) {
+                $email_sent[$step] = true;
+                $recipients = \Util\get_users_email();
+                $html = \Util\get_html($step);
+                if (!empty($recipients))
+                    \Util\notification_mail($recipients, $html);
+            }
+        } catch(Exception $e) {}
+
         continue;
-    } else {
+    }*/ else {
         //final day, select the final result
         echo "final stage\n";
         $activity_level = $levels - 1;
@@ -228,6 +271,18 @@ while(true) {
                 \Util\log(['activity' => 'level_finished_with_no_rates']);
             }
         }
+
+        $step = 4;
+        try {
+            if ($created and !$email_sent[$step]) {
+                $email_sent[$step] = true;
+                $recipients = \Util\get_users_email();
+                $html = \Util\get_html($step);
+                if (!empty($recipients))
+                    \Util\notification_mail($recipients, $html);
+            }
+        } catch(Exception $e) {}
+
         continue;
     }
 

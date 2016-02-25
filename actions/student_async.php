@@ -72,7 +72,6 @@ if(\Answer\is_new_data()) {
     }
 }
 
-
 if(\Pyramid\is_complete()) {
     \Pyramid\show_final_answer();
     exit;

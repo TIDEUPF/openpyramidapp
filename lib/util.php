@@ -100,3 +100,165 @@ function filter_email($email_array) {
     }
     return $filtered;
 }
+
+function get_users_email() {
+    global $link;
+
+    $students_result = mysqli_query($link, "select sid from students");
+
+    $emails = [];
+
+    while($students_row = mysqli_fetch_assoc($students_result)) {
+        if(filter_var($students_row['sid'], FILTER_VALIDATE_EMAIL))
+            $emails[] = $students_row['sid'];
+    }
+
+    return $emails;
+}
+
+function get_html($step) {
+    if($step == 1) {
+        $html = <<<HTML
+<html>
+<body>
+<p>Hi,</p>
+
+<p>You have successfully promoted to the next level in the PyramidApp. You can login to the app using the same email address or the username that you used previously. This is the link to the app: <a href="http://tiny.cc/pyramidapp">tiny.cc/pyramidapp</a>.</p>
+
+<p>In this new level you can see the submitted questions and you can use chat feature to discuss with other group members regarding their questions.</p>
+
+<p>You have time till 6 pm, Saturday, 27th (from Central European Time) to discuss and rate. You can modify previously submitted rating till this deadline. &nbsp;</p>
+
+<p>Hope you will have a nice time in the app!</p>
+
+<p>&nbsp;</p>
+
+<p>Best Regards<br />
+GTI - UPF<br />
+Barcelona</p>
+</body>
+</html>
+HTML;
+    } elseif($step == 2) {
+        $html = <<<HTML
+<html>
+<body>
+<p>Hi,</p>
+
+<p>You have successfully promoted to the next level in the PyramidApp. You can login to the app using the same email address or the username that you used previously. This is the link to the app: <a href="http://tiny.cc/pyramidapp">tiny.cc/pyramidapp</a>.</p>
+
+<p>In this new level you can see the submitted questions and you can use chat feature to discuss with other group members regarding their questions.</p>
+
+<p>You have time till 12 midnight, Saturday, 28th (from Central European Time) to discuss and rate. You can modify previously submitted rating till this deadline. &nbsp;</p>
+
+<p>Hope you will have a nice time in the app!</p>
+
+<p>&nbsp;</p>
+
+<p>Best Regards<br />
+GTI - UPF<br />
+Barcelona</p>
+</body>
+</html>
+HTML;
+} elseif($step == 3) {
+        $html = <<<HTML
+<html>
+<body>
+<p>Hi,</p>
+
+<p>You have successfully promoted to the next level in the PyramidApp. You can login to the app using the same email address or the username that you used previously. This is the link to the app: <a href="http://tiny.cc/pyramidapp">tiny.cc/pyramidapp</a>.</p>
+
+<p>In this new level you can see the submitted questions and you can use chat feature to discuss with other group members regarding their questions.</p>
+
+<p>You have time till 12 midnight, Thursday, 25th (from Central European Time) to discuss and rate. You can modify previously submitted rating till this deadline. &nbsp;</p>
+
+<p>Hope you will have a nice time in the app!</p>
+
+<p>&nbsp;</p>
+
+<p>Best Regards<br />
+GTI - UPF<br />
+Barcelona</p>
+</body>
+</html>
+HTML;
+    } elseif($step == 4) {
+        $html = <<<HTML
+<html>
+<body>
+<p>Hi,</p>
+
+<p>It's the final stage of the PyramidApp. You can login to the app using the same email address or the username that you used previously. This is the link to the app: <a href="http://tiny.cc/pyramidapp">tiny.cc/pyramidapp</a>.</p>
+
+<p>In this new level you can see the submitted questions and you can use chat feature to discuss with other group members regarding their questions.</p>
+
+<p>You have time till 12 midnight, Thursday, 25th (from Central European Time) to discuss and rate. You can modify previously submitted rating till this deadline. &nbsp;</p>
+
+<p>Answers will be provided in the "Step 2.1 comments".</p>
+<p>Thank you for being in the app!</p>
+
+<p>&nbsp;</p>
+
+<p>Best Regards<br />
+GTI - UPF<br />
+Barcelona</p>
+</body>
+</html>
+HTML;
+    }
+
+    return $html;
+}
+
+function notification_mail($recipients, $html) {
+    require_once 'Mail.php';
+    include_once 'Mail/mime.php';
+
+    $from = "Pyramid Interaction App <ssp.clfp@upf.edu>";
+
+    $subject = "PyramidApp notification";
+    $crlf = "\n";
+
+    $host = "ssl://smtp.gmail.com";
+    $port = "465";
+    $username = "ssp.clfp@upf.edu";
+    $password = "sos14Gti!";
+
+    $smtp = \Mail::factory('smtp',
+        [   'host' => $host,
+            'port' => $port,
+            'auth' => true,
+            'persist' => true,
+            'username' => $username,
+            'password' => $password]);
+
+    foreach($recipients as $recipient) {
+        $headers = array (
+            'From' => $from,
+            'To' => $recipient,
+            'Subject' => $subject,
+        );
+
+        // Creating the Mime message
+        $mime = new \Mail_mime($crlf);
+
+        // Setting the body of the email
+    //      $mime->setTXTBody($text);
+        $mime->setHTMLBody($html);
+
+        $body = $mime->get();
+        $headers = $mime->headers($headers);
+
+        $mail = $smtp->send($recipient, $headers, $body);
+
+        if (\PEAR::isError($mail)) {
+            echo("error delevering to {$recipient}: " . $mail->getMessage() . "\n");
+        } else {
+            echo("Message successfully sent message to {$recipient}\n");
+        }
+        sleep(4);
+    }
+
+    unset($smtp);
+}
