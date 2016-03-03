@@ -91,7 +91,7 @@
             </div>
 
             <div id="answer_submitted">
-                Your question was submitted successfully! Please login (using the same userID) to the activity tomorrow to see rating and discussion level.
+                Your question was submitted successfully! Please login (using the same userID) from 8th 00:00h CET to see rating and discussion level.
             </div>
 
         </div>

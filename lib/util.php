@@ -127,7 +127,7 @@ function get_html($step) {
 
 <p>In this new level you can see the submitted questions and you can use chat feature to discuss with other group members regarding their questions.</p>
 
-<p>You have time till 6 pm, Saturday, 27th (from Central European Time) to discuss and rate. You can modify previously submitted rating till this deadline. &nbsp;</p>
+<p>You have time till 12:01 am, Wednesday, 9th (from Central European Time) to discuss and rate. You can modify previously submitted rating till this deadline. &nbsp;</p>
 
 <p>Hope you will have a nice time in the app!</p>
 
@@ -145,13 +145,13 @@ HTML;
 <body>
 <p>Hi,</p>
 
-<p>You have successfully promoted to the next level in the PyramidApp. You can login to the app using the same email address or the username that you used previously. This is the link to the app: <a href="http://tiny.cc/pyramidapp">tiny.cc/pyramidapp</a>.</p>
+<p>It’s the final stage of the PyramidApp. You can login to the app using the same email address or the username that you used previously. This is the link to the app: <a href="http://tiny.cc/pyramidapp">tiny.cc/pyramidapp</a>.</p>
 
-<p>In this new level you can see the submitted questions and you can use chat feature to discuss with other group members regarding their questions.</p>
+<p>In this level you will see final highly rated questions promoted from the previous level. You can discuss about these questions and rate the best.</p>
 
-<p>You have time till 12 midnight, Saturday, 28th (from Central European Time) to discuss and rate. You can modify previously submitted rating till this deadline. &nbsp;</p>
+<p>You have time till 12:01 am, Thursday, 10th (from Central European Time) to discuss and rate. You can modify previously submitted rating till this deadline. Answers to these questions will be provided in the "Step 4.1".</p>
 
-<p>Hope you will have a nice time in the app!</p>
+<p>Thank you for being in the app!</p>
 
 <p>&nbsp;</p>
 
@@ -189,14 +189,11 @@ HTML;
 <body>
 <p>Hi,</p>
 
-<p>It's the final stage of the PyramidApp. You can login to the app using the same email address or the username that you used previously. This is the link to the app: <a href="http://tiny.cc/pyramidapp">tiny.cc/pyramidapp</a>.</p>
+<p>We have two winning questions selected from the PyramidApp. You can login to the app using the same email address or the username that you used previously to view final results. This is the link to the app: <a href="http://tiny.cc/pyramidapp">tiny.cc/pyramidapp</a>.</p>
 
-<p>In this new level you can see the submitted questions and you can use chat feature to discuss with other group members regarding their questions.</p>
+<p>Answers to these questions will be given in the "Step 4.1". Please make sure that you fill out the small feedback form also.</p>
 
-<p>You have time till 12 midnight, Thursday, 25th (from Central European Time) to discuss and rate. You can modify previously submitted rating till this deadline. &nbsp;</p>
-
-<p>Answers will be provided in the "Step 2.1 comments".</p>
-<p>Thank you for being in the app!</p>
+<p>Thank you for helping us in our research. Hope you liked this activity!</p>
 
 <p>&nbsp;</p>
 
