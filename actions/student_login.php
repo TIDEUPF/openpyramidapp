@@ -83,6 +83,11 @@ if(!isset($_SESSION['student'])) {
 
 }
 
+if(!\Student\get_username()) {
+    unset($_SESSION['student']);
+    unset($_SESSION['sname']);
+}
+
 if(!isset($_SESSION['student'])) {
     $vars = array();
     if(!empty($error))
@@ -107,7 +112,11 @@ if(!isset($_SESSION['student'])) {
 
         //late user
         if((int)$flow_data['sync'] == 0) {
-            $gcal_result_1 = mysqli_query($link, "select * from pyramid_groups where pg_level = 0 and pg_started = 1 and pg_fid='{$fid}'");
+            if($flow_data['no_submit'] == 0) {
+                $gcal_result_1 = mysqli_query($link, "select * from pyramid_groups where pg_level = 0 and pg_started = 1 and pg_fid='{$fid}'");
+            } else {
+                $gcal_result_1 = mysqli_query($link, "select * from pyramid_groups where pg_level = 1 and pg_started = 1 and pg_fid='{$fid}'");
+            }
             if (mysqli_num_rows($gcal_result_1) > 0) {
                 $late_user = true;
             }

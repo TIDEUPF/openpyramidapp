@@ -250,7 +250,20 @@
             <fieldset data-role="controlgroup" data-type="horizontal">
                 <div>
                     <span class="question-number"><?=($i+1)?></span>
-                    <legend><?=htmlspecialchars($answer_data['answer_text'], ENT_COMPAT | ENT_HTML401 | ENT_IGNORE)?></legend>
+                    <?php
+                    global $flow_data;
+
+                    if($flow_data['no_submit'] == 0) {
+                        ?>
+                        <legend><?= htmlspecialchars($answer_data['answer_text'], ENT_COMPAT | ENT_HTML401 | ENT_IGNORE) ?></legend>
+                        <?php
+                    } else {
+                        $link_data = explode('|', $answer_data['answer_text'], 2);
+                        ?>
+                        <legend><a target="_blank" href="<?=htmlspecialchars($link_data[1])?>"><?= htmlspecialchars($link_data[0]) ?></a></legend>
+                        <?php
+                    }
+                    ?>
                 </div>
                 <div style="clear:both"></div>
 

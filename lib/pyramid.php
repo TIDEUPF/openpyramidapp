@@ -268,11 +268,11 @@ SQL;
     while($pg = mysqli_fetch_assoc($result)) {
         $sa_sql = "select skip, (select fs_answer from flow_student where sid = sa_selected_id and fid = sa_fid order by fs_id asc) as answer from selected_answers where sa_fid='{$fid}' and sa_pid = '{$pg['pid']}' and sa_level = '{$pg['level']}' and skip = 0 order by sa_pid asc, sa_group_id asc";
         $sa_result = mysqli_query($link, $sa_sql);
-        if(mysqli_num_rows($sa_result) >= $pg['ngroups']) {
+        //if(mysqli_num_rows($sa_result) >= $pg['ngroups']) {
             while($sa_row = mysqli_fetch_assoc($sa_result)) {
                 $answers[] = $sa_row['answer'];
             }
-        }
+        //}
     }
 
     return $answers;

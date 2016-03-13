@@ -285,7 +285,20 @@
             <fieldset data-role="controlgroup" data-type="horizontal">
                 <div>
                     <span class="question-number"><?=($i+1)?></span>
-                    <legend><?=htmlspecialchars($answer_data['answer_text'], ENT_COMPAT | ENT_HTML401 | ENT_IGNORE)?></legend>
+                    <?php
+                    global $flow_data;
+
+                    if($flow_data['no_submit'] == 0) {
+                        ?>
+                        <legend><?= htmlspecialchars($answer_data['answer_text'], ENT_COMPAT | ENT_HTML401 | ENT_IGNORE) ?></legend>
+                        <?php
+                    } else {
+                        $link_data = explode('|', $answer_data['answer_text'], 2);
+                        ?>
+                        <legend><a target="_blank" href="<?=htmlspecialchars($link_data[1])?>"><?= htmlspecialchars($link_data[0]) ?></a></legend>
+                        <?php
+                    }
+                        ?>
                 </div>
                 <div style="clear:both"></div>
                 <select id="id-answer-rating-<?=($i+1)?>" class="rating-widget" name="optradio<?=($i+1)?>" data-role="none" answer_sid="<?=$hidden_input_array['to_whom_rated_id'.($i+1)]?>" answer_text="<?=htmlspecialchars($answer_data['answer_text'], ENT_COMPAT | ENT_HTML401 | ENT_IGNORE)?>">

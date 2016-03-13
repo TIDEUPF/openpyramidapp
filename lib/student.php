@@ -4,6 +4,9 @@ namespace Student;
 function get_username() {
     global $link, $sid, $sname;
 
+    if(empty($_SESSION['student']))
+        return false;
+
     $sid = $_SESSION['student'];
     $res2 = mysqli_query($link, "select * from students where sid = '$sid'");
     if(mysqli_num_rows($res2) > 0){
@@ -12,9 +15,17 @@ function get_username() {
         }
         return $sname;
     }
+
+    return false;
 }
 
 function enforce_login() {
+
+    if(!\Student\get_username()) {
+        unset($_SESSION['student']);
+        unset($_SESSION['sname']);
+    }
+
     if(!isset($_SESSION['student'])) {
         header("location: student_login.php");
         exit(0);

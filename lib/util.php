@@ -127,7 +127,7 @@ function get_html($step) {
 
 <p>In this new level you can see the submitted questions and you can use chat feature to discuss with other group members regarding their questions.</p>
 
-<p>You have time till 12:01 am, Wednesday, 9th (from Central European Time) to discuss and rate. You can modify previously submitted rating till this deadline. &nbsp;</p>
+<p>You have time till 11:59 pm, Wednesday, 9th (from Central European Time) to discuss and rate. You can modify previously submitted rating till this deadline. &nbsp;</p>
 
 <p>Hope you will have a nice time in the app!</p>
 
@@ -149,7 +149,7 @@ HTML;
 
 <p>In this level you will see final highly rated questions promoted from the previous level. You can discuss about these questions and rate the best.</p>
 
-<p>You have time till 12:01 am, Thursday, 10th (from Central European Time) to discuss and rate. You can modify previously submitted rating till this deadline. Answers to these questions will be provided in the "Step 4.1".</p>
+<p>You have time till 11:59 pm, Thursday, 10th (from Central European Time) to discuss and rate. You can modify previously submitted rating till this deadline. Answers to these questions will be provided in the "Step 4.1".</p>
 
 <p>Thank you for being in the app!</p>
 
@@ -209,9 +209,6 @@ HTML;
 }
 
 function notification_mail($recipients, $html) {
-    require_once 'Mail.php';
-    include_once 'Mail/mime.php';
-
     $from = "Pyramid Interaction App <ssp.clfp@upf.edu>";
 
     $subject = "PyramidApp notification";

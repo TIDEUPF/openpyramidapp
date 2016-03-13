@@ -99,8 +99,10 @@
 
             <div>
 
-                In this activity, you have to propose a question to ask from the teacher individually. Then you rate questions suggested by your peers in every level. Finally you all will be selecting the highest rated question/s to be submitted for the teacher to answer. When all members finish rating at one level, the next level options will appear.
 
+                <!--In this activity, you have to propose a question to ask from the teacher individually. Then you rate questions suggested by your peers in every level. Finally you all will be selecting the highest rated question/s to be submitted for the teacher to answer. When all members finish rating at one level, the next level options will appear.
+                -->
+                In this activity, you will see links shared in previous weeks by other course participants. You can rate the links while discussing your proposition for rating about these creations. App will promote you to the next level when people finished rating. Gradually, you all together will select the most interesting highest voted creation.
                 <br>
                 <?php if(!empty($late_user)): ?>
                     <br>You joined the activity late! You may have missed initial steps, but still you will be added to a Pyramid. You can contribute by discussing and rating other peers options provided.

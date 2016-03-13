@@ -215,11 +215,21 @@ function request_rate($params) {
 
     $vars['messages'] = $messages;
 
+    $next_level_messages = [
+        'phone' => [
+            1 => "Submitted rating can be discussed and modified till Monday 14th, 11:59pm CET. Login afterwards to see selected questions at the next level!",
+            2 => "Submitted rating can be discussed and modified till Thursday 15th, 11:59pm CET. Login afterwards to see winning questions!",
+        ],
+        'desktop' => [
+            1 => "You submitted rating in this level successfully. You still can further discuss or modify your rating till Monday 14th, 11:59pm CET. Make sure you login afterwards to see which questions have been selected for the next pyramid level to continue!",
+            2 => "You submitted rating in this level successfully. You still can further discuss or modify your rating till Thursday 15th, 11:59pm CET. Make sure you login afterwards to see the winning questions!",
+        ]
+    ];
     if (\Student\level_is_rated() and (int)$flow_data['sync'] == 0) {//the peer already submitted the answer
         if($device == 'phone') {
-            $vars['async_rated'] = "Submitted rating can be discussed and modified till today midnight. Login tomorrow to see selected questions at the next level!";
+            $vars['async_rated'] = $next_level_messages['phone'][((int)\Pyramid\get_current_level())];//"Submitted rating can be discussed and modified till today midnight. Login tomorrow to see selected questions at the next level!";
         } else {
-            $vars['async_rated'] = "You submitted rating in this level successfully. You still can further discuss or modify your rating till today midnight. Make sure you login tomorrow to see which questions have been selected for the next pyramid level to continue!";
+            $vars['async_rated'] = $next_level_messages['desktop'][((int)\Pyramid\get_current_level())];//"You submitted rating in this level successfully. You still can further discuss or modify your rating till today midnight. Make sure you login tomorrow to see which questions have been selected for the next pyramid level to continue!";
         }
     }
 
@@ -336,10 +346,11 @@ function is_available_answers() {
 }
 
 function get_selected_ids($full=false, $current_level = false) {
-    global $link, $sid, $fid, $ps, $levels, $sname, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+    global $link, $sid, $fid, $ps, $levels, $sname, $flow_data, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
     $result = [];
 
+    //instead of selecting answers from the previous level, select answers from the current one.
     if($current_level) {
         $activity_level_previous = $activity_level;
     } else {
@@ -351,6 +362,24 @@ function get_selected_ids($full=false, $current_level = false) {
         $skip_answers = '';
 
     if($activity_level == 0) {
+        if($flow_data['no_submit'] == 1) {
+            $i=0;
+            $remaining = true;
+
+            while($remaining) {
+                $nosubmit_id = "group_{$peer_group_id}_{$i}";
+                $no_submit_result = mysqli_query($link, "select * from flow_student where sid = '$nosubmit_id' and fid = '$fid'");// to get peer answer
+                if (mysqli_num_rows($no_submit_result) > 0) {//the peer already submitted the answer
+                    $result[] = $nosubmit_id;
+                    $i++;
+                } else {
+                    $remaining = false;
+                }
+            }
+
+            return $result;
+        }
+
         foreach ($peer_array as $rate_peer_id) {
             $res5 = mysqli_query($link, "select * from flow_student where sid = '$rate_peer_id' and fid = '$fid' {$skip_answers}");// to get peer answer
             if (mysqli_num_rows($res5) > 0) {//the peer already submitted the answer
@@ -384,7 +413,7 @@ function get_selected_ids($full=false, $current_level = false) {
 }
 
 function view_final_answer($params) {
-    global $link, $sid, $fid, $pid, $ps, $sname, $levels, $activity_level, $peer_group_id;
+    global $link, $sid, $fid, $pid, $flow_data, $ps, $sname, $levels, $activity_level, $peer_group_id;
 
     if(count($params['final_answer_array'])>1)
         $winning_text = 'Winning questions from this Pyramid';
@@ -395,6 +424,9 @@ function view_final_answer($params) {
         $other_header_text = 'Winning questions from other Pyramids';
     else
         $other_header_text = 'Winning question from other Pyramid';
+
+    if($flow_data['no_submit'] == 1)
+        $winning_text = 'Winning link from this Pyramid';
 
     $vars = array(
         'username' 					=> $sname . ' + ' . (count(\Group\get_status_bar_peers())-1),
