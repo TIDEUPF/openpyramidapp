@@ -145,11 +145,11 @@ HTML;
 <body>
 <p>Hi,</p>
 
-<p>It’s the final stage of the PyramidApp. You can login to the app using the same email address or the username that you used previously. This is the link to the app: <a href="http://tiny.cc/pyramidapp">tiny.cc/pyramidapp</a>.</p>
+<p>It’s the final stage of the PyramidApp. You can login to the app using the same email address or the username that you used previously. This is the link to the app: <a href="http://sos.gti.upf.edu/app/student_login.php">pyramid app</a>.</p>
 
 <p>In this level you will see final highly rated questions promoted from the previous level. You can discuss about these questions and rate the best.</p>
 
-<p>You have time till 11:59 pm, Thursday, 10th (from Central European Time) to discuss and rate. You can modify previously submitted rating till this deadline. Answers to these questions will be provided in the "Step 4.1".</p>
+<p>You have time till 11:59 pm, Tuesday, 15th (from Central European Time) to discuss and rate. You can modify previously submitted rating till this deadline.</p>
 
 <p>Thank you for being in the app!</p>
 
@@ -167,7 +167,7 @@ HTML;
 <body>
 <p>Hi,</p>
 
-<p>You have successfully promoted to the next level in the PyramidApp. You can login to the app using the same email address or the username that you used previously. This is the link to the app: <a href="http://tiny.cc/pyramidapp">tiny.cc/pyramidapp</a>.</p>
+<p>You have successfully promoted to the next level in the PyramidApp. You can login to the app using the same email address or the username that you used previously. This is the link to the app: <a href="http://sos.gti.upf.edu/app/student_login.php">pyramid app</a>.</p>
 
 <p>In this new level you can see the submitted questions and you can use chat feature to discuss with other group members regarding their questions.</p>
 
@@ -189,9 +189,9 @@ HTML;
 <body>
 <p>Hi,</p>
 
-<p>We have two winning questions selected from the PyramidApp. You can login to the app using the same email address or the username that you used previously to view final results. This is the link to the app: <a href="http://tiny.cc/pyramidapp">tiny.cc/pyramidapp</a>.</p>
+<p>We have two winning links selected from the PyramidApp. You can login to the app using the same email address or the username that you used previously to view final results. This is the link to the app: <a href="http://tiny.cc/pyramidapp">tiny.cc/pyramidapp</a>.</p>
 
-<p>Answers to these questions will be given in the "Step 4.1". Please make sure that you fill out the small feedback form also.</p>
+<p>Please make sure that you fill out the small feedback form also.</p>
 
 <p>Thank you for helping us in our research. Hope you liked this activity!</p>
 

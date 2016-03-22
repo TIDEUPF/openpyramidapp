@@ -153,7 +153,7 @@ while(true) {
                 if (!empty($recipients))
                     \Util\notification_mail($recipients, $html);
 
-                $response = $an->send("Next level is ready! Start discussing. Rating is allowed till 28th, 12am CET.");
+                $response = $an->send("Next level is ready! Start discussing. Rating is allowed till 15th, 11:59pm CET.");
             }
         } catch(Exception $e) {}
 
@@ -193,6 +193,8 @@ while(true) {
                 $html = \Util\get_html($step);
                 if (!empty($recipients))
                     \Util\notification_mail($recipients, $html);
+
+                $response = $an->send("Next level is ready! Start discussing. Rating is allowed till 16th, 11:59pm CET.");
             }
         } catch(Exception $e) {}
 
