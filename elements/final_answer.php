@@ -158,7 +158,22 @@
 
             <ul class="winner-answers">
             <?php foreach($final_answer_array as $i=>$answer_text):?>
-                <li><?=htmlspecialchars($answer_text, ENT_COMPAT | ENT_HTML401 | ENT_IGNORE)?></li>
+                <!--<li><?=htmlspecialchars($answer_text, ENT_COMPAT | ENT_HTML401 | ENT_IGNORE)?></li>-->
+
+                <?php
+                global $flow_data;
+
+                if($flow_data['no_submit'] == 0) {
+                    ?>
+                    <li><?=htmlspecialchars($answer_text, ENT_COMPAT | ENT_HTML401 | ENT_IGNORE)?></li>
+                    <?php
+                } else {
+                    $link_data = explode('|', $answer_text, 2);
+                    ?>
+                    <li><a target="_blank" href="<?=htmlspecialchars($link_data[1])?>"><?= htmlspecialchars($link_data[0]) ?></a></li>
+                    <?php
+                }
+                ?>
             <?php endforeach;?>
             </ul>
 

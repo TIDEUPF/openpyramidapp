@@ -231,7 +231,7 @@ while(true) {
 
         $step = 4;
         try {
-            if ($created and !$email_sent[$step]) {
+            if (!$email_sent[$step]) {
                 $email_sent[$step] = true;
                 $recipients = \Util\get_users_email();
                 $html = \Util\get_html($step);

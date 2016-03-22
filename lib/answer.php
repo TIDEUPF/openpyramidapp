@@ -218,11 +218,11 @@ function request_rate($params) {
     $next_level_messages = [
         'phone' => [
             1 => "Submitted rating can be discussed and modified till Monday 14th, 11:59pm CET. Login afterwards to see selected questions at the next level!",
-            2 => "Submitted rating can be discussed and modified till Thursday 15th, 11:59pm CET. Login afterwards to see winning questions!",
+            2 => "Submitted rating can be discussed and modified.",
         ],
         'desktop' => [
             1 => "You submitted rating in this level successfully. You still can further discuss or modify your rating till Monday 14th, 11:59pm CET. Make sure you login afterwards to see which questions have been selected for the next pyramid level to continue!",
-            2 => "You submitted rating in this level successfully. You still can further discuss or modify your rating till Thursday 15th, 11:59pm CET. Make sure you login afterwards to see the winning questions!",
+            2 => "You submitted rating in this level successfully. You still can further discuss or modify your rating.",
         ]
     ];
     if (\Student\level_is_rated() and (int)$flow_data['sync'] == 0) {//the peer already submitted the answer
