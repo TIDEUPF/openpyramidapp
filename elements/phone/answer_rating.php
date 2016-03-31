@@ -220,9 +220,9 @@
 <div id="answer-frame">
     <form method="post" action="student.php" data-ajax="false">
         <div id="submit-confirmation">
-            <span id="confirm-text">Are you sure that you want to finish rating and discussion for this level?</span>
-            <button id="yes-submit" type="submit" name="rate">Yes</button>
-            <button id="no-submit">No</button>
+            <span id="confirm-text">><?=TS("Are you sure that you want to finish rating and discussion for this level?")?><</span>
+            <button id="yes-submit" type="submit" name="rate"><?=TS("Yes")?></button>
+            <button id="no-submit"><?=TS("No")?></button>
         </div>
 
     <div id="answer-header-frame">
@@ -230,7 +230,7 @@
         <div id="topbar">
             <div id="answer-header-user" class="topbar_item"><?=$username?></div>
             <div id="answer-header-level" class="topbar_item"><?=$level?></div>
-            <div id="answer-header-logout" class="topbar_item">Logout</div>
+            <div id="answer-header-logout" class="topbar_item"><?=TS("Logout")?></div>
             <div style="clear:both"></div>
         </div>
 
@@ -298,7 +298,7 @@
     <?php if($flow_data['ch'] == 1):?>
     <link rel="stylesheet" href="chat/client/embedded.css"/>
     <div id="rating-chat" class="ui-corner-all ui-shadow-inset">
-        <div id="rating-chat-instructions" style="margin: .5em 0 0 .3em;">Please use this space to discuss with peers about their options before rating.</div>
+        <div id="rating-chat-instructions" style="margin: .5em 0 0 .3em;"><?=TS("Please use this space to discuss with peers about their options before rating.")?></div>
         <ul class="pages">
             <li class="chat page">
                 <a id="chat-popup-close" href="#" class="ui-icon-arrow-d"></a>

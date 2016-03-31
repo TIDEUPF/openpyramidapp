@@ -109,7 +109,7 @@
         <div>
             <div id="answer-header-user" class="topbar_item"><?=$username?></div>
             <div id="answer-header-level" class="topbar_item"><?=$level?></div>
-            <div id="answer-header-logout" class="topbar_item">Logout</div>
+            <div id="answer-header-logout" class="topbar_item"><?=TS("Logout")?></div>
             <div style="clear:both"></div>
         </div>
 

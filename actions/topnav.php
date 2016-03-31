@@ -18,7 +18,7 @@
 		}
 		else{
 			echo '<li><a href="teacher.php">Flows</a></li>';
-			echo '<li><a href="logout.php">logout</a></li>';
+			echo '<li><a href="logout.php">' .TS("Logout") . '</a></li>';
 		}
 		?>
 	  </ul>

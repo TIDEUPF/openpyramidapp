@@ -153,14 +153,14 @@
 <div id="activity-frame">
     <form action="student_login.php" method="post" data-ajax="false">
 <div id="title">Pyramid Interaction App</div>
-<div id="post-title"><?php echo htmlspecialchars("This is a scalable pedagogical approach that allows proposing individual questions/options which are added into groups enabling discussion and iteratively rating, following a snowball or pyramid structure to agree upon the most interesting question/opinion promoting fruitful collaborations.")?></div>
+<div id="post-title"><?php echo TS("This is a scalable pedagogical approach that allows proposing individual questions/options which are added into groups enabling discussion and iteratively rating, following a snowball or pyramid structure to agree upon the most interesting question/opinion promoting fruitful collaborations.")?></div>
 
         <div id="activity-middle-frame">
             <div id="login-block-wrapper">
                 <div id="login-block">
                     <label for="usr"><b>UserId</b></label>
                     <div id="usr-input"><input type="text" data-clear-btn="true" name="usr" value=""></div>
-                    <button type="submit" class="ui-btn" name="loginBtn">Log in</button>
+                    <button type="submit" class="ui-btn" name="loginBtn"><?=T("Log in")?></button>
                 </div>
             </div>
 
@@ -171,13 +171,13 @@
             <?php endif;?>
 
             <ul id="login-instructions">
-                <li><?php echo htmlspecialchars("It is recommended to provide an "). '<span class="bold">email address</span>' . htmlspecialchars(" here so that you will be automatically notified about the activity progression to make it much easier. This email address does not necessarily have to be the same as your FutureLearn course email.")?></li>
-                <li><?php echo htmlspecialchars("If you do not like to provide an email, you can use a preferred username.")?></li>
-                <li><?php echo htmlspecialchars("You can see activity notifications from the step comments also.")?></li>
-                <li><?php echo htmlspecialchars("Please do remember the e-mail or username you're using for this app! You will need to use it when accessing to participate in other levels of the pyramid. If you use another username you will be added with a different pyramid and affect your activity progress.")?></li>
-                <li><?php echo htmlspecialchars("For more information on how the app works, you can watch the following video. ")?></li>
+                <!--<li><?php echo TS("It is recommended to provide an <span class=\"bold\">email address</span> here so that you will be automatically notified about the activity progression to make it much easier. This email address does not necessarily have to be the same as your FutureLearn course email.")?></li>-->
+                <!--<li><?php echo TS("If you do not like to provide an email, you can use a preferred username.")?></li>-->
+                <!--<li><?php echo TS("You can see activity notifications from the step comments also.")?></li>-->
+                <li><?php echo TS("Please do remember the e-mail or username you're using for this app! You will need to use it when accessing to participate in other levels of the pyramid. If you use another username you will be added with a different pyramid and affect your activity progress.")?></li>
+                <li><?php echo TS("For more information on how the app works, you can watch the following video. ")?></li>
             </ul>
-            <div id="contact"><a href="mailto:ssp.clfp@upf.edu?Subject=Pyramid%20App">Contact address: ssp.clfp@upf.edu</a></div>
+            <div id="contact"><a href="mailto:ssp.clfp@upf.edu?Subject=Pyramid%20App"><?=TS("Contact address")?>: ssp.clfp@upf.edu</a></div>
             <div id="video">
                 <iframe width="560" height="315" src="https://www.youtube.com/embed/-l-pIwflqrc?rel=0" frameborder="0" allowfullscreen></iframe>
             </div>

@@ -28,6 +28,7 @@ function init_cfg() {
             $device = 'phone';
     }
 
+    load_translation("es");
     $answer_required_percentage = 78;
     $answer_submit_required_percentage = 80;
     $timeout = 120;

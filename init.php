@@ -17,6 +17,7 @@ include_once(__DIR__ . '/lib/answer.php');
 include_once(__DIR__ . '/lib/student.php');
 include_once(__DIR__ . '/lib/request.php');
 include_once(__DIR__ . '/lib/inc_pyramid_func.php');
+include_once(__DIR__ . '/lib/translation.php');
 
 init_cfg();
 
