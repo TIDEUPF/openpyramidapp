@@ -18,7 +18,7 @@
         <script src="lib/actions.js"></script>
         <script>
             <?php if(!isset($nosocket)):?>
-            var socket = io({multiplex : false, 'reconnection': true,'reconnectionDelay': 3000,'maxReconnectionAttempts':Infinity, path: '/pyramid_chat/socket.io/'});
+            var socket = io({multiplex : false, 'reconnection': true,'reconnectionDelay': 3000,'maxReconnectionAttempts':Infinity, path: '/socket.io/'});
             <?php endif;?>
             var timeoutPeriod = 10000;
             function del_vali(){ if(confirm('Submit Answer?')) { return true; }else{ return false; } }

@@ -158,7 +158,7 @@
         <div id="activity-middle-frame">
             <div id="login-block-wrapper">
                 <div id="login-block">
-                    <label for="usr"><b>UserId</b></label>
+                    <label for="usr"><b><?=T("UserId")?></b></label>
                     <div id="usr-input"><input type="text" data-clear-btn="true" name="usr" value=""></div>
                     <button type="submit" class="ui-btn" name="loginBtn"><?=T("Log in")?></button>
                 </div>
@@ -175,7 +175,7 @@
                 <!--<li><?php echo TS("If you do not like to provide an email, you can use a preferred username.")?></li>-->
                 <!--<li><?php echo TS("You can see activity notifications from the step comments also.")?></li>-->
                 <li><?php echo TS("Please do remember the e-mail or username you're using for this app! You will need to use it when accessing to participate in other levels of the pyramid. If you use another username you will be added with a different pyramid and affect your activity progress.")?></li>
-                <li><?php echo TS("For more information on how the app works, you can watch the following video. ")?></li>
+                <li><?php echo TS("For more information on how the app works, you can watch the following video.")?></li>
             </ul>
             <div id="contact"><a href="mailto:ssp.clfp@upf.edu?Subject=Pyramid%20App"><?=TS("Contact address")?>: ssp.clfp@upf.edu</a></div>
             <div id="video">

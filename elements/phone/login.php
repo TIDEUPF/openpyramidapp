@@ -110,7 +110,8 @@
             </div>
             <?php endif;?>
 
-            <div id="email-petition"><?php echo htmlspecialchars("It is recommended to provide an "). '<span class="bold">email address</span>' . htmlspecialchars(" here so that you will be automatically notified about the activity progression to make it much easier. This email address does not necessarily have to be the same as your FutureLearn course email.")?> <a href="mailto:ssp.clfp@upf.edu?Subject=Pyramid%20App">Contact address: ssp.clfp@upf.edu</a></div>
+            <!--<div id="email-petition"><?php echo htmlspecialchars("It is recommended to provide an "). '<span class="bold">email address</span>' . htmlspecialchars(" here so that you will be automatically notified about the activity progression to make it much easier. This email address does not necessarily have to be the same as your FutureLearn course email.")?> <a href="mailto:ssp.clfp@upf.edu?Subject=Pyramid%20App">Contact address: ssp.clfp@upf.edu</a></div>-->
+            <div id="email-petition"><a href="mailto:ssp.clfp@upf.edu?Subject=Pyramid%20App"<?=TS("TSContact address")?>: ssp.clfp@upf.edu</a></div>
             <iframe width="280" height="158" src="https://www.youtube.com/embed/-l-pIwflqrc?rel=0" frameborder="0" allowfullscreen></iframe>
 
             <div id="gti-logo"><a target="_blank" href="http://gti.upf.edu"><img src="elements/resources/logo_gti_2013_big_eng.png" /></a></div>

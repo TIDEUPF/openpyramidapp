@@ -5,8 +5,8 @@ require_once '../vendors/GCM/GCMPushMessage.php';
 require_once 'Mail.php';
 include_once 'Mail/mime.php';
 
-//$apiKey = "AIzaSyCvCBiO1YpIani9UnKRXN6ZrVCDs_yTaN8";
-$apiKey = "AIzaSyAxjHJf7HPlq0xiQEd3IZFy8QUKDQPsZZs";
+$apiKey = "AIzaSyCvCBiO1YpIani9UnKRXN6ZrVCDs_yTaN8";
+//$apiKey = "AIzaSyAxjHJf7HPlq0xiQEd3IZFy8QUKDQPsZZs";
 //$apiKey = "";
 $devices = "/topics/global";
 //$message = "Next level is ready! Start discussing.";
@@ -15,19 +15,19 @@ $an->setDevices($devices);
 
 global $link, $fid, $pid, $pyramid_minsize, $levels, $flow_data, $activity_level, $peer_group_id, $n_selected_answers, $random_selection;
 
-$init_day = 1457910000;//
+$init_day = 1459728000;//
 $day_duration = 24 * 60 * 60;
 
 $level_timestamps = [
     $init_day + 1*$day_duration,
-    $init_day + 1*$day_duration + 18 * 60 * 60,
-    $init_day + 2*$day_duration + 12 * 60 * 60,
+    $init_day + 2*$day_duration,
+    $init_day + 3*$day_duration,
     $init_day + 4*$day_duration,
 ];
 
 
 /*
-$init_day = 1456416288;
+$init_day = 1459686922-300;
 $day_duration = 5 * 60;
 
 $level_timestamps = [

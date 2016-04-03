@@ -83,7 +83,7 @@
                 <div style="clear:both"></div>
             </div>
             <div id="pre-header">
-                <div id="answer-header-text">Activity description</div>
+                <div id="answer-header-text"><?=TS("Activity description")?></div>
             </div>
 
         </div>

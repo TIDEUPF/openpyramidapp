@@ -108,7 +108,7 @@ function request($params) {
 
     $timeout = get_answer_timeout();
     $petition = (empty($flow_data['question'])) ? 'Write a question' : $flow_data['question'];
-    $level_text = (\Pyramid\get_current_level() >= 0) ? 'Level ' . \Pyramid\get_current_level() .'/' . $levels : '';
+    $level_text = (\Pyramid\get_current_level() >= 0) ? T('Level') . ' ' . \Pyramid\get_current_level() .'/' . $levels : '';
     $username_text = (count(\Group\get_status_bar_peers()) > 0) ? $sname . ' + ' . (count(\Group\get_status_bar_peers())-1) : $sname;
 
     $peers = implode(', ', \group\get_peers_sname());
@@ -120,8 +120,8 @@ function request($params) {
         'username' 				    => $sname . ' + ' . $peers,
         'level' 				    => $level_text,
         'answer_text' 			    => $petition,
-        'answer_submit_button' 	    => 'Submit your question',
-        'answer_submit_skip_button' => 'Skip the question',
+        'answer_submit_button' 	    => T('Submit your question'),
+        'answer_submit_skip_button' => T('Skip the question'),
         'answer_timeout'            => $timeout['time_left'],
         'answer_skip_timeout'       => $timeout['time_left_skip'],
         'hidden_input_array' 	    => array(
@@ -198,11 +198,11 @@ function request_rate($params) {
     $vars = array(
         'username'              => $sname . ' + ' . (count(\Group\get_status_bar_peers())-1),
         'username'              => $sname . ' + ' . $peers,
-        'level'                 => 'Level '. \Pyramid\get_current_level() .'/' . $levels,
-        'header_text'           => 'Rate the following answers',
+        'level'                 => T('Level') . ' '. \Pyramid\get_current_level() .'/' . $levels,
+        'header_text'           => T('Rate the following answers'),
         'answer_text_array'     => $answer_text_array,
-        'answer_rate_submit'    => 'Rate',
-        'rating_labels'         => array('Not rated', 'Awful', 'Bad', 'Good', 'Great', 'Awesome'),
+        'answer_rate_submit'    => T('Rate'),
+        'rating_labels'         => array(T('Not rated'), T('Awful'), T('Bad'), T('Good'), T('Great'), T('Awesome')),
         'hidden_input_array'    => $hidden_input_array,
     );
 
@@ -217,12 +217,12 @@ function request_rate($params) {
 
     $next_level_messages = [
         'phone' => [
-            1 => "Submitted rating can be discussed and modified till Monday 14th, 11:59pm CET. Login afterwards to see selected questions at the next level!",
-            2 => "Submitted rating can be discussed and modified.",
+            1 => T("Submitted rating can be discussed and modified till Monday 14th, 11:59pm CET. Login afterwards to see selected questions at the next level!"),
+            2 => T("Submitted rating can be discussed and modified."),
         ],
         'desktop' => [
-            1 => "You submitted rating in this level successfully. You still can further discuss or modify your rating till Monday 14th, 11:59pm CET. Make sure you login afterwards to see which questions have been selected for the next pyramid level to continue!",
-            2 => "You submitted rating in this level successfully. You still can further discuss or modify your rating.",
+            1 => T("You submitted rating in this level successfully. You still can further discuss or modify your rating till Monday 14th, 11:59pm CET. Make sure you login afterwards to see which questions have been selected for the next pyramid level to continue!"),
+            2 => T("You submitted rating in this level successfully. You still can further discuss or modify your rating."),
         ]
     ];
     if (\Student\level_is_rated() and (int)$flow_data['sync'] == 0) {//the peer already submitted the answer
@@ -238,7 +238,7 @@ function request_rate($params) {
 
     $body = \View\element("answer_rating", $vars);
     \View\page(array(
-        'title' => 'Rating',
+        'title' => T('Rating'),
         'body' => $body,
     ));
     exit;
@@ -430,7 +430,7 @@ function view_final_answer($params) {
 
     $vars = array(
         'username' 					=> $sname . ' + ' . (count(\Group\get_status_bar_peers())-1),
-        'level' 					=> 'Level ' . \Pyramid\get_current_level() .'/' . $levels,
+        'level' 					=> T('Level') . ' ' . \Pyramid\get_current_level() .'/' . $levels,
         'header_text' 			    => $winning_text,
         'other_header_text' 	    => $other_header_text,
         'final_answer_array' 		=> $params['final_answer_array'],

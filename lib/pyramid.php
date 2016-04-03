@@ -372,7 +372,7 @@ function wait($params) {
     $vars = array(
         'username' 					=> $sname . ' + ' . (count(\Group\get_status_bar_peers())-1),
         'username' 					=> $sname . ' + ' . $peers,
-        'level' 				    => 'Level ' . \Pyramid\get_current_level() .'/' . $levels,
+        'level' 				    => T('Level') . ' ' . \Pyramid\get_current_level() .'/' . $levels,
         'answer_text' 			=> 'Write a question',
         'answer_submit_button' 	=> 'Submit your question',
         'hidden_input_array' 		=> array(
@@ -453,7 +453,7 @@ function no_questions_available($params) {
 
     $vars = array(
         'username' 					=> $sname,
-        'level' 				    => 'Level '. \Pyramid\get_current_level() . '/' . $levels,
+        'level' 				    => T('Level') . ' '. \Pyramid\get_current_level() . '/' . $levels,
         'answer_text' 			=> 'Write a question',
         'answer_submit_button' 	=> 'Submit your question',
         'hidden_input_array' 		=> array(

@@ -1,6 +1,6 @@
 <?php
 $error;
-
+global $force_email;
 
 
 if(empty($_SESSION['user_id'])) {
@@ -36,30 +36,32 @@ if(!isset($_SESSION['student'])) {
             $sname = str_replace(array('*', "'", ',', ' ', '"', '(', ')', '<', '>', '=', ';', '-', '#', '/', '$', '%', '\\', '`'), '', $sname);
             $uname = str_replace(array('*', "'", ',', ' ', '"', '(', ')', '<', '>', '=', ';', '-', '#', '/', '$', '%', '\\', '`'), '', $uname);
 
+            $is_email = false;
             if(filter_var($sname, FILTER_VALIDATE_EMAIL)) {
                 $email_split = explode('@', $sname);
                 $sname = $email_split[0];
+                $is_email = true;
             }
 
-            mysqli_query($link,"insert into students values ('$uname', '$sname', NOW() )");
-                    if(mysqli_affected_rows($link) > 0) {
+            if($force_email and !$is_email) {
+                $error = T('You need to introduce a valid e-mail address.');
+            } else {
+                mysqli_query($link, "insert into students values ('$uname', '$sname', NOW() )");
+                if (mysqli_affected_rows($link) > 0) {
+                    $_SESSION['student'] = $uname;
+                    $_SESSION['sname'] = $sname;
+                    //header("location: student_activity.php"); exit(0);
+                } else {
+                    $res2 = mysqli_query($link, "select * from students where sid = '$uname'");
+                    if (mysqli_num_rows($res2) <= 0) {
+                        $error = 'Database error!';
+                    } else {
                         $_SESSION['student'] = $uname;
                         $_SESSION['sname'] = $sname;
-                        //header("location: student_activity.php"); exit(0);
-                    } else{
-                        $res2 = mysqli_query($link, "select * from students where sid = '$uname'");
-                         if(mysqli_num_rows($res2) <= 0) {
-                             $error = 'Database error!';
-                         } else {
-                             $_SESSION['student'] = $uname;
-                             $_SESSION['sname'] = $sname;
-                         }
                     }
-               // }
+                }
+            }
 
-            //} else{
-            //    $error = 'UserId not in course';
-            //}
         }
 
         //comment this part------- this for testing purposes
