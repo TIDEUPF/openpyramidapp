@@ -113,7 +113,7 @@ $translation = [
 
     "Your question was submitted successfully! Please login (using the same userID) from 9th 00:00h CET to see rating and discussion level."
     =>
-        "La pregunta ha sido entregada! Por favor entra con el mismo e-mail a partir del Miercoles 13 a las 9h para puntuar las preguntas.",
+        "La pregunta ha sido entregada! Por favor entra con el mismo e-mail a partir del Miercoles 6 para puntuar las preguntas.",
 
     "Start the activity"
     =>
