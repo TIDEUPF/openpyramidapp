@@ -123,9 +123,33 @@ $translation = [
     =>
         "Descripción de la actividad",
 
-    "Hello"
+    "Please use this space to discuss with peers about their options before rating."
     =>
-        "Hola",
+        "Usa este espacio para discutir con tus compañeros las diferentes opciones.",
+
+    "Discuss with with your peers!!!"
+    =>
+        "¡Discute con tus compañeros!",
+
+    "Are you sure that you want to finish rating and discussion for this level?"
+    =>
+        "Estás seguro que quieres enviar la puntuación?",
+
+    "Yes"
+    =>
+        "Sí",
+
+    "No"
+    =>
+        "No",
+
+    "Submit rating here! But you still can continue discussion and modify rating accordingly."
+    =>
+        "¡Envía las puntuaciones! Después aún podras modificar tu puntuación.",
+
+    "Please Rate All!"
+    =>
+        "¡Puntua todas las opciones!",
 
     "Hello"
     =>
@@ -134,6 +158,14 @@ $translation = [
     "Hello"
     =>
         "Hola",
+
+    "Please rate all options!"
+    =>
+        "Puntua todas la opciones por favor!",
+
+    "Rating is individual. Please rate all options!"
+    =>
+        "Puntua todas la opciones por favor!",
 
 
 ];

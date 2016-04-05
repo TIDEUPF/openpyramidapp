@@ -244,7 +244,7 @@
     </div>
 
     <div id="answer-middle-frame">
-        <div id="answer-header-text">Please rate all options!</div>
+        <div id="answer-header-text"><?=TS("Please rate all options!")?></div>
         <?php foreach($answer_text_array as $i=> $answer_data):?>
         <div class="answer-rating-widget">
             <fieldset data-role="controlgroup" data-type="horizontal">
@@ -287,7 +287,7 @@
             <div>
                 <div id="answer-waiting-group"><?=$answer_waiting_message?></div>
                 <!--<div id="pre-submit-warning" style="font-size: 1.35em; margin-top:20px;">Please note that when you submit rating, you will no longer be able to edit rating values. Also you will be removed from the discussion thread for this level.</div>-->
-                <div id="pre-submit-warning" style="font-size: 1.35em; margin-top:20px;">Submit rating here! But you still can continue discussion and modify rating accordingly.</div>
+                <div id="pre-submit-warning" style="font-size: 1.35em; margin-top:20px;"><?=TS("Submit rating here! But you still can continue discussion and modify rating accordingly.")?></div>
                 <div id="answer-next-button"><button id="answer-next-button-ui" class="ui-btn"><?= $answer_rate_submit?></button></div>
             </div>
 
@@ -513,7 +513,7 @@
     <div id="mobile-bottom-chat-message">
     </div>
     <div id="mobile-bottom-chat-input">
-        <input type="text" class="inputMessage" placeholder="Send a message to your peers..."/>
+        <input type="text" class="inputMessage" placeholder="<?=TS("Discuss with with your peers!")?>"/>
     </div>
     <a id="chat-phone-write-padding" href="#"></a>
     <a id="chat-phone-write" href="#" class="ui-icon-edit"></a>

@@ -268,12 +268,12 @@ function submit_rate() {
             $value = \Request\param($rating_var . $i);
 
             if (empty($value) and $value !== "0")
-                $error = 'Please Rate All!';
+                $error = T('Please Rate All!');
 
             $question_rating_values[$rating_var] = mysqli_real_escape_string($link, $value);
         }
         if(empty($question_rating_values['optradio']))
-            $error = 'Please Rate All!';
+            $error =  T('Please Rate All!');
 
         //timeout
         if($question_rating_values['lvl'] != $activity_level)

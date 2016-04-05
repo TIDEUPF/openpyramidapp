@@ -335,7 +335,7 @@
                     </ul>
                 </div>
                 <a id="chat-write" href="#" class="ui-icon-edit"></a>
-                <input type="text" class="inputMessage" placeholder="Discuss with with your peers!!!"/>
+                <input type="text" class="inputMessage" placeholder="<?=TS("Discuss with with your peers!")?>"/>
             </li>
         </ul>
     </div>
@@ -354,9 +354,9 @@
         <div>
             <div id="answer-waiting-group"><?=$answer_waiting_message?></div>
             <!--<div style="font-size: 1.35em; margin-top:20px;">Please note that when you submit rating, you will no longer be able to edit rating values. Also you will be removed from the discussion thread for this level.</div>-->
-            <div style="font-size: 1.35em; margin-top:20px;">Submit rating here! But you still can continue discussion and modify rating accordingly.</div>
+            <div style="font-size: 1.35em; margin-top:20px;"><?=TS("Submit rating here! But you still can continue discussion and modify rating accordingly.")?></div>
 
-            <div id="answer-next-button"><button id="answer-next-button-ui" class="ui-btn"><?= $answer_rate_submit?></button></div>
+            <div id="answer-next-button"><button id="answer-next-button-ui" class="ui-btn"><?=$answer_rate_submit?></button></div>
         </div>
 
     </div>
