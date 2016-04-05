@@ -73,7 +73,7 @@ $translation = [
 
     "Submitted rating can be discussed and modified till Monday 14th, 11:59pm CET. Login afterwards to see selected questions at the next level!"
     =>
-        "Puesdes modificar tu puntuación hasta el Martes 15 a las 23:59h. Posteriormente podrás puntuar las preguntas del siguiente nivel.",
+        "Puesdes modificar tu puntuación hasta el miércoles 6 a las 23:59h. Posteriormente podrás puntuar las preguntas del siguiente nivel.",
 
     "Submitted rating can be discussed and modified."
     =>
@@ -81,11 +81,15 @@ $translation = [
 
     "You submitted rating in this level successfully. You still can further discuss or modify your rating till Monday 14th, 11:59pm CET. Make sure you login afterwards to see which questions have been selected for the next pyramid level to continue!"
     =>
-        "La puntuación hs sido guardada. Aún puedes discutir o modificar tu puntuación hasta el Martes 15 a las 23:59h. Asegurate de volver después para ver que preguntas han sido seleccionadas en el siguiente nivel de la pirámide!",
+        "La puntuación ha sido guardada. Aún puedes discutir o modificar tu puntuación hasta el miércoles 6 a las 23:59h. Asegurate de volver después para ver que preguntas han sido seleccionadas en el siguiente nivel de la pirámide!",
 
     "You submitted rating in this level successfully. You still can further discuss or modify your rating."
     =>
-        "La puntuación hs sido guardada. Aún puedes discutir o modificar tu puntuación.",
+        "La puntuación ha sido guardada. Aún puedes discutir o modificar tu puntuación.",
+
+    "Submitted rating can be discussed and modified till Monday 14th, 11:59pm CET. Login afterwards to see selected questions at the next level!"
+    =>
+        "Aún puedes discutir o modificar tu puntuación hasta el miércoles 6 a las 23:59h. Asegurate de volver después para ver que preguntas han sido seleccionadas en el siguiente nivel de la pirámide!",
 
     "Log in"
     =>
