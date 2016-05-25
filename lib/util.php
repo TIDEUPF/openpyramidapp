@@ -118,7 +118,7 @@ function get_users_email() {
 
 function get_html($step) {
     if($step == 1) {
-        $html = <<<HTML
+        /*$html = <<<HTML
 <html>
 <body>
 <p>Hi,</p>
@@ -139,6 +139,29 @@ Barcelona</p>
 </body>
 </html>
 HTML;
+        */
+        $html = <<<HTML
+<html>
+<body>
+<p>Hola,</p>
+
+<p>Has sido promocionado al siguiente nivel de la PyramidApp. Puedes volver a la app introduciendo el mismo email. Este es el enlace a la app: <a href="http://tiny.cc/pyramidapp">tiny.cc/pyramidapp</a>.</p>
+
+<p>En este nivel puedes ver las preguntas entregadas por otros miembros y tienes un chat para discutir las diferentes opciones.</p>
+
+<p>Tienes de tiempo hasta el miércoles a las 23:59h para discutir y puntuar las preguntas. &nbsp;</p>
+
+<p>¡Que pases un buén rato en la app!</p>
+
+<p>&nbsp;</p>
+
+<p>Saludos<br />
+GTI - UPF<br />
+Barcelona</p>
+</body>
+</html>
+HTML;
+
     } elseif($step == 2) {
         $html = <<<HTML
 <html>

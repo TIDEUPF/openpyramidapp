@@ -15,14 +15,14 @@ $an->setDevices($devices);
 
 global $link, $fid, $pid, $pyramid_minsize, $levels, $flow_data, $activity_level, $peer_group_id, $n_selected_answers, $random_selection;
 
-$init_day = 1459728000;//
+$init_day = 1459720800;//
 $day_duration = 24 * 60 * 60;
 
 $level_timestamps = [
-    $init_day + 1*$day_duration,
     $init_day + 2*$day_duration,
     $init_day + 3*$day_duration,
     $init_day + 4*$day_duration,
+    $init_day + 5*$day_duration,
 ];
 
 
