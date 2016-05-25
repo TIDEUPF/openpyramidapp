@@ -1,70 +1,75 @@
 <?php
-session_start(); 
+session_start();
 include('dbvar.php');
 
-$error; 
+$error;
 if(!isset($_SESSION['user'])){
-	if(isset($_POST['loginBtn'])) {
-		if(empty($_POST['usr']) || empty($_POST['pwd'])) {
-			$error = "Username and Password can not be empty!";
-		}
-		else{
-			$uname = mysqli_real_escape_string($link, stripslashes(trim(strip_tags($_POST['usr']))));
-			$pass =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['pwd']))));			
-			
-			$count_login = mysqli_num_rows(mysqli_query($link, "select uname from teacher where uname = '$uname' and pass = '$pass' limit 1 "));
-			if($count_login > 0){
-				//$_SESSION['token'] = $token;
-				$_SESSION['user'] = $uname;
-				header("location: teacher.php");
-				exit(0);
-			}
-			else{
-				$error = 'Username or password incorrect';
-			}
-		
-		}
-	}
+    if(isset($_POST['loginBtn'])) {
+        if(empty($_POST['usr']) || empty($_POST['pwd'])) {
+            $error = "Username and Password can not be empty!";
+        }
+        else{
+            $uname = mysqli_real_escape_string($link, stripslashes(trim(strip_tags($_POST['usr']))));
+            $pass =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['pwd']))));
+
+            $count_login = mysqli_num_rows(mysqli_query($link, "select uname from teacher where uname = '$uname' and pass = '$pass' limit 1 "));
+            if($count_login > 0){
+                //$_SESSION['token'] = $token;
+                $_SESSION['user'] = $uname;
+                header("location: teacher.php");
+                exit(0);
+            }
+            else{
+                $error = 'Username or password incorrect';
+            }
+
+        }
+    }
 }
 else{
-	header("location: teacher.php");
-	exit(0);
+    header("location: teacher.php");
+    exit(0);
 }
-  
-?><!DOCTYPE html>
-<html>
-  <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="vendors/bootstrap/bootstrap.min.css">
-      <script src="vendors/jquery/jquery-2.1.4.min.js"></script>
-      <script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
-      <script src="lib/actions.js"></script>
-      <script>var socket = io();</script>
-  </head>
 
-  <body>
-  <input type="hidden" name="page" value="teacher_login" />
-  <?php include('topnav.php'); ?>
-    <div class="container">
-      <h2>Teacher Login</h2>
-      <h3><b>Login</b></h3>
-      <form role="form" action="" method="post">
-        <div class="form-group">
-          <label for="usr">Name:</label>
-          <input type="text" class="form-control" id="usr" name="usr">
-        </div>
-        <div class="form-group">
-          <label for="pwd">Password:</label>
-          <input type="password" class="form-control" id="pwd" name="pwd">
-        </div>
-		 <div class="form-group">
-          <input type="submit" class="btn btn-info" value="Login" name="loginBtn">
-        </div>
-		<span><?php if(!empty($error)) {echo $error;} ?></span>
-      </form>
+?><!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>LoginPage</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+    <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+
+</head>
+<body>
+
+<div data-role="page">
+    <div data-role="header">
+        <h1>PyramidApp - Educator View</h1>
     </div>
 
-    
-  </body>
+    <div data-role="main" class="ui-content">
+        <div>
+            <img src="elements/resources/pyramid-logo.png" alt="pyramid_icon" height="150" width="200" align="left">
+            <br>
+            <p>Educators can create pyramid collaborative learning activities here and view status of an ongoing pyramid activity.
+                When you login, you will be shown a window to design pyramid flows (activities) by specifying your design requirements
+                and parameter values. Some parameters are provided with default values to make the design process faster and easier.</p>
+            <br> <br><br>
+        </div>
 
+
+        <form method="post" action="" data-ajax="false">
+            <div class="ui-field-contain">
+                <label for="uid">User ID:</label>
+                <input type="text" name="usr" id="usr">
+                <label for="password">Password:</label>
+                <input type="password" name="pwd" id="pwd">
+            </div>
+            <input type="submit" data-inline="true" value="Login" name="loginBtn">
+        </form>
+    </div>
+</div>
+
+</body>
 </html>
