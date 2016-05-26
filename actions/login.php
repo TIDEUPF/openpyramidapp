@@ -39,6 +39,12 @@ else{
     <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
 
+    <style>
+        form {
+            width: 500px;
+            margin: 0 auto 0 auto
+        }
+    </style>
 </head>
 <body>
 

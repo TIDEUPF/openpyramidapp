@@ -1,3 +1,8 @@
+#center-frame {
+    width: 900px;
+    margin: 20px auto 0 auto;
+}
+
 .ui-btn.my-tooltip-btn,
 .ui-btn.my-tooltip-btn:hover,
 .ui-btn.my-tooltip-btn:active {background: none; border: 0;}

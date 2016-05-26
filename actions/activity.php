@@ -40,6 +40,7 @@ if(!isset($_SESSION['user']) or !isset($_REQUEST['activity'])) {
     <link rel="stylesheet" type="text/css" href="elements/resources/css/teacher/styles.css">
 </head>
 <body>
+<div id="center-frame">
 <div id="pyramid-levels-2" class="pyramid-animation" style="position: relative;float: left;margin-left: 15px;">
     <svg viewBox="70 5 280 210">
         <polygon points="210,5 350,210 70,210" style="fill:pink;stroke:purple;stroke-width:2" />
@@ -667,6 +668,7 @@ if(!isset($_SESSION['user']) or !isset($_REQUEST['activity'])) {
 
 
 </script>
+</div>
 </body>
 </html>
 
