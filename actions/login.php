@@ -2,7 +2,6 @@
 session_start();
 include('dbvar.php');
 
-$error;
 if(!isset($_SESSION['user'])){
     if(isset($_POST['loginBtn'])) {
         if(empty($_POST['usr']) || empty($_POST['pwd'])) {

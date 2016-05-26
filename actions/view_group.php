@@ -21,7 +21,7 @@ else{
 	header("location: login.php");
 	exit(0);
 }	
-q
+
 ?><!DOCTYPE html>
 <html>
   <head>

@@ -6,7 +6,7 @@ include('dbvar.php');
 
 if(isset($_SESSION['user'])) {
     $teacher_id = $_SESSION['user'];
-
+/*
     $student_count = mysqli_num_rows(mysqli_query($link, "select * from students"));
 
     if(isset($_POST['cflow'])) {
@@ -61,6 +61,7 @@ if(isset($_SESSION['user'])) {
             mysqli_query($link,"insert into flow values (null, '$teacher_id', '$fname', '$fdes', '$fcname', '$fesname', '$fsg', '$fl', '$pyramid_size', '$min_pyramid', '$expe', '$rps', '$datestamp', $tst, $rt, $htst, $hrt, '{$qs}', '{$ch}', '{$sync}', '{$multi_py}', '{$n_selected_answers}', '{$random_selection}')");
         }
     }
+*/
 } else {
     header("location: login.php");
     exit(0);
@@ -68,7 +69,51 @@ if(isset($_SESSION['user'])) {
 
 global $default_teacher_question;
 $tq = $default_teacher_question;
+
 //TODO: restore form http://stackoverflow.com/questions/19109884/serializing-and-deserializing-a-form-with-its-current-state
+
+    $default_data = [
+        "checkbox-v-2b" => false,
+        "checkbox-v-2a" => false,
+        "textinput-s" => 30,
+        "textarea-1" => "",
+        "textinput-s" => "",
+    ];
+
+    $data = $default_data;
+
+
+    //sanitize data
+    foreach($data as $key => &$element) {
+        if(isset($_REQUEST[$key])) {
+            if(is_string($element))
+                $element = trim($element);
+
+            if(is_bool($element))
+                $element = true;
+        } else {
+            if(is_bool($element) and $element)
+                $element = false;
+        }
+
+        if(is_string($element))
+            $element = htmlentities($element);
+
+        if(is_bool($element))
+            $element = $element ? " checked " : "";
+    }
+
+if(!isset($_REQUEST['save']))	{
+    //default values
+} else {
+    $datestamp = time();
+    $data_sql = mysqli_real_escape_string($link, json_encode($data));
+    mysqli_query($link,"insert into activity values (null, '$teacher_id', '$data_sql')");
+    $activity_id = mysqli_insert_id($link);
+
+    header("location: activity.php?activity=" . $activity_id);
+}
+
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -77,7 +122,7 @@ $tq = $default_teacher_question;
     <link rel="stylesheet" href="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
     <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="resources/css/teacher/styles.css">
+    <link rel="stylesheet" type="text/css" href="elements/resources/css/teacher/styles.css">
 </head>
 
 <body>
@@ -97,7 +142,7 @@ $tq = $default_teacher_question;
                     <div data-role="popup" id="popupInfo1" class="ui-content" data-theme="a" style="max-width:350px;">
                         <p>This is the task description that will appear for students when they access the pyramid activity.</p>
                     </div></label>
-                <textarea name="textarea-1" id="description"></textarea>
+                <textarea name="textarea-1" id="description" value="<?=$data['textarea-1']?>"></textarea>
             </div>
 
             <div class="ui-field-contain">
@@ -105,7 +150,7 @@ $tq = $default_teacher_question;
                     <div data-role="popup" id="popupInfo2" class="ui-content" data-theme="a" style="max-width:350px;">
                         <p>This is the total number of expected students in the class available for the activity. This could be an estimated value (specially during a massive open online course case).</p>
                     </div></label>
-                <input type="number" name="textinput-s" id="class_size" placeholder="Total class size" value="30" data-clear-btn="true">
+                <input type="number" name="textinput-s" id="class_size" placeholder="Total class size" value="<?=$data['textinput-s']?>" data-clear-btn="true">
             </div>
             <div class="ui-field-contain">
                 <fieldset data-role="controlgroup">
@@ -113,14 +158,14 @@ $tq = $default_teacher_question;
                         <div data-role="popup" id="popupInfo7" class="ui-content" data-theme="a" style="max-width:700px;">
                             <p>This field specifies whether the classroom setting is a face-to-face or virtual learning context.</p>
                         </div></legend>
-                    <input type="checkbox" name="checkbox-v-2a" id="checkbox-v-2a">
+                    <input type="checkbox" name="checkbox-v-2a" id="checkbox-v-2a" <?=$data['checkbox-v-2a']?>>
                     <label for="checkbox-v-2a">Classroom</label>
-                    <input type="checkbox" name="checkbox-v-2b" id="checkbox-v-2b">
+                    <input type="checkbox" name="checkbox-v-2b" id="checkbox-v-2b" <?=$data['checkbox-v-2b']?>>
                     <label for="checkbox-v-2b">Distance</label>
                 </fieldset>
             </div>
 
-            <div class="ui-input-btn ui-btn ui-btn-inline ui-corner-all">Save<input type="button" data-enhanced="true" value="Save"></div>
+            <div class="ui-input-btn ui-btn ui-btn-inline ui-corner-all">Save<input name="save" type="submit" data-enhanced="true" value="Save"></div>
 
         </form>
 
