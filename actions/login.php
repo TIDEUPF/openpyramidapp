@@ -55,7 +55,16 @@ else{
 
     <div data-role="main" class="ui-content">
         <div>
-            <img src="elements/resources/pyramid-logo.png" alt="pyramid_icon" height="150" width="200" align="left">
+            <div class="login-pyramid-block">
+                <img src="elements/resources/pyramid-logo.png" alt="pyramid_icon" height="150" width="200">
+                <div class="login-pyramid-block-subtitle">
+                    <span><?=TS('What is a "pyramid"?')?> </span><a href="#what" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="<?=TS('What is a "pyramid?"?')?>"><?=TS('What is a "pyramid"?')?></a>
+                    <div data-role="popup" id="what" class="ui-content" data-theme="a" style="max-width:350px;">
+                        <p><?=TS('A pyramid is structured in a way that students start studying given task or problem individually and proposing an initial solution. Then, individuals team up (usually pairs) to compare and discuss their proposals and, finally, proposes a new shared solution. New larger groups are formed growingly (by iteratively joining previous groups) in order to generate new agreed proposals until a global consensus is achieved. A Pyramid scenario fosters individual participation and accountability (all have the opportunity and need to express a contribution) and balanced positive inter-actions (opinions of all members count) in a collaborative knowledge-oriented negotiation process.')?></p>
+                    </div>
+                </div>
+
+            </div>
             <br>
             <p>Educators can create pyramid collaborative learning activities here and view status of an ongoing pyramid activity.
                 When you login, you will be shown a window to design pyramid flows (activities) by specifying your design requirements

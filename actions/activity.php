@@ -50,8 +50,8 @@ if(!isset($_SESSION['user']) or !isset($_REQUEST['activity'])) {
         <circle cx="300" cy="175" r="12" stroke="green" stroke-width="2" fill="yellow" />
         <line x1="112" y1="150" x2="308" y2="150" style="stroke:rgb(255,0,155);stroke-width:4" />
 
-        <text x="120" y="205" fill="red">Level 1 - Individual phase</text>
-        <text x="55" y="140" fill="red" transform="rotate(-52,50,60)">Rating phase(s)</text>
+        <text x="120" y="205" fill="red">Level 1 – Individual level</text>
+        <text x="55" y="140" fill="red" transform="rotate(-52,50,60)">Rating level(s)</text>
 
         <!-- first level first 2 groups animation -->
         <circle cx="120" cy="175" stroke="green" stroke-width="2" fill="yellow">
@@ -144,7 +144,7 @@ if(!isset($_SESSION['user']) or !isset($_REQUEST['activity'])) {
             <circle cx="270" r="12" stroke="green" stroke-width="2" fill="yellow" />
             <circle cx="300" r="12" stroke="green" stroke-width="2" fill="yellow" />
             <circle cx="330" r="12" stroke="green" stroke-width="2" fill="yellow" />
-            <text x="120" y="30" fill="red">Level 1 - Individual phase</text>
+            <text x="120" y="30" fill="red">Level 1 – Individual level</text>
 
             <!-- first level first 2 groups animation -->
             <circle cx="120" stroke="green" stroke-width="2" fill="yellow">
@@ -234,7 +234,7 @@ if(!isset($_SESSION['user']) or !isset($_REQUEST['activity'])) {
             </g>
         </g>
 
-        <text x="55" y="140" fill="red" transform="rotate(-52,50,60)">Rating phase(s)</text>
+        <text x="55" y="140" fill="red" transform="rotate(-52,50,60)">Rating level(s)</text>
 
         <!--circle cx="170" cy="120" r="17" stroke="green" stroke-width="2" fill="yellow"-->
 
@@ -276,7 +276,7 @@ if(!isset($_SESSION['user']) or !isset($_REQUEST['activity'])) {
             <circle cx="285" r="12" stroke="green" stroke-width="2" fill="yellow" />
             <circle cx="325" r="12" stroke="green" stroke-width="2" fill="yellow" />
             <circle cx="360" r="12" stroke="green" stroke-width="2" fill="yellow" />
-            <text x="120" y="30" fill="red">Level 1 - Individual phase</text>
+            <text x="120" y="30" fill="red">Level 1 – Individual level</text>
 
             <!-- first level first 2 groups animation -->
             <circle cx="120" stroke="green" stroke-width="2" fill="yellow">
@@ -417,7 +417,7 @@ if(!isset($_SESSION['user']) or !isset($_REQUEST['activity'])) {
             </g>
         </g>
 
-        <text x="55" y="140" fill="red" transform="rotate(-52,50,60)">Rating phase(s)</text>
+        <text x="55" y="140" fill="red" transform="rotate(-52,50,60)">Rating level(s)</text>
 
         <!--circle cx="170" cy="120" r="17" stroke="green" stroke-width="2" fill="yellow"-->
 
