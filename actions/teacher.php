@@ -27,6 +27,7 @@ if(isset($_SESSION['user'])) {
         $fesname = '';//$fesname =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['fesname']))));
         $fl = (int) $_POST['fl'];
         $fsg = (int) $_POST['fsg'];
+        $str_id = \Util\rand_str(5);
 
         //80 per cent of expected students
         if($multi_py) {
