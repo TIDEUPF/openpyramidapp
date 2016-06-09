@@ -21,7 +21,6 @@ if(!isset($_SESSION['user'])){
             else{
                 $error = 'Username or password incorrect';
             }
-
         }
     }
 }
