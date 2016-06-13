@@ -10,23 +10,26 @@ if(isset($_SESSION['user'])) {
     $student_count = mysqli_num_rows(mysqli_query($link, "select * from students"));
 
     if(isset($_POST['cflow'])) {
-        $fname = mysqli_real_escape_string($link, stripslashes(trim(strip_tags($_POST['fname']))));
-        $fdes =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['fdes']))));
-        $fcname =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['fcname']))));
-        $qs =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['qs']))));
-        $tst = 60 * (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['tst']))));
-        $rt = 60 * (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['rt']))));
-        $htst = $tst + 120;
-        $hrt = $rt + 120;
-        $expe = mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['expe']))));
-        $sync = (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['sync']))));
-        $multi_py = (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['multi_py']))));
-        $ch = (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['ch']))));
-        $n_selected_answers = (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['n_selected_answers']))));
-        $random_selection = (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['random_selection']))));
-        $fesname = '';//$fesname =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['fesname']))));
-        $fl = (int) $_POST['fl'];
-        $fsg = (int) $_POST['fsg'];
+		$fname = mysqli_real_escape_string($link, stripslashes(trim(strip_tags($_POST['activity']))));
+		$fdes =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['description']))));
+		//$fcname =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['fcname']))));
+		$fcname =  '';
+		$qs =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['task_description']))));
+		$tst = (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['s_question']))));
+		$rt = (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['s_rating']))));
+		$htst = (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['h_question']))));
+		$hrt = (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['h_rating']))));
+		//$htst = $tst + 120;
+		//$hrt = $rt + 120;
+		$expe = mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['expected_students']))));
+		$sync = (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['sync']))));
+		$multi_py = (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['multiple_pyramids']))));
+		$ch = (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['chat']))));
+		$n_selected_answers = (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['n_selected_answers']))));
+		$random_selection = (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['random_selection']))));
+		$fesname = '';//$fesname =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['fesname']))));
+		$fl = (int) $_POST['n_levels'];
+		$fsg = (int) $_POST['first_group_size'];
         $str_id = \Util\rand_str(5);
 
         //80 per cent of expected students
@@ -117,12 +120,19 @@ if(!isset($_REQUEST['save']))	{
 
     $defaults = [
         'async' => [
-            'sync' => false,
+            //'sync' => false,
             's_question' => 180,
             'h_question' => 240,
-            's_rating' => 180,
-            'h_rating' => 240,
-            'satisfaction' => 240,
+            's_rating' => 120,
+            'h_rating' => 180,
+            'satisfaction' => 60,
+            //'expected_students' => 20,
+            'chat' => 1,
+            'n_selected_answers' => 1,
+            'random_selection' => 1,
+            'n_levels' => 3,
+            'first_group_size' => 3,
+            'multiple_pyramids' => 1,
         ],
         'sync' => [],
     ];
@@ -147,38 +157,38 @@ if(!isset($_REQUEST['save']))	{
         <form data-ajax="false">
             <div class="ui-field-contain">
                 <label for="activity">Activity name:</label>
-                <input type="text" name="textinput-s" id="activity" placeholder="Activity name" value="" data-clear-btn="true">
+                <input type="text" name="activity" id="activity" placeholder="Activity name" value="" data-clear-btn="true">
             </div>
 
             <div class="ui-field-contain">
-                <label for="description">Task Description:<a href="#popupInfo1" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
+                <label for="task_description">Task Description:<a href="#popupInfo1" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
                     <div data-role="popup" id="popupInfo1" class="ui-content" data-theme="a" style="max-width:350px;">
                         <p>This is the task description that will appear for students when they access the pyramid activity.</p>
                     </div></label>
-                <textarea name="textarea-1" id="description" value="<?=$data['textarea-1']?>"></textarea>
+                <textarea name="task_description" id="task_description" value="<?=$data['task_description']?>"></textarea>
             </div>
 
             <div class="ui-field-contain">
-                <label for="class_size">Total number of students:<a href="#popupInfo2" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
+                <label for="expected_students">Total number of students:<a href="#popupInfo2" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
                     <div data-role="popup" id="popupInfo2" class="ui-content" data-theme="a" style="max-width:350px;">
                         <p>This is the total number of expected students in the class available for the activity. This could be an estimated value (specially during a massive open online course case).</p>
                     </div></label>
-                <input type="number" name="textinput-s" id="class_size" placeholder="Total class size" value="<?=$data['textinput-s']?>" data-clear-btn="true">
+                <input type="number" name="expected_students" id="expected_students" placeholder="Total class size" value="<?=$data['textinput-s']?>" data-clear-btn="true">
             </div>
             <div class="ui-field-contain">
-                <fieldset data-role="controlgroup">
+                <fieldset id="learning_setting_fieldset" data-role="controlgroup">
                     <legend>Learning setting:<a href="#popupInfo7" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
                         <div data-role="popup" id="popupInfo7" class="ui-content" data-theme="a" style="max-width:700px;">
                             <p>This field specifies whether the classroom setting is a face-to-face or virtual learning context.</p>
                         </div></legend>
-                    <input type="checkbox" name="checkbox-v-2a" id="checkbox-v-2a" <?=$data['checkbox-v-2a']?>>
-                    <label for="checkbox-v-2a">Classroom</label>
-                    <input type="checkbox" name="checkbox-v-2b" id="checkbox-v-2b" <?=$data['checkbox-v-2b']?>>
-                    <label for="checkbox-v-2b">Distance</label>
+                    <input type="radio" name="learning_setting" id="learning_setting-a" <?=($data['learning_setting'] == 'classroom') ? 'checked' : ''?>>
+                    <label for="learning_setting-a">Classroom</label>
+                    <input type="radio" name="learning_setting" id="learning_setting-b" <?=($data['learning_setting'] == 'distance') ? 'checked' : ''?>>
+                    <label for="learning_setting-b">Distance</label>
                 </fieldset>
             </div>
 
-            <div class="ui-input-btn ui-btn ui-btn-inline ui-corner-all">Save<input name="save" type="submit" data-enhanced="true" value="Save"></div>
+            <button type="button" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-right ui-icon-arrow-r">Next</button>
 
             <?php /*second screen*/?>
             <div id="center-frame">
@@ -587,28 +597,28 @@ if(!isset($_REQUEST['save']))	{
                     <h4>Pyramid Configurations</h4>
                     <form id="myform">
                         <div class="ui-field-contain ui-mini">
-                            <label for="slider-s">No. of students per group at rating level 1:<a href="#popupInfo" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
+                            <label for="first_group_size">No. of students per group at rating level 1:<a href="#popupInfo" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
                                 <div data-role="popup" id="popupInfo" class="ui-content" data-theme="a" style="max-width:700px;">
                                     <p>This specifies the initial group size at level 2 (first rating level) after option submission level. This size will be doubled when groups propagate to upper levels.</p>
                                 </div>
                             </label>
-                            <input type="range" name="slider-s" id="slider-s" value="3" min="2" max="10" data-highlight="true">
+                            <input type="range" name="first_group_size" id="first_group_size" value="3" min="2" max="10" data-highlight="true">
                         </div>
 
                         <div class="ui-field-contain">
-                            <label for="slider-s2">No. of levels:<a href="#popupInfo5" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
+                            <label for="n_levels">No. of levels:<a href="#popupInfo5" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
                                 <div data-role="popup" id="popupInfo5" class="ui-content" data-theme="a" style="max-width:700px;">
                                     <p>This includes both option submission level and rating levels. It is recommended to have 3 to 4 levels for active participation.</p>
                                 </div></label>
-                            <input type="range" name="slider-s2" id="slider-s2" value="3" min="2" max="4" data-highlight="true">
+                            <input type="range" name="n_levels" id="n_levels" value="3" min="2" max="4" data-highlight="true">
                         </div>
 
                         <div class="ui-field-contain">
-                            <label for="flip-1">Allow multiple pyramids:<a href="#popupInfo4" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
+                            <label for="multiple_pyramids">Allow multiple pyramids:<a href="#popupInfo4" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
                                 <div data-role="popup" id="popupInfo4" class="ui-content" data-theme="a" style="max-width:700px;">
                                     <p>If your class is relatively large class, it would be better to enable this feature, so several pyramids will be created and students will be automatically allocated.</p>
                                 </div></label>
-                            <select name="flip-1" id="flip-1" data-role="slider">
+                            <select name="multiple_pyramids" id="multiple_pyramids" data-role="slider">
                                 <option value="off">No</option>
                                 <option value="on" selected="selected">Yes</option>
                             </select>
@@ -623,11 +633,11 @@ if(!isset($_REQUEST['save']))	{
                         </div>
 
                         <div class="ui-field-contain">
-                            <label for="flip-1">Discussion :<a href="#popupInfo6" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
+                            <label for="chat">Discussion :<a href="#popupInfo6" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
                                 <div data-role="popup" id="popupInfo6" class="ui-content" data-theme="a" style="max-width:700px;">
                                     <p>If discussion is enabled, students can chat with peers to clarify and negotiate their options during rating phases.</p>
                                 </div></label>
-                            <select name="flip-2" id="flip-2" data-role="slider">
+                            <select name="chat" id="chat" data-role="slider">
                                 <option value="off">No</option>
                                 <option value="on" selected="selected">Yes</option>
                             </select>
@@ -649,88 +659,101 @@ if(!isset($_REQUEST['save']))	{
 
                                 <div id="pop-background"></div>
 
-                                <label for="optimer">Option submission timer:<a text-data="#cpopup1" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
+                                <label for="s_question">Option submission timer:<a text-data="#cpopup1" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
                                                                                 title="This timer specifies the time permitted for initial option (artifact) submission for students">More</a>
                                     <div id="cpopup1-text" class="ui-content tooltip-popup" data-theme="a" style="display:none">
                                         <p>If discussion is enabled, students can chat with peers to clarify and negotiate their options during rating phases.</p>
                                     </div>
                                 </label>
                                 <div style="position:relative;float:left;">
-                                    <input type="number" name="optimer" id="optimer" value="" data-clear-btn="true" data-wrapper-class="numk" />
+                                    <input type="number" name="s_question" id="s_question" value="" data-clear-btn="true" data-wrapper-class="numk" />
                                 </div>
 
                                 <div style="position:relative;float:left; margin-left:10px; margin-top:2px;">
                                     <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
-                                        <input type="radio" name="radio-choice-h-2" id="radio-choice-h-2a" value="on" checked="checked">
-                                        <label for="radio-choice-h-2a">Minutes</label>
-                                        <input type="radio" name="radio-choice-h-2" id="radio-choice-h-2b" value="off">
-                                        <label for="radio-choice-h-2b">Hours</label>
-                                        <input type="radio" name="radio-choice-h-2" id="radio-choice-h-2c" value="other">
-                                        <label for="radio-choice-h-2c">Days</label>
+                                        <input type="radio" name="s_question_unit" id="s_question_unit-a" value="m" checked="checked">
+                                        <label for="s_question_unit-a">Minutes</label>
+                                        <input type="radio" name="s_question_unit" id="s_question_unit-b" value="h">
+                                        <label for="s_question_unit-b">Hours</label>
+                                        <input type="radio" name="s_question_unit" id="s_question_unit-c" value="d">
+                                        <label for="s_question_unit-c">Days</label>
                                     </fieldset></div>
                                 <div style="clear:both;"></div>
 
-                                <label for="hardtimer">Option submission hard timer:<a href="#popup2" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
+                                <label for="h_question">Option submission hard timer:<a href="#popup2" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
                                                                                        title="This timer specifies the maximum time permitted for initial option (artifact) submission for students. Once expired, every student will be promoted next level."></a>
                                 </label>
                                 <div style="position:relative;float:left;">
-                                    <input type="number" name="hardtimer" id="hardtimer" data-wrapper-class="numk" value="" data-clear-btn="true" />
+                                    <input type="number" name="h_question" id="h_question" data-wrapper-class="numk" value="" data-clear-btn="true" />
                                 </div>
 
                                 <div style="position:relative;float:left; margin-left:10px; margin-top:2px;">
                                     <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
-                                        <input type="radio" name="radio-choice-h2-2" id="radio-choice-h2-2a" value="on" checked="checked">
-                                        <label for="radio-choice-h2-2a">Minutes</label>
-                                        <input type="radio" name="radio-choice-h2-2" id="radio-choice-h2-2b" value="off">
-                                        <label for="radio-choice-h2-2b">Hours</label>
-                                        <input type="radio" name="radio-choice-h2-2" id="radio-choice-h2-2c" value="other">
-                                        <label for="radio-choice-h2-2c">Days</label>
+                                        <input type="radio" name="h_question_unit" id="h_question_unit-a" value="m" checked="checked">
+                                        <label for="h_question_unit-a">Minutes</label>
+                                        <input type="radio" name="h_question_unit" id="h_question_unit-b" value="h">
+                                        <label for="h_question_unit-b">Hours</label>
+                                        <input type="radio" name="h_question_unit" id="h_question_unit-c" value="d">
+                                        <label for="h_question_unit-c">Days</label>
                                     </fieldset></div>
                                 <div style="clear:both;"></div>
 
-                                <label for="ratimer">Rating timer:<a href="#popup3" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
+                                <label for="s_rating">Rating timer:<a href="#popup3" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
                                                                      title="This timer specifies the time permitted for rating at each level including discussion time."></a>
                                 </label>
                                 <div style="position:relative;float:left;">
-                                    <input type="number" name="ratimer" id="ratimer" data-wrapper-class="numk" value="" data-clear-btn="true">
+                                    <input type="number" name="s_rating" id="s_rating" data-wrapper-class="numk" value="" data-clear-btn="true">
                                 </div>
 
                                 <div style="position:relative;float:left; margin-left:10px; margin-top:2px;">
                                     <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
-                                        <input type="radio" name="radio-choice-h3-2" id="radio-choice-h3-2a" value="on" checked="checked">
-                                        <label for="radio-choice-h3-2a">Minutes</label>
-                                        <input type="radio" name="radio-choice-h3-2" id="radio-choice-h3-2b" value="off">
-                                        <label for="radio-choice-h3-2b">Hours</label>
-                                        <input type="radio" name="radio-choice-h3-2" id="radio-choice-h3-2c" value="other">
-                                        <label for="radio-choice-h3-2c">Days</label>
+                                        <input type="radio" name="s_rating_unit" id="s_rating_unit-a" value="m" checked="checked">
+                                        <label for="s_rating_unit-a">Minutes</label>
+                                        <input type="radio" name="s_rating_unit" id="s_rating_unit-b" value="h">
+                                        <label for="s_rating_unit-b">Hours</label>
+                                        <input type="radio" name="s_rating_unit" id="s_rating_unit-c" value="d">
+                                        <label for="s_rating_unit-c">Days</label>
                                     </fieldset></div>
                                 <div style="clear:both;"></div>
 
-                                <label for="rahardtimer">Rating hard timer:<a href="#popup4" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
+                                <label for="h_rating">Rating hard timer:<a href="#popup4" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
                                                                               title="This is the maximum time allowed for rating and discussion at each level. Once expired everyone is promoted to next level."></a>
                                 </label>
                                 <div style="position:relative;float:left;">
-                                    <input type="number" name="rahardtimer" id="rahardtimer" data-wrapper-class="numk" value="" data-clear-btn="true">
+                                    <input type="number" name="h_rating" id="h_rating" data-wrapper-class="numk" value="" data-clear-btn="true">
                                 </div>
 
                                 <div style="position:relative;float:left; margin-left:10px; margin-top:2px;">
                                     <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
-                                        <input type="radio" name="radio-choice-h4-2" id="radio-choice-h4-2a" value="on" checked="checked">
-                                        <label for="radio-choice-h4-2a">Minutes</label>
-                                        <input type="radio" name="radio-choice-h4-2" id="radio-choice-h4-2b" value="off">
-                                        <label for="radio-choice-h4-2b">Hours</label>
-                                        <input type="radio" name="radio-choice-h4-2" id="radio-choice-h4-2c" value="other">
-                                        <label for="radio-choice-h4-2c">Days</label>
+                                        <input type="radio" name="h_rating_unit" id="h_rating_unit-a" value="m" checked="checked">
+                                        <label for="h_rating_unit-a">Minutes</label>
+                                        <input type="radio" name="h_rating_unit" id="h_rating_unit-b" value="h">
+                                        <label for="h_rating_unit-b">Hours</label>
+                                        <input type="radio" name="h_rating_unit" id="h_rating_unit-c" value="d">
+                                        <label for="h_rating_unit-c">Days</label>
                                     </fieldset></div>
                                 <div style="clear:both;"></div>
 
-                                <label for="slider-s3">Satisfaction percentage:<a href="#popup5" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
+                                <label for="satisfaction">Satisfaction percentage:<a href="#popup5" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
                                                                                   title="When this percentage is reached, students will be promoted for the next level. This is important when longer timer values are defined at MOOC scenarios with less participation."></a>
                                 </label>
-                                <input type="range" name="slider-s3" id="slider-s3" value="60" min="30" max="100" data-highlight="true">
+                                <input type="range" name="satisfaction" id="satisfaction" value="60" min="30" max="100" data-highlight="true">
 
                                 <button type="submit" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-check">Submit</button>
                             </div>
+
+                            <div class="ui-input-btn ui-btn ui-btn-inline ui-corner-all">Save<input name="save" type="submit" data-enhanced="true" value="Save"></div>
+
+                            <!--fields not enetred by the user -->
+                            <input type="hidden" name="sync">
+                            <input type="hidden" name="random_selection">
+                            <input type="hidden" name="n_selected_answers">
+                            <input type="hidden" name="first_group_size">
+
+                            <input type="hidden" name="s_question_seconds">
+                            <input type="hidden" name="h_question_seconds">
+                            <input type="hidden" name="s_rating_seconds">
+                            <input type="hidden" name="h_rating_seconds">
                         </form>
                     </div>
                     <!--</div>-->
@@ -739,6 +762,107 @@ if(!isset($_REQUEST['save']))	{
                 <div style="clear: both;"></div>
 
                 <script>
+
+                    //timers in seconds
+                    var timers = [
+                        's_question',
+                        'h_question',
+                        's_rating',
+                        'h_rating'
+                    ];
+
+                    var units_in_seconds = {
+                        'm': 60,
+                        'h': 3600,
+                        'd': 86400
+                    };
+
+
+                    var defaults = <?=json_encode($defaults)?>;
+                    var sync = false;
+
+                    function timer_to_seconds(field, value) {
+                        var converted_value = {};
+                        for(var unit in units_in_seconds) {
+                            if(value > units_in_seconds[unit])
+                                continue;
+
+                            converted_value.value = value / units_in_seconds[unit];
+                            converted_value.unit = unit;
+                        }
+
+                        return converted_value;
+                    }
+
+                    function restore_timers() {
+                        for(var timer in timers) {
+                            var value = defaults[sync][timer];
+                            var converted_value = timer_to_seconds(timer, value);
+
+                            set_field(timer, converted_value.value);
+                            set_field(timer + '_unit', unit);
+                        }
+                    }
+
+                    function set_field(field, value) {
+                        if($('[name="' + field + '"][type="radio"]')) {
+                            $('[name="' + field + '"][value="' + defaults[sync][field] + '"]').prop("checked", true);
+                        } else if($('select[name="' + field + '"]') {
+                            $('[name="' + field + '"] [value="' + defaults[sync][field] + '"]').prop("selected", true);
+                        } else {
+                            $('[name="' + field + '"]').val(defaults[sync][field]);
+                        }
+
+                    }
+
+                    function flow_apply_defaults() {
+                        var fields = [
+                            'satisfaction',
+                            'n_selected_answers',
+                            'n_levels',
+                            'first_group_size',
+                            'chat',
+                            'random_selection',
+                            'multiple_pyramids'
+                        ];
+
+                        for(var field in fields) {
+                            set_field(field, defaults[sync][field]);
+                        }
+
+                        restore_timers();
+                    }
+
+                    //calculate the remaining variables before submitting
+                    $('form').submit() {
+                        $flow = $(this);
+
+                        for(var timer in timers) {
+                            var unit = $('[name="' + timer + '_unit"]').val();
+                            var timer_value = parseInt($('[name="' + timer + '"]').val(), 10);
+                            var timer_value_seconds = units_in_seconds[unit] * timer_value;
+                            $('[name="' + timer + '_seconds"]').val(timer_value_seconds);
+                        }
+
+                        //sync
+                        var learning_setting = $('[name="learning_setting"]:checked').val();
+                        var sync = (learning_setting === "on") ? 1 : 0;
+                        $('[name="sync"]').val(sync);
+
+                        //random_selection
+                        var random_selection = 0;
+                        $('[name="random_selection"]').val(random_selection);
+
+                        //n_selected_answers
+                        var n_selected_answers = 1;
+                        $('[name="n_selected_answers"]').val(n_selected_answers);
+
+                        //first_group_size
+                        var first_group_size = 1;
+                        $('[name="first_group_size"]').val(first_group_size);
+                    }
+
+
                     var e = document.querySelector('#click-circle1');
                     e.addEventListener('click', function(event){
                         var e = document.querySelector('#popup');
@@ -757,15 +881,15 @@ if(!isset($_REQUEST['save']))	{
                     //number of levels
 
                     $(document).on('pageinit', function() {
-                        $('#slider-s').on('slidestop', function(event) {
-                            var n_students = parseInt($('#slider-s').val(), 10);
+                        $('#first_group_size').on('slidestop', function(event) {
+                            var n_students = parseInt($('#first_group_size').val(), 10);
 
                             var radius = Math.pow(n_students,1/10) / Math.pow(3,1/10) * 17;
                             $('.level1 circle').attr('r', radius);
                         });
 
-                        $('#slider-s2').on('slidestop', function(event) {
-                            var pyramid_number = $('#slider-s2').val();
+                        $('#n_levels').on('slidestop', function(event) {
+                            var pyramid_number = $('#n_levels').val();
 
                             $('.pyramid-animation').hide();
                             $('#pyramid-levels-' + pyramid_number).show();

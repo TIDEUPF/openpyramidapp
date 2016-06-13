@@ -43,3 +43,8 @@
     top: -2500px;
     left: -2500px;
 }
+
+#learning_setting_fieldset .ui-controlgroup-controls {
+    width: 65%;
+    float: right;
+}
