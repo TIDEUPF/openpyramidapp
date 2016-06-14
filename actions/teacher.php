@@ -138,7 +138,7 @@ if(!isset($_REQUEST['save']))	{
         ],
         'sync' => [
             'sync' => 0,
-            's_question' => 180,
+            's_question' => 3600,
             'h_question' => 240,
             's_rating' => 120,
             'h_rating' => 180,
@@ -797,9 +797,9 @@ if(!isset($_REQUEST['save']))	{
     ];
 
     var units_in_seconds = {
-        'm': 60,
+        'd': 86400,
         'h': 3600,
-        'd': 86400
+        'm': 60
     };
 
     var sync_table = {
@@ -813,11 +813,12 @@ if(!isset($_REQUEST['save']))	{
     function timer_to_seconds(field, value) {
         var converted_value = {};
         for(var unit in units_in_seconds) {
-            if(value > units_in_seconds[unit])
+            if(value < units_in_seconds[unit])
                 continue;
 
             converted_value.value = value / units_in_seconds[unit];
             converted_value.unit = unit;
+            break;
         }
 
         return converted_value;
@@ -852,6 +853,9 @@ if(!isset($_REQUEST['save']))	{
 
         //update sliders
         $('[data-role="slider"], [data-type="range"]').slider('refresh');
+
+        //update control groups
+        $('[data-role="controlgroup"]').controlgroup('refresh')
     }
 
     //calculate the remaining variables before submitting
@@ -965,9 +969,9 @@ if(!isset($_REQUEST['save']))	{
     //util
     function set_field(field, value) {
         if($('[name="' + field + '"][type="radio"]').length) {
-            $('[name="' + field + '"][value="' + defaults[sync][field] + '"]').prop("checked", true);
+            $('[name="' + field + '"][value="' + value + '"]').prop("checked", true);
         } else if($('select[name="' + field + '"]').length) {
-            $('[name="' + field + '"] [value="' + defaults[sync][field] + '"]').prop("selected", true);
+            $('[name="' + field + '"] [value="' + value + '"]').prop("selected", true);
         } else {
             $('[name="' + field + '"]').val(value);
         }
