@@ -171,7 +171,7 @@ if(!isset($_REQUEST['save']))	{
     </div>
     <div data-role="main" class="ui-content">
         <div id="center-frame">
-            <form data-ajax="false">
+            <form data-ajax="false" method="post">
                 <div id="page-1" class="page">
                     <div class="ui-field-contain">
                         <label for="activity">Activity name:</label>
@@ -206,11 +206,11 @@ if(!isset($_REQUEST['save']))	{
                         </fieldset>
                     </div>
 
-                    <button class="create-flow-next" goto="2" type="button" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-right ui-icon-arrow-r">Next</button>
+                    <a goto="2" class="create-flow-next ui-btn ui-corner-all ui-shadow ui-btn-icon-right ui-icon-arrow-r">Next</a>
                 </div>
 
                 <?php /*second screen*/?>
-                <div id="page-2" class="page">
+                <div id="page-2" class="page" style="display: none;">
                     <div id="pyramid-levels-2" class="pyramid-animation" style="position: relative;float: left;margin-left: 15px;">
                         <svg viewBox="70 5 280 210">
                             <polygon points="210,5 350,210 70,210" style="fill:pink;stroke:purple;stroke-width:2" />
@@ -612,9 +612,9 @@ if(!isset($_REQUEST['save']))	{
                         </svg>
                     </div>
 
-                    <div id="popup" style="/*display:none; */position: relative;float: left;width:500px;height:500px;">
+                    <div id="popup" style="position: relative;float: left;width:500px;">
                         <h4>Pyramid Configurations</h4>
-                        <form id="myform">
+
                             <div class="ui-field-contain ui-mini">
                                 <label for="first_group_size">No. of students per group at rating level 1:<a href="#popupInfo" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
                                     <div data-role="popup" id="popupInfo" class="ui-content" data-theme="a" style="max-width:700px;">
@@ -662,122 +662,122 @@ if(!isset($_REQUEST['save']))	{
                                 </select>
                             </div>
 
-                            <div class="ui-input-btn ui-btn ui-btn-inline ui-corner-all">
-                                Create<input name="create" type="submit" data-enhanced="true" value="Create">
-                            </div>
-                        </form>
-
                         <!--<div class="ui-field-contain">-->
-                        <a href="#popupAdvanced" data-rel="popup" data-position-to="window" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-icon-check ui-btn-icon-left ui-btn-a" data-transition="pop">Advanced Settings</a>
+                        <a href="#popupAdvanced" data-rel="popup" data-position-to="window" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-transition="pop">Advanced Settings</a>
                         <div data-role="popup" id="popupAdvanced" data-theme="a" class="ui-corner-all">
 
-                            <form>
-                                <div style="padding:10px 20px;">
-                                    <h4>Advanced Pyramid Configurations</h4>
-                                    <h5>It is optional to change these default values.</h5>
+                            <div style="padding:10px 20px;">
+                                <h4>Advanced Pyramid Configurations</h4>
+                                <h5>It is optional to change these default values.</h5>
 
-                                    <div id="pop-background"></div>
+                                <div id="pop-background"></div>
 
-                                    <label for="s_question">Option submission timer:<a text-data="#cpopup1" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
-                                                                                    title="This timer specifies the time permitted for initial option (artifact) submission for students">More</a>
-                                        <div id="cpopup1-text" class="ui-content tooltip-popup" data-theme="a" style="display:none">
-                                            <p>If discussion is enabled, students can discussion with peers to clarify and negotiate their options during rating phases.</p>
-                                        </div>
-                                    </label>
-                                    <div style="position:relative;float:left;">
-                                        <input type="number" name="s_question" id="s_question" value="" data-clear-btn="true" data-wrapper-class="numk" />
+                                <label for="s_question">Option submission timer:<a text-data="#cpopup1" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
+                                                                                title="This timer specifies the time permitted for initial option (artifact) submission for students">More</a>
+                                    <div id="cpopup1-text" class="ui-content tooltip-popup" data-theme="a" style="display:none">
+                                        <p>If discussion is enabled, students can discussion with peers to clarify and negotiate their options during rating phases.</p>
                                     </div>
-
-                                    <div style="position:relative;float:left; margin-left:10px; margin-top:2px;">
-                                        <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
-                                            <input type="radio" name="s_question_unit" id="s_question_unit-a" value="m" checked="checked">
-                                            <label for="s_question_unit-a">Minutes</label>
-                                            <input type="radio" name="s_question_unit" id="s_question_unit-b" value="h">
-                                            <label for="s_question_unit-b">Hours</label>
-                                            <input type="radio" name="s_question_unit" id="s_question_unit-c" value="d">
-                                            <label for="s_question_unit-c">Days</label>
-                                        </fieldset></div>
-                                    <div style="clear:both;"></div>
-
-                                    <label for="h_question">Option submission hard timer:<a href="#popup2" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
-                                                                                           title="This timer specifies the maximum time permitted for initial option (artifact) submission for students. Once expired, every student will be promoted next level."></a>
-                                    </label>
-                                    <div style="position:relative;float:left;">
-                                        <input type="number" name="h_question" id="h_question" data-wrapper-class="numk" value="" data-clear-btn="true" />
-                                    </div>
-
-                                    <div style="position:relative;float:left; margin-left:10px; margin-top:2px;">
-                                        <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
-                                            <input type="radio" name="h_question_unit" id="h_question_unit-a" value="m" checked="checked">
-                                            <label for="h_question_unit-a">Minutes</label>
-                                            <input type="radio" name="h_question_unit" id="h_question_unit-b" value="h">
-                                            <label for="h_question_unit-b">Hours</label>
-                                            <input type="radio" name="h_question_unit" id="h_question_unit-c" value="d">
-                                            <label for="h_question_unit-c">Days</label>
-                                        </fieldset></div>
-                                    <div style="clear:both;"></div>
-
-                                    <label for="s_rating">Rating timer:<a href="#popup3" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
-                                                                         title="This timer specifies the time permitted for rating at each level including discussion time."></a>
-                                    </label>
-                                    <div style="position:relative;float:left;">
-                                        <input type="number" name="s_rating" id="s_rating" data-wrapper-class="numk" value="" data-clear-btn="true">
-                                    </div>
-
-                                    <div style="position:relative;float:left; margin-left:10px; margin-top:2px;">
-                                        <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
-                                            <input type="radio" name="s_rating_unit" id="s_rating_unit-a" value="m" checked="checked">
-                                            <label for="s_rating_unit-a">Minutes</label>
-                                            <input type="radio" name="s_rating_unit" id="s_rating_unit-b" value="h">
-                                            <label for="s_rating_unit-b">Hours</label>
-                                            <input type="radio" name="s_rating_unit" id="s_rating_unit-c" value="d">
-                                            <label for="s_rating_unit-c">Days</label>
-                                        </fieldset></div>
-                                    <div style="clear:both;"></div>
-
-                                    <label for="h_rating">Rating hard timer:<a href="#popup4" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
-                                                                                  title="This is the maximum time allowed for rating and discussion at each level. Once expired everyone is promoted to next level."></a>
-                                    </label>
-                                    <div style="position:relative;float:left;">
-                                        <input type="number" name="h_rating" id="h_rating" data-wrapper-class="numk" value="" data-clear-btn="true">
-                                    </div>
-
-                                    <div style="position:relative;float:left; margin-left:10px; margin-top:2px;">
-                                        <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
-                                            <input type="radio" name="h_rating_unit" id="h_rating_unit-a" value="m" checked="checked">
-                                            <label for="h_rating_unit-a">Minutes</label>
-                                            <input type="radio" name="h_rating_unit" id="h_rating_unit-b" value="h">
-                                            <label for="h_rating_unit-b">Hours</label>
-                                            <input type="radio" name="h_rating_unit" id="h_rating_unit-c" value="d">
-                                            <label for="h_rating_unit-c">Days</label>
-                                        </fieldset></div>
-                                    <div style="clear:both;"></div>
-
-                                    <label for="satisfaction">Satisfaction percentage:<a href="#popup5" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
-                                                                                      title="When this percentage is reached, students will be promoted for the next level. This is important when longer timer values are defined at MOOC scenarios with less participation."></a>
-                                    </label>
-                                    <input type="range" name="satisfaction" id="satisfaction" value="60" min="30" max="100" data-highlight="true">
-
-                                    <button type="submit" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-check">Submit</button>
+                                </label>
+                                <div style="position:relative;float:left;">
+                                    <input type="number" name="s_question" id="s_question" value="" data-clear-btn="true" data-wrapper-class="numk" />
                                 </div>
 
-                                <div class="ui-input-btn ui-btn ui-btn-inline ui-corner-all">Save<input name="save" type="submit" data-enhanced="true" value="Save"></div>
+                                <div style="position:relative;float:left; margin-left:10px; margin-top:2px;">
+                                    <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
+                                        <input type="radio" name="s_question_unit" id="s_question_unit-a" value="m" checked="checked">
+                                        <label for="s_question_unit-a">Minutes</label>
+                                        <input type="radio" name="s_question_unit" id="s_question_unit-b" value="h">
+                                        <label for="s_question_unit-b">Hours</label>
+                                        <input type="radio" name="s_question_unit" id="s_question_unit-c" value="d">
+                                        <label for="s_question_unit-c">Days</label>
+                                    </fieldset></div>
+                                <div style="clear:both;"></div>
 
-                                <!--fields not enetred by the user -->
-                                <input type="hidden" name="sync">
-                                <input type="hidden" name="random_selection">
-                                <input type="hidden" name="n_selected_answers">
+                                <label for="h_question">Option submission hard timer:<a href="#popup2" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
+                                                                                       title="This timer specifies the maximum time permitted for initial option (artifact) submission for students. Once expired, every student will be promoted next level."></a>
+                                </label>
+                                <div style="position:relative;float:left;">
+                                    <input type="number" name="h_question" id="h_question" data-wrapper-class="numk" value="" data-clear-btn="true" />
+                                </div>
 
-                                <input type="hidden" name="s_question_seconds">
-                                <input type="hidden" name="h_question_seconds">
-                                <input type="hidden" name="s_rating_seconds">
-                                <input type="hidden" name="h_rating_seconds">
-                            </form>
+                                <div style="position:relative;float:left; margin-left:10px; margin-top:2px;">
+                                    <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
+                                        <input type="radio" name="h_question_unit" id="h_question_unit-a" value="m" checked="checked">
+                                        <label for="h_question_unit-a">Minutes</label>
+                                        <input type="radio" name="h_question_unit" id="h_question_unit-b" value="h">
+                                        <label for="h_question_unit-b">Hours</label>
+                                        <input type="radio" name="h_question_unit" id="h_question_unit-c" value="d">
+                                        <label for="h_question_unit-c">Days</label>
+                                    </fieldset></div>
+                                <div style="clear:both;"></div>
+
+                                <label for="s_rating">Rating timer:<a href="#popup3" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
+                                                                     title="This timer specifies the time permitted for rating at each level including discussion time."></a>
+                                </label>
+                                <div style="position:relative;float:left;">
+                                    <input type="number" name="s_rating" id="s_rating" data-wrapper-class="numk" value="" data-clear-btn="true">
+                                </div>
+
+                                <div style="position:relative;float:left; margin-left:10px; margin-top:2px;">
+                                    <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
+                                        <input type="radio" name="s_rating_unit" id="s_rating_unit-a" value="m" checked="checked">
+                                        <label for="s_rating_unit-a">Minutes</label>
+                                        <input type="radio" name="s_rating_unit" id="s_rating_unit-b" value="h">
+                                        <label for="s_rating_unit-b">Hours</label>
+                                        <input type="radio" name="s_rating_unit" id="s_rating_unit-c" value="d">
+                                        <label for="s_rating_unit-c">Days</label>
+                                    </fieldset></div>
+                                <div style="clear:both;"></div>
+
+                                <label for="h_rating">Rating hard timer:<a href="#popup4" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
+                                                                              title="This is the maximum time allowed for rating and discussion at each level. Once expired everyone is promoted to next level."></a>
+                                </label>
+                                <div style="position:relative;float:left;">
+                                    <input type="number" name="h_rating" id="h_rating" data-wrapper-class="numk" value="" data-clear-btn="true">
+                                </div>
+
+                                <div style="position:relative;float:left; margin-left:10px; margin-top:2px;">
+                                    <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
+                                        <input type="radio" name="h_rating_unit" id="h_rating_unit-a" value="m" checked="checked">
+                                        <label for="h_rating_unit-a">Minutes</label>
+                                        <input type="radio" name="h_rating_unit" id="h_rating_unit-b" value="h">
+                                        <label for="h_rating_unit-b">Hours</label>
+                                        <input type="radio" name="h_rating_unit" id="h_rating_unit-c" value="d">
+                                        <label for="h_rating_unit-c">Days</label>
+                                    </fieldset></div>
+                                <div style="clear:both;"></div>
+
+                                <label for="satisfaction">Satisfaction percentage:<a href="#popup5" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
+                                                                                  title="When this percentage is reached, students will be promoted for the next level. This is important when longer timer values are defined at MOOC scenarios with less participation."></a>
+                                </label>
+                                <input type="range" name="satisfaction" id="satisfaction" value="60" min="30" max="100" data-highlight="true">
+
+                                <a data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-check">Submit</a>
+                            </div>
+                        </div><!--popup-->
+                        <br>
+                        <div class="ui-input-btn ui-btn ui-btn-inline ui-shadow ui-corner-all ui-icon-check ui-btn-icon-left ui-btn-a">
+                            Create<input name="create" type="submit" data-enhanced="true" value="Create">
                         </div>
-                        <!--</div>-->
+
+                        <div id="popup-clearance"></div>
+
+                        <!--fields not enetred by the user -->
+                        <input type="hidden" name="sync">
+                        <input type="hidden" name="random_selection">
+                        <input type="hidden" name="n_selected_answers">
+
+                        <input type="hidden" name="s_question_seconds">
+                        <input type="hidden" name="h_question_seconds">
+                        <input type="hidden" name="s_rating_seconds">
+                        <input type="hidden" name="h_rating_seconds">
+
+
                     </div>
 
                     <div style="clear: both;"></div>
+
+
 
                 </div>
             </form>
@@ -901,17 +901,20 @@ if(!isset($_REQUEST['save']))	{
     });
 
     //next page
-    $('.create-flow-next').click(function() {
-
+    $('.create-flow-next').click(function(event) {
+        event.stopPropagation();
+        event.preventDefault();
         var learning_setting = $('[name="learning_setting"]:checked').val();
         var goto = $(this).attr('goto');
         sync = sync_table[learning_setting];
         flow_apply_defaults();
-        $('.page').fadeOut();
-        $('#page-' + goto).fadeIn();
+        $('#page-1').fadeOut(400,'swing', function() {
+            //$('.page').hide();
+            $('#page-' + goto).fadeIn();
+        });
     });
 
-    $(document).on('pageinit', function() {
+    $(document).on('pagecreate', function() {
         //init
         flow_apply_defaults();
 
@@ -928,6 +931,8 @@ if(!isset($_REQUEST['save']))	{
             $('.pyramid-animation').hide();
             $('#pyramid-levels-' + pyramid_number).show();
         });
+
+        $('[data-role="popup"]').popup( "option", "history", false );
     });
 
     //tooltip popups
