@@ -6,6 +6,8 @@ include('dbvar.php');
 
 if(isset($_SESSION['user'])) {
     $teacher_id = $_SESSION['user'];
+
+    
 /*
     $student_count = mysqli_num_rows(mysqli_query($link, "select * from students"));
 
