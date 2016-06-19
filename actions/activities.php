@@ -84,15 +84,16 @@ select * from (
     where fid = fsr_fid and pid = fsr_pid and sid = fsr_to_whom_rated_id) 
     as answer, sum(fsr_rating) as rating 
     from flow_student_rating 
-    where fsr_fid = {$fid} and fsr_pid = {$i} and fsr_level = {$level} and fsr_group_id = {$group} and fsr_to_whom_rated_id <> '-1' and skip = 0 
+    where fsr_fid = {$fid} and fsr_pid = {$i} and fsr_level = {$level} and fsr_group_id = {$pg_group_id} and fsr_to_whom_rated_id <> '-1' and skip = 0 
     group by fsr_to_whom_rated_id
 ) as rated_answers 
-order by rating asc
+order by rating desc
 SQL;
 
+            $ranking = [];
             $rated_questions = mysqli_query($link, $rated_questions_sql);
             while($rated_questions_row = mysqli_fetch_assoc($rated_questions)) {
-                
+                $ranking[] = $rated_questions_row;
             }
 
             //there is a winning answer
@@ -109,7 +110,11 @@ SQL;
                         $answer = $data4['fs_answer'];
                     }
                 }
-                $pyramid_data[$i]['levels'][$level]['groups'][] = [$group, $answer];
+                $pyramid_data[$i]['levels'][$level]['groups'][] = [
+                    'members' => $group,
+                    'answer' => $answer,
+                    'ranking' => $ranking
+                ];
             }
         }
     }
@@ -165,9 +170,15 @@ SQL;
                                 <div class="activity-pyramid-level-group-block">
                                     <a href="#grp<?=($pkey+1)?>2<?=($gkey+1)?>" data-rel="popup" class="ui-btn ui-corner-all">Group <?=($gkey+1)?> </a>
                                     <div data-role="popup" id="grp<?=($pkey+1)?>2<?=($gkey+1)?>" data-theme="a" class="group-popup ui-corner-all">
-                                        <?=implode('<br>', explode(',', $group[0]))?>
+                                        <?=implode('<br>', explode(',', $group['members']))?>
+
+                                        <div class="ranking">
+                                        <?php $i=0; foreach($group['ranking'] as $ar):?>
+                                            <?=(($i++)+1)?> <?=htmlspecialchars($ar['answer'])?> <?=$ar['rating']?><br>
+                                        <?php endforeach;?>
+                                        </div>
                                     </div>
-                                    <?=htmlspecialchars($group[1])?>
+                                    <?=htmlspecialchars($group['answer'])?>
                                 </div>
                             <?php endforeach;?>
                         </div>

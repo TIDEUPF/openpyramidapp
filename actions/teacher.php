@@ -124,34 +124,64 @@ if(!isset($_REQUEST['save']))	{
 
     $defaults = [
         'async' => [
-            'sync' => 0,
-            's_question' => 180,
-            'h_question' => 240,
-            's_rating' => 120,
-            'h_rating' => 180,
-            'satisfaction' => 60,
-            //'expected_students' => 20,
-            'discussion' => 1,
-            'n_selected_answers' => 1,
-            'random_selection' => 1,
-            'n_levels' => 3,
-            'first_group_size' => 4,
-            'multiple_pyramids' => 1,
+            'discussion' => [
+                'sync' => 0,
+                's_question' => 24*3600,
+                'h_question' => 36*3600,
+                's_rating' => 24*3600,
+                'h_rating' => 36*3600,
+                'satisfaction' => 60,
+                'discussion' => 1,
+                'n_selected_answers' => 1,
+                'random_selection' => 1,
+                'n_levels' => 3,
+                'first_group_size' => 4,
+                'multiple_pyramids' => 1,
+                ],
+            'no_discussion' => [
+                'sync' => 0,
+                's_question' => 24*3600,
+                'h_question' => 36*3600,
+                's_rating' => 24*3600,
+                'h_rating' => 2*24*3600,
+                'satisfaction' => 60,
+                'discussion' => 0,
+                'n_selected_answers' => 1,
+                'random_selection' => 1,
+                'n_levels' => 3,
+                'first_group_size' => 4,
+                'multiple_pyramids' => 1,
+                ],
         ],
         'sync' => [
-            'sync' => 0,
-            's_question' => 3600,
-            'h_question' => 240,
-            's_rating' => 120,
-            'h_rating' => 180,
-            'satisfaction' => 60,
-            //'expected_students' => 20,
-            'discussion' => 1,
-            'n_selected_answers' => 1,
-            'random_selection' => 1,
-            'n_levels' => 3,
-            'first_group_size' => 2,
-            'multiple_pyramids' => 0,
+            'discussion' => [
+                'sync' => 1,
+                's_question' => 120,
+                'h_question' => 240,
+                's_rating' => 180,
+                'h_rating' => 300,
+                'satisfaction' => 60,
+                'discussion' => 1,
+                'n_selected_answers' => 1,
+                'random_selection' => 1,
+                'n_levels' => 3,
+                'first_group_size' => 4,
+                'multiple_pyramids' => 1,
+            ],
+            'no_discussion' => [
+                'sync' => 1,
+                's_question' => 120,
+                'h_question' => 240,
+                's_rating' => 60,
+                'h_rating' => 180,
+                'satisfaction' => 60,
+                'discussion' => 0,
+                'n_selected_answers' => 1,
+                'random_selection' => 1,
+                'n_levels' => 3,
+                'first_group_size' => 4,
+                'multiple_pyramids' => 1,
+            ],
         ],
     ];
     header('Content-Type: text/html; charset=utf-8');
@@ -189,13 +219,6 @@ if(!isset($_REQUEST['save']))	{
                     </div>
 
                     <div class="ui-field-contain">
-                        <label for="expected_students">Total number of students:<a href="#popupInfo2" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
-                            <div data-role="popup" id="popupInfo2" class="ui-content" data-theme="a" style="max-width:350px;">
-                                <p>This is the total number of expected students in the class available for the activity. This could be an estimated value (specially during a massive open online course case).</p>
-                            </div></label>
-                        <input type="number" name="expected_students" id="expected_students" placeholder="Total class size" data-clear-btn="true">
-                    </div>
-                    <div class="ui-field-contain">
                         <fieldset id="learning_setting_fieldset" data-role="controlgroup">
                             <legend>Learning setting:<a href="#popupInfo7" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
                                 <div data-role="popup" id="popupInfo7" class="ui-content" data-theme="a" style="max-width:700px;">
@@ -208,12 +231,23 @@ if(!isset($_REQUEST['save']))	{
                         </fieldset>
                     </div>
 
+                    <div class="ui-field-contain">
+                        <label for="discussion">Discussion :<a href="#popupInfo6" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
+                            <div data-role="popup" id="popupInfo6" class="ui-content" data-theme="a" style="max-width:700px;">
+                                <p>If discussion is enabled, students can discussion with peers to clarify and negotiate their options during rating phases.</p>
+                            </div></label>
+                        <select name="discussion" id="discussion" data-role="slider">
+                            <option value="0">No</option>
+                            <option value="1" selected="selected">Yes</option>
+                        </select>
+                    </div>
+
                     <a goto="2" class="create-flow-next ui-btn ui-corner-all ui-shadow ui-btn-icon-right ui-icon-arrow-r">Next</a>
                 </div>
 
                 <?php /*second screen*/?>
                 <div id="page-2" class="page" style="display: none;">
-                    <div id="pyramid-levels-2" class="pyramid-animation" style="position: relative;float: left;margin-left: 15px;">
+                    <div id="pyramid-levels-3" class="pyramid-animation" style="position: relative;float: left;margin-left: 15px;">
                         <svg viewBox="70 5 280 210">
                             <polygon points="210,5 350,210 70,210" style="fill:pink;stroke:purple;stroke-width:2" />
                             <circle cx="120" cy="175" r="12" stroke="green" stroke-width="2" fill="yellow" />
@@ -300,7 +334,92 @@ if(!isset($_REQUEST['save']))	{
                         </svg>
                     </div>
 
-                    <div id="pyramid-levels-3" class="pyramid-animation" style="position: relative;float: left;margin-left: 15px;">
+                    <div id="pyramid-levels-2" class="pyramid-animation" style="position: relative;float: left;margin-left: 15px;">
+                        <svg viewBox="70 5 280 210">
+                            <polygon points="210,5 350,210 70,210" style="fill:pink;stroke:purple;stroke-width:2" />
+                            <circle cx="120" cy="175" r="12" stroke="green" stroke-width="2" fill="yellow" />
+                            <circle cx="180" cy="175" r="12" stroke="green" stroke-width="2" fill="yellow" />
+                            <circle cx="240" cy="175" r="12" stroke="green" stroke-width="2" fill="yellow" />
+                            <circle cx="300" cy="175" r="12" stroke="green" stroke-width="2" fill="yellow" />
+                            <line x1="112" y1="150" x2="308" y2="150" style="stroke:rgb(255,0,155);stroke-width:4" />
+
+                            <text x="120" y="205" fill="red">Level 1 – Individual level</text>
+                            <text x="55" y="140" fill="red" transform="rotate(-52,50,60)">Rating level(s)</text>
+
+                            <!-- first level first 2 groups animation -->
+                            <circle cx="120" cy="175" stroke="green" stroke-width="2" fill="yellow">
+                                <animate attributeName="cx" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="120" to="150" />
+                                <animate attributeName="cy" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="175" to="160" />
+                                <animate attributeName="r" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="12" to="16" />
+                                <animate attributeName="fill" attributeType="CSS" from="yellow" to="purple" begin="0s" dur="2s" fill="freeze" />
+                                <set attributeName="visibility" attributeType="CSS" to="hidden" begin="2s" dur="5s" fill="freeze" />
+                            </circle>
+
+                            <circle cx="180" cy="175" stroke="green" stroke-width="2" fill="yellow">
+                                <animate attributeName="cx" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="180" to="150" />
+                                <animate attributeName="cy" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="175" to="160" />
+                                <animate attributeName="r" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="12" to="16" />
+                                <animate attributeName="fill" attributeType="CSS" from="yellow" to="purple" begin="0s" dur="2s" fill="freeze" />
+                                <set attributeName="visibility" attributeType="CSS" to="hidden" begin="2s" dur="5s" fill="freeze" />
+                            </circle>
+
+                            <!-- first level next 2 groups animation -->
+                            <circle cx="240" cy="180" r="12" stroke="green" stroke-width="2" fill="yellow">
+                                <animate attributeName="cx" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="240" to="270" />
+                                <animate attributeName="cy" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="180" to="160" />
+                                <animate attributeName="r" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="12" to="16" />
+                                <animate attributeName="fill" attributeType="CSS" from="yellow" to="purple" begin="0s" dur="2s" fill="freeze" />
+                                <set attributeName="visibility" attributeType="CSS" to="hidden" begin="2s" dur="5s" fill="freeze" />
+                            </circle>
+
+                            <circle cx="300" cy="180" r="16" stroke="green" stroke-width="2" fill="yellow">
+                                <animate attributeName="cx" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="300" to="270" />
+                                <animate attributeName="cy" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="180" to="160" />
+                                <animate attributeName="r" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="12" to="16" />
+                                <animate attributeName="fill" attributeType="CSS" from="yellow" to="purple" begin="0s" dur="2s" fill="freeze" />
+                                <set attributeName="visibility" attributeType="CSS" to="hidden" begin="2s" dur="5s" fill="freeze" />
+                            </circle>
+
+                            <g class="level1">
+                                <circle id="click-circle2"  r="17" stroke="black" stroke-width="2" visibility="hidden">
+                                    <set attributeName="visibility" attributeType="CSS" to="visible" begin="2s" dur="2s" fill="freeze" />
+                                    <animate attributeName="cx" attributeType="XML" begin="2s" dur="2s" fill="freeze" from="270" to="230" />
+                                    <animate attributeName="cy" attributeType="XML" begin="2s" dur="2s" fill="freeze" from="160" to="120" />
+                                    <animate attributeName="r" attributeType="XML" begin="2s" dur="2s" from="16" to="17" />
+                                    <animate attributeName="fill" attributeType="CSS" from="yellow" to="green" begin="2s" dur="4s" fill="freeze" />
+                                </circle>
+
+                                <circle id="click-circle1" r="17" stroke="black" stroke-width="2" fill="purple" visibility="hidden">
+                                    <set attributeName="visibility" attributeType="CSS" to="visible" begin="2s" dur="2s" fill="freeze" />
+                                    <animate attributeName="cx" attributeType="XML" begin="2s" dur="2s" fill="freeze" from="150" to="180" />
+                                    <animate attributeName="cy" attributeType="XML" begin="2s" dur="2s" fill="freeze" from="160" to="120" />
+                                    <animate attributeName="r" attributeType="XML" begin="2s" dur="2s" from="16" to="17" />
+                                    <animate attributeName="fill" attributeType="CSS" begin="2s" dur="2s" fill="freeze" />
+                                </circle>
+                            </g>
+
+
+                            <line x1="149" y1="95" x2="271" y2="95" style="stroke:rgb(255,0,155);stroke-width:4" />
+
+                            <circle stroke="blue" stroke-width="2" visibility="hidden">
+                                <set attributeName="visibility" attributeType="CSS" to="visible" begin="4.5s" dur="2s" fill="freeze" />
+                                <animate attributeName="cx" attributeType="XML" begin="4.5s" dur="3s" fill="freeze" from="180" to="210" />
+                                <animate attributeName="cy" attributeType="XML" begin="4.5s" dur="3s" fill="freeze" from="120" to="62" />
+                                <animate attributeName="r" attributeType="XML" begin="4.5s" dur="3s" fill="freeze" from="17" to="23" />
+                                <animate attributeName="fill" attributeType="CSS" from="purple" to="red" begin="4.5s" dur="2s" fill="freeze" />
+                            </circle>
+
+                            <circle stroke="blue" stroke-width="2" visibility="hidden">
+                                <set attributeName="visibility" attributeType="CSS" to="visible" begin="4.5s" dur="2s" fill="freeze" />
+                                <animate attributeName="cx" attributeType="XML" begin="4.5s" dur="3s" fill="freeze" from="230" to="210" />
+                                <animate attributeName="cy" attributeType="XML" begin="4.5s" dur="3s" fill="freeze" from="120" to="62" />
+                                <animate attributeName="r" attributeType="XML" begin="4.5s" dur="3s" fill="freeze" from="17" to="23" />
+                                <animate attributeName="fill" attributeType="CSS" from="green" to="red" begin="4.5s" dur="2s" fill="freeze" />
+                            </circle>
+                        </svg>
+                    </div>
+
+                    <div id="pyramid-levels-4" class="pyramid-animation" style="position: relative;float: left;margin-left: 15px;">
                         <svg viewBox="40 5 340 257">
                             <polygon points="210,5 380,261 40,261" style="fill:pink;stroke:purple;stroke-width:2" />
                             <line x1="112" y1="150" x2="308" y2="150" style="stroke:rgb(255,0,155);stroke-width:4" />
@@ -431,7 +550,7 @@ if(!isset($_REQUEST['save']))	{
                         </svg>
                     </div>
 
-                    <div id="pyramid-levels-4" class="pyramid-animation" style="position: relative;float: left;margin-left: 15px;">
+                    <div id="pyramid-levels-5" class="pyramid-animation" style="position: relative;float: left;margin-left: 15px;">
                         <svg viewBox="0 5 420 307">
                             <polygon points="210,5 420,311 0,311" style="fill:pink;stroke:purple;stroke-width:2" />
                             <line x1="112" y1="150" x2="308" y2="150" style="stroke:rgb(255,0,155);stroke-width:4" />
@@ -617,7 +736,15 @@ if(!isset($_REQUEST['save']))	{
                     <div id="popup" style="position: relative;float: left;width:500px;">
                         <h4>Pyramid Configurations</h4>
 
-                            <div class="ui-field-contain ui-mini">
+                        <div class="ui-field-contain">
+                            <label for="expected_students">Total number of students:<a href="#popupInfo2" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
+                                <div data-role="popup" id="popupInfo2" class="ui-content" data-theme="a" style="max-width:350px;">
+                                    <p>This is the total number of expected students in the class available for the activity. This could be an estimated value (specially during a massive open online course case).</p>
+                                </div></label>
+                            <input type="number" name="expected_students" id="expected_students" placeholder="Total class size" data-clear-btn="true">
+                        </div>
+
+                        <div class="ui-field-contain ui-mini">
                                 <label for="first_group_size">No. of students per group at rating level 1:<a href="#popupInfo" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
                                     <div data-role="popup" id="popupInfo" class="ui-content" data-theme="a" style="max-width:700px;">
                                         <p>This specifies the initial group size at level 2 (first rating level) after option submission level. This size will be doubled when groups propagate to upper levels.</p>
@@ -634,15 +761,21 @@ if(!isset($_REQUEST['save']))	{
                                 <input type="range" name="n_levels" id="n_levels" value="3" min="2" max="4" data-highlight="true">
                             </div>
 
-                            <div class="ui-field-contain">
+                            <div id="multiple_pyramids_block" class="ui-field-contain">
                                 <label for="multiple_pyramids">Allow multiple pyramids:<a href="#popupInfo4" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
                                     <div data-role="popup" id="popupInfo4" class="ui-content" data-theme="a" style="max-width:700px;">
                                         <p>If your class is relatively large class, it would be better to enable this feature, so several pyramids will be created and students will be automatically allocated.</p>
-                                    </div></label>
+                                    </div>
+                                </label>
                                 <select name="multiple_pyramids" id="multiple_pyramids" data-role="slider">
                                     <option value="0">No</option>
                                     <option value="1" selected="selected">Yes</option>
                                 </select>
+                                <label for="n_levels">No. of pyramids created:<a href="#popupInfo52" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
+                                    <div data-role="popup" id="popupInfo52" class="ui-content" data-theme="a" style="max-width:700px;">
+                                        <p>This fields show the number of pyramids the app will create based on the total number of students and students per pyramid.</p>
+                                    </div></label>
+                                <input type="number" name="n_pyramids" id="n_pyramids" value="" data-highlight="true" readonly>
                             </div>
 
                             <div class="ui-field-contain">
@@ -650,18 +783,15 @@ if(!isset($_REQUEST['save']))	{
                                     <div data-role="popup" id="popupInfo3" class="ui-content" data-theme="a" style="max-width:700px;">
                                         <p>Number of students allowed to be grouped into a single pyramid. Based on the total number of students and this value, several pyramids may require and it will be automatically suggested by the system.</p>
                                     </div></label>
-                                <input type="number" name="minInfo" id="minInfo" value="12" data-clear-btn="true">
+                                <input type="number" name="min_students_per_pyramid" id="min_students_per_pyramid" value="12" data-clear-btn="true">
                             </div>
 
                             <div class="ui-field-contain">
-                                <label for="discussion">Discussion :<a href="#popupInfo6" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
-                                    <div data-role="popup" id="popupInfo6" class="ui-content" data-theme="a" style="max-width:700px;">
-                                        <p>If discussion is enabled, students can discussion with peers to clarify and negotiate their options during rating phases.</p>
+                                <label for="n_final_outcomes">Final outcomes :<a href="#popupInfoOutcomes" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
+                                    <div data-role="popup" id="popupInfoOutcomes" class="ui-content" data-theme="a" style="max-width:700px;">
+                                        <p>Total number of outcomes taking in account all pyramids.</p>
                                     </div></label>
-                                <select name="discussion" id="discussion" data-role="slider">
-                                    <option value="0">No</option>
-                                    <option value="1" selected="selected">Yes</option>
-                                </select>
+                                <input type="number" name="n_final_outcomes" id="n_final_outcomes" value="" readonly>
                             </div>
 
                         <!--<div class="ui-field-contain">-->
@@ -809,13 +939,23 @@ if(!isset($_REQUEST['save']))	{
         'distance': 'async'
     };
 
+    var discussion_table = {
+        0: 'no_discussion',
+        1: 'discussion'
+    };
+
     var defaults = <?=json_encode($defaults)?>;
     var sync = 'sync';
+    var discussion = 'discussion';
+    var current_default = defaults[sync][discussion];
 
-    function timer_to_seconds(field, value) {
+    function timer_to_seconds(value) {
         var converted_value = {};
         for(var unit in units_in_seconds) {
             if(value < units_in_seconds[unit])
+                continue;
+
+            if(value % units_in_seconds[unit] && unit != 'm')
                 continue;
 
             converted_value.value = value / units_in_seconds[unit];
@@ -828,8 +968,8 @@ if(!isset($_REQUEST['save']))	{
 
     function restore_timers() {
         for(var timer in timers) {
-            var value = defaults[sync][timers[timer]];
-            var converted_value = timer_to_seconds(timers[timer], value);
+            var value = current_default[timers[timer]];
+            var converted_value = timer_to_seconds(value);
 
             set_field(timers[timer], converted_value.value);
             set_field(timers[timer] + '_unit', converted_value.unit);
@@ -848,7 +988,7 @@ if(!isset($_REQUEST['save']))	{
         ];
 
         for(var field in fields) {
-            set_field(fields[field], defaults[sync][fields[field]]);
+            set_field(fields[field], current_default[fields[field]]);
         }
 
         restore_timers();
@@ -859,6 +999,57 @@ if(!isset($_REQUEST['save']))	{
         //update control groups
         $('[data-role="controlgroup"]').controlgroup('refresh')
     }
+
+    function set_n_final_outcomes() {
+        var expected_students_setting = parseInt($('[name="expected_students"]').val(), 10);
+        var first_group_size_setting = parseInt($('[name="first_group_size"]').val(), 10);
+        var n_levels_setting = parseInt($('[name="n_levels"]').val(), 10);
+        var final_outcomes = 0;
+
+        if(!(expected_students_setting > 0 && first_group_size_setting > 0 && n_levels_setting > 0))
+            return false;
+
+        for(var i=2; i<=n_levels_setting; i++) {
+            if(i==2) {
+                final_outcomes = Math.floor(expected_students_setting / first_group_size_setting);
+            } else {
+                final_outcomes = Math.floor(expected_students_setting / 2);
+            }
+        }
+
+        $('[name="n_final_outcomes"]').val(final_outcomes);
+    }
+
+
+    function max_possible_levels_update(event) {
+        var expected_students_setting = parseInt($('[name="expected_students"]').val(), 10);
+        var first_group_size_setting = parseInt($('[name="first_group_size"]').val(), 10);
+        var max_possible_levels = 4;
+
+        if(!(expected_students_setting > 0 && first_group_size_setting > 0))
+            return false;
+
+        var n_groups = expected_students_setting / first_group_size_setting;
+        if(n_groups < 2)
+            return false;
+        else if (n_groups < 4)
+            max_possible_levels = 3;
+        else if (n_groups < 8)
+            max_possible_levels = 4;
+        else
+            max_possible_levels = 5;
+
+        $('[name="n_levels"]').attr("max", max_possible_levels);
+        $('[name="n_levels"]').slider("refresh");
+    }
+
+    function update_students_levels() {
+        max_possible_levels_update();
+        set_n_final_outcomes();
+    }
+
+    $('[name="expected_students"]').on('change', update_students_levels);
+    $('[name="first_group_size"]').on('change', update_students_levels);
 
     //calculate the remaining variables before submitting
     $('form').submit(function() {
@@ -877,11 +1068,11 @@ if(!isset($_REQUEST['save']))	{
         $('[name="sync"]').val(sync);
 
         //random_selection
-        var random_selection = defaults[sync]['random_selection'];
+        var random_selection = current_default['random_selection'];
         $('[name="random_selection"]').val(random_selection);
 
         //n_selected_answers
-        var n_selected_answers = defaults[sync]['n_selected_answers'];
+        var n_selected_answers = current_default['n_selected_answers'];
         $('[name="n_selected_answers"]').val(n_selected_answers);
 
     });
@@ -890,9 +1081,7 @@ if(!isset($_REQUEST['save']))	{
     var e = document.querySelector('#click-circle1');
     e.addEventListener('click', function(event){
         var e = document.querySelector('#popup');
-        //e.setAttribute('style', 'display:block;');
         e.style.display = 'block';
-        // alert('OK');
     });
 
     var e = document.querySelector('#click-circle2');
@@ -907,8 +1096,11 @@ if(!isset($_REQUEST['save']))	{
         event.stopPropagation();
         event.preventDefault();
         var learning_setting = $('[name="learning_setting"]:checked').val();
+        var discussion_setting = $('[name="discussion"]').val();
         var goto = $(this).attr('goto');
         sync = sync_table[learning_setting];
+        discussion = discussion_table[discussion_setting];
+        current_default = defaults[sync][discussion];
         flow_apply_defaults();
         $('#page-1').fadeOut(400,'swing', function() {
             //$('.page').hide();

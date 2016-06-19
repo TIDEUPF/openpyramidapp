@@ -60,3 +60,18 @@
     height: 150px;
     width: 1px;
 }
+
+input[readonly] {
+    background-color: lightgrey;
+}
+
+#multiple_pyramids_block  > div.ui-slider,
+#multiple_pyramids_block  > div.ui-input-text {
+    width: 5.8em !important;
+    margin-right: 15px !important;
+}
+
+#multiple_pyramids_block  > label {
+    margin-top: 0;
+    width: 25% !important;
+}
