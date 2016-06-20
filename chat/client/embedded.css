@@ -8,11 +8,33 @@ ul.pages {
 
 .chat.page {
     /*display: none;*/
+    position: relative;
 }
 
 .chat.page > .ui-input-text {
     margin: 1.5em 1em !important;
     /*display: none;*/
+}
+
+#chat-script-buttons-block {
+    position: absolute;
+    bottom: 25px;
+    right: 7px;
+    width: 200px;
+}
+
+#chat-script-buttons-block button {
+    font-weight: normal;
+    margin-top: 5px !important;
+    display: block;
+    background-color: #ebf9ff;
+    padding: 4px;
+    width: 190px !important;
+    white-space: normal;
+}
+
+#chat-script-buttons-block button:hover {
+    background-color: #d0fbfd;
 }
 
 .login.page {
@@ -43,6 +65,7 @@ ul.pages {
 
 .chatArea {
     /*height: 100%;*/
+    width: 415px;
     padding-bottom: 10px;
 }
 

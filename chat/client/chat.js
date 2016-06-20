@@ -74,13 +74,20 @@ $(function() {
     }
 
     // Sends a chat message
-    function sendMessage () {
+    function sendMessage() {
         var message = $inputMessage.val();
-        // Prevent markup from being injected into the message
         message = cleanInput(message);
-        // if there is a non-empty message and a socket connection
+
         if (message && connected) {
             $inputMessage.val('');
+            sendCustomMessage(message);
+        }
+    }
+
+    // Sends a chat message
+    function sendCustomMessage(message) {
+        // if there is a non-empty message and a socket connection
+        if (message && connected) {
             addChatMessage({
                 username: username,
                 message: message,
@@ -260,6 +267,12 @@ $(function() {
     $('#chat-write').on('click', function(e){
         e.preventDefault();
         sendMessage();
+    });
+
+    $('.chat-script-button').on('click', function(e){
+        e.preventDefault();
+        var message = $(this).val();
+        sendCustomMessage(message);
     });
 
     // Focus input when clicking anywhere on login page

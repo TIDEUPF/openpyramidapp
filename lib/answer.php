@@ -195,6 +195,25 @@ function request_rate($params) {
     if(strlen($peers) > $peer_toolbar_strlen)
         $peers = substr($peers, 0, $peer_toolbar_strlen) . '...';
 
+    $scripted_buttons = [
+        'i_like' => [
+            "value" => "I like...",
+            "label" => "I like...",
+        ],
+        'i_propose' => [
+            "value" => "I propose that...",
+            "label" => "I propose that...",
+        ],
+        'i_can_t_agree' => [
+            "value" => "I can't agree because...",
+            "label" => "I can't agree because...",
+        ],
+        'aspects_not_clear' => [
+            "value" => "These aspects are not clear to me yet...",
+            "label" => "These aspects are not clear to me yet...",
+        ],
+    ];
+
     $vars = array(
         'username'              => $sname . ' + ' . (count(\Group\get_status_bar_peers())-1),
         'username'              => $sname . ' + ' . $peers,
@@ -203,6 +222,7 @@ function request_rate($params) {
         'answer_text_array'     => $answer_text_array,
         'answer_rate_submit'    => T('Rate'),
         'rating_labels'         => array(T('Not rated'), T('Awful'), T('Bad'), T('Good'), T('Great'), T('Awesome')),
+        'scripted_buttons'      => $scripted_buttons,
         'hidden_input_array'    => $hidden_input_array,
     );
 

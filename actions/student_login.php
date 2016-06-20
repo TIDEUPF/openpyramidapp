@@ -9,13 +9,13 @@ if(empty($_SESSION['user_id'])) {
 
 if(!isset($_SESSION['student'])) {
     if(isset($_POST['loginBtn'])) {
-        if(empty($_POST['usr']) or empty($_REQUEST['code'])) {
+        if(empty($_POST['usr'])/* or empty($_REQUEST['code'])*/) {
 
             $error = "UserId can not be empty!";
         }
         //the following is the correct student login that cross-refer with the student excel table
         else{
-            $code = mysqli_real_escape_string($link,trim($_REQUEST['code']));
+            //$code = mysqli_real_escape_string($link,trim($_REQUEST['code']));
             $uname = mysqli_real_escape_string($link, stripslashes(strtoupper(trim(strip_tags($_POST['usr'])))));
 
             //$res1 = mysqli_query($link, "select * from studentexcel where se_sid = '$uname'");

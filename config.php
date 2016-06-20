@@ -6,7 +6,8 @@ function init_cfg() {
     global $default_teacher_question, $force_email, $answer_required_percentage, $peer_toolbar_strlen, $answer_submit_required_percentage, $timeout, $answer_skip_timeout ,$answer_timeout, $pyramid_minsize, $device;
     $detect = new Mobile_Detect;
 
-    $force_email = true;
+    //$force_email = true;
+    $force_email = false;
     $default_teacher_question = 'Please submit the question';
 
     $device = 'tablet';
