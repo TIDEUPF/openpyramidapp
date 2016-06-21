@@ -219,14 +219,14 @@ if(!isset($_REQUEST['save']))	{
                     </div>
 
                     <div class="ui-field-contain">
-                        <fieldset id="learning_setting_fieldset" data-role="controlgroup">
+                        <fieldset id="learning_setting_fieldset" data-role="controlgroup" data-disabled="true">
                             <legend>Learning setting:<a href="#popupInfo7" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
                                 <div data-role="popup" id="popupInfo7" class="ui-content" data-theme="a" style="max-width:700px;">
                                     <p>This field specifies whether the classroom setting is a face-to-face or virtual learning context.</p>
                                 </div></legend>
-                            <input type="radio" name="learning_setting" id="learning_setting-a" value="classroom" checked>
+                            <input type="radio" name="learning_setting" id="learning_setting-a" value="classroom" checked data-disabled="true">
                             <label for="learning_setting-a">Classroom</label>
-                            <input type="radio" name="learning_setting" id="learning_setting-b" value="distance">
+                            <input type="radio" name="learning_setting" id="learning_setting-b" value="distance" data-disabled="true">
                             <label for="learning_setting-b">Distance</label>
                         </fieldset>
                     </div>
@@ -236,7 +236,7 @@ if(!isset($_REQUEST['save']))	{
                             <div data-role="popup" id="popupInfo6" class="ui-content" data-theme="a" style="max-width:700px;">
                                 <p>If discussion is enabled, students can discussion with peers to clarify and negotiate their options during rating phases.</p>
                             </div></label>
-                        <select name="discussion" id="discussion" data-role="slider">
+                        <select name="discussion" id="discussion" data-role="slider" data-disabled="true">
                             <option value="0">No</option>
                             <option value="1" selected="selected">Yes</option>
                         </select>
@@ -1048,8 +1048,12 @@ if(!isset($_REQUEST['save']))	{
         set_n_final_outcomes();
     }
 
-    $('[name="expected_students"]').on('change', update_students_levels);
-    $('[name="first_group_size"]').on('change', update_students_levels);
+    function update_first_group_size() {
+        var expected_students_setting = get_field_integer("expected_students");
+        var max_possible_size = Math.min(10, Math.floor(expected_students_setting/2))
+        $('[name="first_group_size"]').attr("max", max_possible_size);
+        $('[name="first_group_size"]').slider("refresh");
+    }
 
     //calculate the remaining variables before submitting
     $('form').submit(function() {
@@ -1127,6 +1131,10 @@ if(!isset($_REQUEST['save']))	{
         });
 
         $('[data-role="popup"]').popup( "option", "history", false );
+
+        $('[name="expected_students"]').on('change', update_students_levels);
+        $('[name="expected_students"]').on('change', update_first_group_size);
+        $('[name="first_group_size"]').on('slidestop', update_students_levels);
     });
 
     //tooltip popups
@@ -1176,6 +1184,14 @@ if(!isset($_REQUEST['save']))	{
         }
     }
 
+    function get_field_integer(field) {
+        var field_text = $('[name="' + field + '"]').val();
+        var field_setting = parseInt(field_text, 10);
+        if(!(field_setting > 0 || field_setting < 0 || field_text === "0"))
+            throw field_text + " is not an integer";
+
+        return field_setting;
+    }
 
 </script>
 </body>

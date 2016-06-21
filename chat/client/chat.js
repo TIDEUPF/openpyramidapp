@@ -269,10 +269,17 @@ $(function() {
         sendMessage();
     });
 
-    $('.chat-script-button').on('click', function(e){
+    $('.chat-script-switch').on('click', function(e) {
+        e.preventDefault();
+        $(this).fadeOut(300, function() {
+            $('.chat-script-button').show();
+        });
+    });
+
+    $('.chat-script-button').on('click', function(e) {
         e.preventDefault();
         var message = $(this).val();
-        sendCustomMessage(message);
+        $currentInput.val(message);
     });
 
     // Focus input when clicking anywhere on login page

@@ -26,11 +26,16 @@ ul.pages {
 #chat-script-buttons-block button {
     font-weight: normal;
     margin-top: 5px !important;
-    display: block;
+    display: none;
     background-color: #ebf9ff;
     padding: 4px;
     width: 190px !important;
     white-space: normal;
+}
+
+#chat-script-buttons-block button.chat-script-switch {
+    display: block;
+    height: 44.38px;
 }
 
 #chat-script-buttons-block button:hover {

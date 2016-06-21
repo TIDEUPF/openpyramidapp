@@ -337,6 +337,7 @@
                 <a id="chat-write" href="#" class="ui-icon-edit"></a>
                 <input type="text" class="inputMessage" placeholder="<?=TS("Discuss with with your peers!")?>"/>
                 <div id="chat-script-buttons-block">
+                    <button type="button" class="chat-script-switch" name="script-button-switch" value="<?=TS("script-button-switch");?>"><?=TS("Show hints");?></button>
                     <?php foreach($scripted_buttons as $k => $button_item): ?>
                     <button type="button" class="chat-script-button" name="script-button-<?=$k?>" value="<?=TS($button_item['value']);?>"><?=TS($button_item['label']);?></button>
                     <?php endforeach; ?>

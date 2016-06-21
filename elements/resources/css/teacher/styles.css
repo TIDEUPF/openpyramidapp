@@ -65,6 +65,10 @@ input[readonly] {
     background-color: lightgrey;
 }
 
+select[name="discussion"]~[role="application"] {
+    width: 100px !important;
+}
+
 #multiple_pyramids_block  > div.ui-slider,
 #multiple_pyramids_block  > div.ui-input-text {
     width: 5.8em !important;
