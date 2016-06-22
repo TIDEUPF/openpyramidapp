@@ -949,7 +949,16 @@ if(!isset($_REQUEST['save']))	{
     var discussion = 'discussion';
     var current_default = defaults[sync][discussion];
 
-    function timer_to_seconds(value) {
+    function time_field_to_seconds(field) {
+        var unit_time = get_field_integer(field);
+        var unit = $(field + '_unit').val();
+        var unit_seconds = units_in_seconds[unit];
+        var seconds_time = unit_time * unit_seconds;
+
+        return seconds_time;
+    }
+
+    function time_seconds_to_units(value) {
         var converted_value = {};
         for(var unit in units_in_seconds) {
             if(value < units_in_seconds[unit])
@@ -969,7 +978,7 @@ if(!isset($_REQUEST['save']))	{
     function restore_timers() {
         for(var timer in timers) {
             var value = current_default[timers[timer]];
-            var converted_value = timer_to_seconds(value);
+            var converted_value = time_seconds_to_units(value);
 
             set_field(timers[timer], converted_value.value);
             set_field(timers[timer] + '_unit', converted_value.unit);
@@ -1001,23 +1010,14 @@ if(!isset($_REQUEST['save']))	{
     }
 
     function set_n_final_outcomes() {
-        var expected_students_setting = parseInt($('[name="expected_students"]').val(), 10);
-        var first_group_size_setting = parseInt($('[name="first_group_size"]').val(), 10);
-        var n_levels_setting = parseInt($('[name="n_levels"]').val(), 10);
-        var final_outcomes = 0;
+        var n_groups = get_n_groups();
+        var n_levels_rating = get_field_integer("n_levels") - 1;
+        var n_pyramids = get_number_of_pyramids();
 
-        if(!(expected_students_setting > 0 && first_group_size_setting > 0 && n_levels_setting > 0))
-            return false;
+        var n_outcomes_per_pyramid = Math.floor(n_groups / Math.pow(2, n_levels_rating - 1));
+        var n_final_outcomes = n_outcomes_per_pyramid * n_pyramids;
 
-        for(var i=2; i<=n_levels_setting; i++) {
-            if(i==2) {
-                final_outcomes = Math.floor(expected_students_setting / first_group_size_setting);
-            } else {
-                final_outcomes = Math.floor(expected_students_setting / 2);
-            }
-        }
-
-        $('[name="n_final_outcomes"]').val(final_outcomes);
+        $('[name="n_final_outcomes"]').val(n_final_outcomes);
     }
 
     function n_pyramids_update(event) {
@@ -1026,18 +1026,24 @@ if(!isset($_REQUEST['save']))	{
         $('[name="n_pyramids"]').val(number_of_pyramids);
     }
 
-    function max_possible_levels_update(event) {
+    function get_n_groups() {
         var expected_students_setting = get_field_integer("expected_students");
         var number_of_pyramids = get_number_of_pyramids();
         var expected_students_per_pyramid = Math.floor(expected_students_setting / number_of_pyramids);
-
         var first_group_size_setting = get_field_integer("first_group_size");
-        var max_possible_levels = 4;
 
         if(!(expected_students_per_pyramid > 0 && first_group_size_setting > 0))
             return false;
 
-        var n_groups = expected_students_per_pyramid / first_group_size_setting;
+        var n_groups = Math.floor(expected_students_per_pyramid / first_group_size_setting);
+
+        return n_groups;
+    }
+
+    function max_possible_levels_update(event) {
+        var max_possible_levels = 4;
+        var n_groups = get_n_groups();
+
         if(n_groups < 2)
             return false;
         else if (n_groups < 4)
