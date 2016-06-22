@@ -1020,16 +1020,24 @@ if(!isset($_REQUEST['save']))	{
         $('[name="n_final_outcomes"]').val(final_outcomes);
     }
 
+    function n_pyramids_update(event) {
+        var number_of_pyramids = get_number_of_pyramids();
+
+        $('[name="n_pyramids"]').val(number_of_pyramids);
+    }
 
     function max_possible_levels_update(event) {
-        var expected_students_setting = parseInt($('[name="expected_students"]').val(), 10);
-        var first_group_size_setting = parseInt($('[name="first_group_size"]').val(), 10);
+        var expected_students_setting = get_field_integer("expected_students");
+        var number_of_pyramids = get_number_of_pyramids();
+        var expected_students_per_pyramid = Math.floor(expected_students_setting / number_of_pyramids);
+
+        var first_group_size_setting = get_field_integer("first_group_size");
         var max_possible_levels = 4;
 
-        if(!(expected_students_setting > 0 && first_group_size_setting > 0))
+        if(!(expected_students_per_pyramid > 0 && first_group_size_setting > 0))
             return false;
 
-        var n_groups = expected_students_setting / first_group_size_setting;
+        var n_groups = expected_students_per_pyramid / first_group_size_setting;
         if(n_groups < 2)
             return false;
         else if (n_groups < 4)
@@ -1043,14 +1051,38 @@ if(!isset($_REQUEST['save']))	{
         $('[name="n_levels"]').slider("refresh");
     }
 
-    function update_students_levels() {
+    function update_fields() {
+        n_pyramids_update();
+        update_first_group_size();
         max_possible_levels_update();
         set_n_final_outcomes();
     }
 
+    function get_number_of_pyramids() {
+        var number_of_pyramids = 1;
+
+        try {
+            var multiple_pyramids_setting = get_field_integer("multiple_pyramids");
+            var min_students_per_pyramid_setting = get_field_integer("min_students_per_pyramid");
+            var expected_students_setting = get_field_integer("expected_students");
+
+            if (multiple_pyramids_setting) {
+                number_of_pyramids = Math.floor(expected_students_setting / min_students_per_pyramid_setting);
+            }
+        } catch (e) {
+
+        }
+
+        return Math.max(1, number_of_pyramids);
+    }
+
     function update_first_group_size() {
         var expected_students_setting = get_field_integer("expected_students");
-        var max_possible_size = Math.min(10, Math.floor(expected_students_setting/2))
+        var number_of_pyramids = get_number_of_pyramids();
+        var expected_students_per_pyramid = Math.floor(expected_students_setting / number_of_pyramids);
+
+        var max_possible_size = Math.min(10, Math.floor(expected_students_per_pyramid/2));
+
         $('[name="first_group_size"]').attr("max", max_possible_size);
         $('[name="first_group_size"]').slider("refresh");
     }
@@ -1132,9 +1164,11 @@ if(!isset($_REQUEST['save']))	{
 
         $('[data-role="popup"]').popup( "option", "history", false );
 
-        $('[name="expected_students"]').on('change', update_students_levels);
-        $('[name="expected_students"]').on('change', update_first_group_size);
-        $('[name="first_group_size"]').on('slidestop', update_students_levels);
+        $('[name="expected_students"]').on('change', update_fields);
+        $('[name="first_group_size"]').on('slidestop', update_fields);
+        $('[name="n_levels"]').on('slidestop', update_fields);
+        $('[name="multiple_pyramids"]').on('change', update_fields);
+        $('[name="min_students_per_pyramid"]').on('change', update_fields);
     });
 
     //tooltip popups
