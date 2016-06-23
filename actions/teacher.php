@@ -4,36 +4,107 @@ include('dbvar.php');
 
 //include('inc_pyramid_func.php');
 
+
+    $flow_fields = [
+        'activiy',
+        'task_description',
+        'learning_setting',
+        'discussion',
+        'expected_students',
+        'first_group_size',
+        'n_levels',
+        'multiple_pyramids',
+        'min_students_per_pyramid',
+        'satisfaction',
+        's_question',
+        'h_question',
+        's_rating',
+        'h_rating',
+        'sync',
+        'random_selection',
+        'n_selected_answers'
+    ];
+
 if(isset($_SESSION['user'])) {
     $teacher_id = $_SESSION['user'];
 
-    
-/*
-    $student_count = mysqli_num_rows(mysqli_query($link, "select * from students"));
+    if(isset($_POST['create_flow'])) {
+        $flow_data_decoded = json_decode($_POST['flow_data']);
 
-    if(isset($_POST['cflow'])) {
-		$fname = mysqli_real_escape_string($link, stripslashes(trim(strip_tags($_POST['activity']))));
-		$fdes =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['description']))));
-		//$fcname =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['fcname']))));
-		$fcname =  '';
-		$qs =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['task_description']))));
-		$tst = (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['s_question']))));
-		$rt = (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['s_rating']))));
-		$htst = (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['h_question']))));
-		$hrt = (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['h_rating']))));
-		//$htst = $tst + 120;
-		//$hrt = $rt + 120;
-		$expe = mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['expected_students']))));
-		$sync = (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['sync']))));
-		$multi_py = (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['multiple_pyramids']))));
-		$ch = (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['discussion']))));
-		$n_selected_answers = (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['n_selected_answers']))));
-		$random_selection = (int)mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['random_selection']))));
-		$fesname = '';//$fesname =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['fesname']))));
-		$fl = (int) $_POST['n_levels'];
-		$fsg = (int) $_POST['first_group_size'];
-        $str_id = \Util\rand_str(5);
+        //validate
+        $error = false;
+        $flow_object = new stdClass();
+        foreach ($flow_fields as $field) {
+            if (!isset($flow_data->$field)) {
+                $error = true;
+                break;
+            }
 
+            if (empty($flow_data->$field) and $flow_data->$field !== "0" and $flow_data->$field !== 0) {
+                $error = true;
+                break;
+            }
+
+            $flow_object->$field = is_integer($flow_data->$field) ? ((int)$flow_data->$field) : $flow_data->$field;
+        }
+
+        //validate n_levels
+        $n_levels_fields = [
+            'min_students_per_pyramid',
+            'first_group_size',
+        ];
+
+        foreach ($flow_fields as $field) {
+            if (!(is_integer($flow_object->$field) and $flow_object->$field > 0)) {
+                $error = true;
+            }
+        }
+
+        //number of levels
+        $n_levels = floor(log(floor($flow_object->min_students_per_pyramid / $flow_object->first_group_size), 2)) + 2;
+        if ($flow_object->n_levels > $n_levels)
+            $flow_object->n_levels = $n_levels;
+
+        //sanitize sql
+        $flow_data = [];
+        foreach ($flow_fields as $field) {
+            $flow_data[$field] = mysqli_real_escape_string($link, $flow_object->$field);
+        }
+
+        $flow_object_json = json_encode($flow_object);
+        $flow_object_json_sql = mysqli_real_escape_string($link, $flow_object_json);
+
+        $datestamp = time();
+        $sql = <<<SQL
+insert into flow values (
+null, 
+'{$teacher_id}', 
+'{$flow_data['activity']}',
+'{$flow_data['task_description']}', 
+'', /*legacy*/
+'', /*legacy*/
+'{$flow_data['first_group_size']}', 
+'{$flow_data['n_levels']}$fl', 
+'{$flow_data['min_students_per_pyramid']}', /*$pyramid_size*/
+'{$flow_data['min_students_per_pyramid']}', /*$min_pyramid*/ 
+'{$flow_data['expected_students']}', 
+'1', /*legacy*/
+'{$datestamp}', 
+'{$flow_data['s_question']}', 
+'{$flow_data['s_rating']}', 
+'{$flow_data['h_question']}', 
+'{$flow_data['h_rating']}', 
+'{$flow_data['task_description']}',
+'{$flow_data['discussion']}',
+'{$flow_data['sync']}',
+'{$flow_data['multiple_pyramids']}',
+'{$flow_data['n_selected_answers']}',
+'{$flow_data['random_selection']}',
+'{$flow_data['$flow_object_json_sql']}'
+)
+SQL;
+
+        /*
         //80 per cent of expected students
         if($multi_py) {
             $multi_pyramid_max_size = 20;
@@ -52,22 +123,17 @@ if(isset($_SESSION['user'])) {
             else
                 $min_pyramid = $expe;
         }
-
-        //number of levels
-        $max_levels = floor(log(floor($min_pyramid/$fsg), 2)) + 1;
-        if($fl > $max_levels)
-            $fl = $max_levels;
-
-        $rps = 1;//TODO: legacy var
-
-        if($fl < 1 || $rps < 1 || $fsg < 1)	{
-            $error = 'Levels and Responses cannot be 0';
-        } else {
-            $datestamp = time();
-            mysqli_query($link,"insert into flow values (null, '$teacher_id', '$fname', '$fdes', '$fcname', '$fesname', '$fsg', '$fl', '$pyramid_size', '$min_pyramid', '$expe', '$rps', '$datestamp', $tst, $rt, $htst, $hrt, '{$qs}', '{$ch}', '{$sync}', '{$multi_py}', '{$n_selected_answers}', '{$random_selection}')");
-        }
-    }
 */
+    }
+} elseif(isset($_REQUEST['edit'])) {
+    $edit_id = (int)$_REQUEST['edit'];
+
+    $flow_query = mysqli_query($link, "select * from flow where fid = '{$edit_id}' and teacher_id = '$teacher_id'");
+    while($flow_query_row = mysqli_fetch_assoc($link, $flow_query)) {
+        $json_edit = $flow_query_row['json'];
+        $edit = true;
+    }
+
 } else {
     header("location: login.php");
     exit(0);
@@ -78,17 +144,6 @@ $tq = $default_teacher_question;
 
 //TODO: restore form http://stackoverflow.com/questions/19109884/serializing-and-deserializing-a-form-with-its-current-state
 
-    /*
-    $default_data = [
-        "checkbox-v-2b" => false,
-        "checkbox-v-2a" => false,
-        "textinput-s" => 30,
-        "textarea-1" => "",
-        "textinput-s" => "",
-    ];
-*/
-
-    //$data = $default_data;
 
 /*
     //sanitize data
@@ -121,6 +176,7 @@ if(!isset($_REQUEST['save']))	{
 
     header("location: activity.php?activity=" . $activity_id);
 }
+
 
     $defaults = [
         'async' => [
@@ -184,6 +240,12 @@ if(!isset($_REQUEST['save']))	{
             ],
         ],
     ];
+
+    $data_disabled = "";
+    if(isset($edit)) {
+        $data_disabled = "data-disabled=\"true\"";
+    }
+
     header('Content-Type: text/html; charset=utf-8');
 ?><!DOCTYPE html>
 <html lang="en">
@@ -219,14 +281,14 @@ if(!isset($_REQUEST['save']))	{
                     </div>
 
                     <div class="ui-field-contain">
-                        <fieldset id="learning_setting_fieldset" data-role="controlgroup" data-disabled="true">
+                        <fieldset id="learning_setting_fieldset" data-role="controlgroup">
                             <legend>Learning setting:<a href="#popupInfo7" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
                                 <div data-role="popup" id="popupInfo7" class="ui-content" data-theme="a" style="max-width:700px;">
                                     <p>This field specifies whether the classroom setting is a face-to-face or virtual learning context.</p>
                                 </div></legend>
-                            <input type="radio" name="learning_setting" id="learning_setting-a" value="classroom" checked data-disabled="true">
+                            <input type="radio" name="learning_setting" id="learning_setting-a" value="classroom" checked <?=$data_disabled?>>
                             <label for="learning_setting-a">Classroom</label>
-                            <input type="radio" name="learning_setting" id="learning_setting-b" value="distance" data-disabled="true">
+                            <input type="radio" name="learning_setting" id="learning_setting-b" value="distance" <?=$data_disabled?>>
                             <label for="learning_setting-b">Distance</label>
                         </fieldset>
                     </div>
@@ -236,7 +298,7 @@ if(!isset($_REQUEST['save']))	{
                             <div data-role="popup" id="popupInfo6" class="ui-content" data-theme="a" style="max-width:700px;">
                                 <p>If discussion is enabled, students can discussion with peers to clarify and negotiate their options during rating phases.</p>
                             </div></label>
-                        <select name="discussion" id="discussion" data-role="slider" data-disabled="true">
+                        <select name="discussion" id="discussion" data-role="slider" <?=$data_disabled?>>
                             <option value="0">No</option>
                             <option value="1" selected="selected">Yes</option>
                         </select>
@@ -811,7 +873,7 @@ if(!isset($_REQUEST['save']))	{
                                     </div>
                                 </label>
                                 <div style="position:relative;float:left;">
-                                    <input type="number" name="s_question" id="s_question" value="" data-clear-btn="true" data-wrapper-class="numk" />
+                                    <input type="number" name="s_question_unit_value" id="s_question_unit_value" value="" data-clear-btn="true" data-wrapper-class="numk" />
                                 </div>
 
                                 <div style="position:relative;float:left; margin-left:10px; margin-top:2px;">
@@ -829,7 +891,7 @@ if(!isset($_REQUEST['save']))	{
                                                                                        title="This timer specifies the maximum time permitted for initial option (artifact) submission for students. Once expired, every student will be promoted next level."></a>
                                 </label>
                                 <div style="position:relative;float:left;">
-                                    <input type="number" name="h_question" id="h_question" data-wrapper-class="numk" value="" data-clear-btn="true" />
+                                    <input type="number" name="h_question_value" id="h_question_value" data-wrapper-class="numk" value="" data-clear-btn="true" />
                                 </div>
 
                                 <div style="position:relative;float:left; margin-left:10px; margin-top:2px;">
@@ -847,7 +909,7 @@ if(!isset($_REQUEST['save']))	{
                                                                      title="This timer specifies the time permitted for rating at each level including discussion time."></a>
                                 </label>
                                 <div style="position:relative;float:left;">
-                                    <input type="number" name="s_rating" id="s_rating" data-wrapper-class="numk" value="" data-clear-btn="true">
+                                    <input type="number" name="s_rating_unit_value" id="s_rating_unit_value" data-wrapper-class="numk" value="" data-clear-btn="true">
                                 </div>
 
                                 <div style="position:relative;float:left; margin-left:10px; margin-top:2px;">
@@ -865,7 +927,7 @@ if(!isset($_REQUEST['save']))	{
                                                                               title="This is the maximum time allowed for rating and discussion at each level. Once expired everyone is promoted to next level."></a>
                                 </label>
                                 <div style="position:relative;float:left;">
-                                    <input type="number" name="h_rating" id="h_rating" data-wrapper-class="numk" value="" data-clear-btn="true">
+                                    <input type="number" name="h_rating_unit_value" id="h_rating_unit_value" data-wrapper-class="numk" value="" data-clear-btn="true">
                                 </div>
 
                                 <div style="position:relative;float:left; margin-left:10px; margin-top:2px;">
@@ -889,7 +951,7 @@ if(!isset($_REQUEST['save']))	{
                         </div><!--popup-->
                         <br>
                         <div class="ui-input-btn ui-btn ui-btn-inline ui-shadow ui-corner-all ui-icon-check ui-btn-icon-left ui-btn-a">
-                            Create<input name="create" type="submit" data-enhanced="true" value="Create">
+                            Create<input name="create_flow" type="submit" data-enhanced="true" value="Create">
                         </div>
 
                         <div id="popup-clearance"></div>
@@ -899,17 +961,15 @@ if(!isset($_REQUEST['save']))	{
                         <input type="hidden" name="random_selection">
                         <input type="hidden" name="n_selected_answers">
 
-                        <input type="hidden" name="s_question_seconds">
-                        <input type="hidden" name="h_question_seconds">
-                        <input type="hidden" name="s_rating_seconds">
-                        <input type="hidden" name="h_rating_seconds">
+                        <input type="hidden" name="s_question">
+                        <input type="hidden" name="h_question">
+                        <input type="hidden" name="s_rating">
+                        <input type="hidden" name="h_rating">
 
-
+                        <input type="hidden" name="flow_data">
                     </div>
 
                     <div style="clear: both;"></div>
-
-
 
                 </div>
             </form>
@@ -927,6 +987,18 @@ if(!isset($_REQUEST['save']))	{
         's_rating',
         'h_rating'
     ];
+
+    var new_flow_fields = [
+        'satisfaction',
+        'n_selected_answers',
+        'n_levels',
+        'first_group_size',
+        'discussion',
+        'random_selection',
+        'multiple_pyramids'
+    ];
+
+    var edit_flow_fields = <?=json_encode($flow_fields)?>;
 
     var units_in_seconds = {
         'd': 86400,
@@ -947,10 +1019,21 @@ if(!isset($_REQUEST['save']))	{
     var defaults = <?=json_encode($defaults)?>;
     var sync = 'sync';
     var discussion = 'discussion';
+
+    var edit = <?=(isset($edit)) ? 'true' : 'false'?>;
+    <?php if(isset($edit)):?>
+    var flow_edit_data = <?=json_encode($json_edit)?>;
+    var current_default = flow_edit_data;
+    var default_flow_fields = edit_flow_fields;
+    var sync = default_flow_fields.sync;
+    var discussion = default_flow_fields.discussion;
+    <?php else:?>
     var current_default = defaults[sync][discussion];
+    var default_flow_fields = new_flow_fields;
+    <?php endif;?>
 
     function time_field_to_seconds(field) {
-        var unit_time = get_field_integer(field);
+        var unit_time = get_field_integer(field + '_unit_value');
         var unit = $(field + '_unit').val();
         var unit_seconds = units_in_seconds[unit];
         var seconds_time = unit_time * unit_seconds;
@@ -977,36 +1060,26 @@ if(!isset($_REQUEST['save']))	{
 
     function restore_timers() {
         for(var timer in timers) {
-            var value = current_default[timers[timer]];
+            var value = current_default[timers[timer] + '_seconds'];
             var converted_value = time_seconds_to_units(value);
 
-            set_field(timers[timer], converted_value.value);
+            set_field(timers[timer] + '_unit_value', converted_value.value);
             set_field(timers[timer] + '_unit', converted_value.unit);
         }
     }
 
-    function flow_apply_defaults() {
-        var fields = [
-            'satisfaction',
-            'n_selected_answers',
-            'n_levels',
-            'first_group_size',
-            'discussion',
-            'random_selection',
-            'multiple_pyramids'
-        ];
+    function timers_to_seconds() {
+        for(var timer in timers) {
+            var converted_value = time_field_to_seconds(timers[timer]);
 
-        for(var field in fields) {
-            set_field(fields[field], current_default[fields[field]]);
+            set_field(timers[timer], converted_value.value);
         }
+    }
 
-        restore_timers();
-
-        //update sliders
-        $('[data-role="slider"], [data-type="range"]').slider('refresh');
-
-        //update control groups
-        $('[data-role="controlgroup"]').controlgroup('refresh')
+    function flow_load_fields() {
+        for(var field in default_flow_fields) {
+            set_field(default_flow_fields[field], current_default[default_flow_fields[field]]);
+        }
     }
 
     function set_n_final_outcomes() {
@@ -1095,14 +1168,7 @@ if(!isset($_REQUEST['save']))	{
 
     //calculate the remaining variables before submitting
     $('form').submit(function() {
-        $flow = $(this);
-
-        for(var timer in timers) {
-            var unit = $('[name="' + timers[timer] + '_unit"]').val();
-            var timer_value = parseInt($('[name="' + timers[timer] + '"]').val(), 10);
-            var timer_value_seconds = units_in_seconds[unit] * timer_value;
-            $('[name="' + timers[timer] + '_seconds"]').val(timer_value_seconds);
-        }
+        timers_to_seconds();
 
         //sync
         var learning_setting = $('[name="learning_setting"]:checked').val();
@@ -1117,6 +1183,13 @@ if(!isset($_REQUEST['save']))	{
         var n_selected_answers = current_default['n_selected_answers'];
         $('[name="n_selected_answers"]').val(n_selected_answers);
 
+        var flow_data = {};
+        for(var i in flow_fields) {
+            var field = flow_fields[i];
+            flow_data[field] = $('[name="' + field +'"]').val();
+        }
+
+        $('[name="flow_data"]').val(flow_data);
     });
 
 
@@ -1137,22 +1210,36 @@ if(!isset($_REQUEST['save']))	{
     $('.create-flow-next').click(function(event) {
         event.stopPropagation();
         event.preventDefault();
-        var learning_setting = $('[name="learning_setting"]:checked').val();
-        var discussion_setting = $('[name="discussion"]').val();
+
         var goto = $(this).attr('goto');
-        sync = sync_table[learning_setting];
-        discussion = discussion_table[discussion_setting];
-        current_default = defaults[sync][discussion];
-        flow_apply_defaults();
+
+        if(!edit) {
+            var learning_setting = $('[name="learning_setting"]:checked').val();
+            var discussion_setting = $('[name="discussion"]').val();
+            sync = sync_table[learning_setting];
+            discussion = discussion_table[discussion_setting];
+            current_default = defaults[sync][discussion];
+            flow_load_fields();
+        }
+
         $('#page-1').fadeOut(400,'swing', function() {
-            //$('.page').hide();
             $('#page-' + goto).fadeIn();
         });
     });
 
-    $(document).on('pagecreate', function() {
+    $(document).on('beforepagecreate', function() {
         //init
-        flow_apply_defaults();
+        flow_load_fields();
+    });
+
+    $(document).on('pagecreate', function() {
+        restore_timers();
+
+        //update sliders
+        $('[data-role="slider"], [data-type="range"]').slider('refresh');
+
+        //update control groups
+        $('[data-role="controlgroup"]').controlgroup('refresh')
 
         $('#first_group_size').on('slidestop', function(event) {
             var n_students = parseInt($('#first_group_size').val(), 10);
