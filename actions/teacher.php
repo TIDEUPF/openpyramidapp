@@ -891,7 +891,7 @@ if(!isset($_REQUEST['save']))	{
                                                                                        title="This timer specifies the maximum time permitted for initial option (artifact) submission for students. Once expired, every student will be promoted next level."></a>
                                 </label>
                                 <div style="position:relative;float:left;">
-                                    <input type="number" name="h_question_value" id="h_question_value" data-wrapper-class="numk" value="" data-clear-btn="true" />
+                                    <input type="number" name="h_question_unit_value" id="h_question_unit_value" data-wrapper-class="numk" value="" data-clear-btn="true" />
                                 </div>
 
                                 <div style="position:relative;float:left; margin-left:10px; margin-top:2px;">
@@ -995,7 +995,11 @@ if(!isset($_REQUEST['save']))	{
         'first_group_size',
         'discussion',
         'random_selection',
-        'multiple_pyramids'
+        'multiple_pyramids',
+        's_question',
+        'h_question',
+        's_rating',
+        'h_rating'
     ];
 
     var edit_flow_fields = <?=json_encode($flow_fields)?>;
@@ -1034,7 +1038,7 @@ if(!isset($_REQUEST['save']))	{
 
     function time_field_to_seconds(field) {
         var unit_time = get_field_integer(field + '_unit_value');
-        var unit = $(field + '_unit').val();
+        var unit = $('[name="' + field + '_unit' + '"]').val();
         var unit_seconds = units_in_seconds[unit];
         var seconds_time = unit_time * unit_seconds;
 
@@ -1060,7 +1064,7 @@ if(!isset($_REQUEST['save']))	{
 
     function restore_timers() {
         for(var timer in timers) {
-            var value = current_default[timers[timer] + '_seconds'];
+            var value = current_default[timers[timer]];
             var converted_value = time_seconds_to_units(value);
 
             set_field(timers[timer] + '_unit_value', converted_value.value);
@@ -1072,7 +1076,7 @@ if(!isset($_REQUEST['save']))	{
         for(var timer in timers) {
             var converted_value = time_field_to_seconds(timers[timer]);
 
-            set_field(timers[timer], converted_value.value);
+            set_field(timers[timer], converted_value);
         }
     }
 
@@ -1184,12 +1188,12 @@ if(!isset($_REQUEST['save']))	{
         $('[name="n_selected_answers"]').val(n_selected_answers);
 
         var flow_data = {};
-        for(var i in flow_fields) {
-            var field = flow_fields[i];
+        for(var i in edit_flow_fields) {
+            var field = edit_flow_fields[i];
             flow_data[field] = $('[name="' + field +'"]').val();
         }
 
-        $('[name="flow_data"]').val(flow_data);
+        $('[name="flow_data"]').val(JSON.stringify(flow_data));
     });
 
 
@@ -1227,7 +1231,7 @@ if(!isset($_REQUEST['save']))	{
         });
     });
 
-    $(document).on('beforepagecreate', function() {
+    $(document).on('pagebeforecreate', function() {
         //init
         flow_load_fields();
     });
