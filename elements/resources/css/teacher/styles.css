@@ -79,3 +79,161 @@ select[name="discussion"]~[role="application"] {
     margin-top: 0;
     width: 25% !important;
 }
+
+
+/*activities pages*/
+#activity-select-block {
+    width: 900px;
+    margin: 0 auto 0 auto;
+    padding: 20px;
+}
+
+#activity-select-block label {
+    width: 200px;
+}
+
+#activity-winning-answers-block-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 20px;
+}
+
+.activity-winning-answers-block-pyramid-list {
+    list-style-type: none;
+}
+
+.activity-winning-answers-block-pyramid-block {
+    margin: 20px;
+    padding-bottom: 5px;
+    background-color: #f3f3f3;
+    border-radius: 10px;
+}
+
+.activity-winning-answers-block-pyramid-number {
+    padding: 10px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    background-color: #dedede;
+    font-weight: bold;
+}
+
+.activity-pyramid-group-block-number {
+    text-align: center;
+    font-size: 150%;
+    padding: 5px;
+}
+
+.activity-pyramid-level-group-block {
+    width: 300px;
+    display: inline-block;
+    vertical-align: text-top;
+    margin: 10px 40px;
+}
+
+.activity-pyramid-group-block-list {
+    text-align: center;
+    text-justify: distribute;
+}
+
+.ranking ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.ranking ul li {
+    display:block;
+    height: 20px;
+    padding: 0;
+}
+
+.popup-members-title {
+    font-size: 150%;
+    text-align: center;
+    margin-top: 12px;
+}
+
+.popup-ranking-title {
+    font-size: 150%;
+    text-align: center;
+}
+
+.ranking {
+    margin-top: 25px;
+}
+
+.ranking ul li .ranking-score {
+    margin-right: 10px;
+    float: right;
+    display:block;
+}
+
+.ranking ul li .ranking-text {
+    width: 450px;
+    margin-left: 10px;
+    float: left;
+    display: block;
+
+}
+
+.ranking ul li .ranking-position {
+    width: 20px;
+    margin-left: 10px;
+    float: left;
+    display: block;
+}
+
+.popup-members-list {
+    list-style-type: none;
+}
+
+.summary-field-block {
+    padding: 10px;
+    margin: 10px auto 10px auto;
+    width: 900px;
+}
+
+.summary-field-title {
+    font-weight: bold;
+    font-size: 120%;
+}
+
+.summary-field-data {
+    margin: 5px 0 0 10px;
+}
+
+#pyramid-summary-levels-block {
+    margin: 10px auto 10px auto;
+    width: 600px;
+    height: 230px;
+}
+
+#activity-info-main {
+    width: 900px;
+    margin: 0 auto 0 auto;
+}
+
+#select-activity-button {
+    width: 300px;
+}
+
+.activity-pyramid-group-block-number {
+    text-align: center;
+    font-size: 150%;
+}
+
+.activity-pyramid-level-block {
+    background-color: #f3f3f3;
+    margin: 20px;
+    border-radius: 10px;
+}
+
+.activity-pyramid-group-block-number {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    background-color: #dedede;
+}
+
+.activity-pyramid-block {
+    width: 900px;
+    margin: 0 auto 0 auto;
+}

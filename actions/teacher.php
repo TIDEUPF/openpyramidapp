@@ -6,7 +6,7 @@ include('dbvar.php');
 
 
     $flow_fields = [
-        'activiy',
+        'activity',
         'task_description',
         'learning_setting',
         'discussion',
@@ -28,24 +28,53 @@ include('dbvar.php');
 if(isset($_SESSION['user'])) {
     $teacher_id = $_SESSION['user'];
 
-    if(isset($_POST['create_flow'])) {
+    if($_REQUEST['edit']) {
+        $fid = (int)$_REQUEST['edit'];
+
+        $sql = <<<SQL
+select * from `flow` 
+where 
+`fid` = {$fid} AND 
+`teacher_id` = '{$teacher_id}'
+SQL;
+
+        $flow_result = mysqli_query($link, $sql);
+        if(!(mysqli_affected_rows($link) > 0)) {
+            $error = true;
+        }
+
+        $row = mysqli_fetch_assoc($flow_result);
+
+        $flow_object = json_decode($row['json']);
+
+        //check fields
+        foreach ($flow_fields as $field) {
+            if (!isset($flow_object->$field)) {
+                $error = true;
+                break;
+            }
+        }
+
+        $edit = true;
+    } elseif(isset($_POST['create_flow'])) {
+        $action = $_POST['create_flow'];
         $flow_data_decoded = json_decode($_POST['flow_data']);
 
         //validate
         $error = false;
         $flow_object = new stdClass();
         foreach ($flow_fields as $field) {
-            if (!isset($flow_data->$field)) {
+            if (!isset($flow_data_decoded->$field)) {
                 $error = true;
                 break;
             }
 
-            if (empty($flow_data->$field) and $flow_data->$field !== "0" and $flow_data->$field !== 0) {
+            if (empty($flow_data_decoded->$field) and $flow_data_decoded->$field !== "0" and $flow_data_decoded->$field !== 0) {
                 $error = true;
                 break;
             }
 
-            $flow_object->$field = is_integer($flow_data->$field) ? ((int)$flow_data->$field) : $flow_data->$field;
+            $flow_object->$field = is_numeric($flow_data_decoded->$field) ? ((int)$flow_data_decoded->$field) : $flow_data_decoded->$field;
         }
 
         //validate n_levels
@@ -54,7 +83,7 @@ if(isset($_SESSION['user'])) {
             'first_group_size',
         ];
 
-        foreach ($flow_fields as $field) {
+        foreach ($n_levels_fields as $field) {
             if (!(is_integer($flow_object->$field) and $flow_object->$field > 0)) {
                 $error = true;
             }
@@ -75,16 +104,18 @@ if(isset($_SESSION['user'])) {
         $flow_object_json_sql = mysqli_real_escape_string($link, $flow_object_json);
 
         $datestamp = time();
-        $sql = <<<SQL
+
+        if($action == "create") {
+            $sql = <<<SQL
 insert into flow values (
 null, 
 '{$teacher_id}', 
 '{$flow_data['activity']}',
-'{$flow_data['task_description']}', 
+'', /*legacy*/
 '', /*legacy*/
 '', /*legacy*/
 '{$flow_data['first_group_size']}', 
-'{$flow_data['n_levels']}$fl', 
+'{$flow_data['n_levels']}', 
 '{$flow_data['min_students_per_pyramid']}', /*$pyramid_size*/
 '{$flow_data['min_students_per_pyramid']}', /*$min_pyramid*/ 
 '{$flow_data['expected_students']}', 
@@ -100,10 +131,49 @@ null,
 '{$flow_data['multiple_pyramids']}',
 '{$flow_data['n_selected_answers']}',
 '{$flow_data['random_selection']}',
-'{$flow_data['$flow_object_json_sql']}'
+'{$flow_object_json_sql}'
 )
 SQL;
 
+            $insert_result = mysqli_query($link, $sql);
+
+            if (!mysqli_insert_id($link))
+                $error = true;
+        } else {
+            $fid = (int)$_REQUEST['fid'];
+
+            $sql = <<<SQL
+update flow set
+fname = '{$flow_data['activity']}',
+nostupergrp = '{$flow_data['first_group_size']}', 
+levels = '{$flow_data['n_levels']}', 
+pyramid_size = '{$flow_data['min_students_per_pyramid']}', /*$pyramid_size*/
+pyramid_minsize = '{$flow_data['min_students_per_pyramid']}', /*$min_pyramid*/ 
+expected_students = '{$flow_data['expected_students']}', 
+`timestamp` = '{$datestamp}', 
+question_timeout = '{$flow_data['s_question']}', 
+rating_timeout = '{$flow_data['s_rating']}', 
+hardtimer_question = '{$flow_data['h_question']}', 
+hardtimer_rating = '{$flow_data['h_rating']}', 
+question = '{$flow_data['task_description']}',
+ch = '{$flow_data['discussion']}',
+sync = '{$flow_data['sync']}',
+multi_py = '{$flow_data['multiple_pyramids']}',
+n_selected_answers = '{$flow_data['n_selected_answers']}',
+random_selection = '{$flow_data['random_selection']}',
+`json`= '{$flow_object_json_sql}'
+WHERE
+fid = '{$fid}' AND 
+teacher_id = '{$teacher_id}'
+SQL;
+
+            $update_result = mysqli_query($link, $sql);
+
+            if (!(mysqli_affected_rows($link) > 0))
+                $error = true;
+
+            $edit = true;
+        }
         /*
         //80 per cent of expected students
         if($multi_py) {
@@ -125,15 +195,6 @@ SQL;
         }
 */
     }
-} elseif(isset($_REQUEST['edit'])) {
-    $edit_id = (int)$_REQUEST['edit'];
-
-    $flow_query = mysqli_query($link, "select * from flow where fid = '{$edit_id}' and teacher_id = '$teacher_id'");
-    while($flow_query_row = mysqli_fetch_assoc($link, $flow_query)) {
-        $json_edit = $flow_query_row['json'];
-        $edit = true;
-    }
-
 } else {
     header("location: login.php");
     exit(0);
@@ -176,7 +237,6 @@ if(!isset($_REQUEST['save']))	{
 
     header("location: activity.php?activity=" . $activity_id);
 }
-
 
     $defaults = [
         'async' => [
@@ -265,7 +325,7 @@ if(!isset($_REQUEST['save']))	{
     </div>
     <div data-role="main" class="ui-content">
         <div id="center-frame">
-            <form data-ajax="false" method="post">
+            <form data-ajax="false" method="post" action="teacher.php">
                 <div id="page-1" class="page">
                     <div class="ui-field-contain">
                         <label for="activity">Activity name:</label>
@@ -399,16 +459,18 @@ if(!isset($_REQUEST['save']))	{
                     <div id="pyramid-levels-2" class="pyramid-animation" style="position: relative;float: left;margin-left: 15px;">
                         <svg viewBox="70 5 280 210">
                             <polygon points="210,5 350,210 70,210" style="fill:pink;stroke:purple;stroke-width:2" />
-                            <circle cx="120" cy="175" r="12" stroke="green" stroke-width="2" fill="yellow" />
-                            <circle cx="180" cy="175" r="12" stroke="green" stroke-width="2" fill="yellow" />
-                            <circle cx="240" cy="175" r="12" stroke="green" stroke-width="2" fill="yellow" />
-                            <circle cx="300" cy="175" r="12" stroke="green" stroke-width="2" fill="yellow" />
-                            <line x1="112" y1="150" x2="308" y2="150" style="stroke:rgb(255,0,155);stroke-width:4" />
+                            <circle cx="140" cy="165" r="15" stroke="green" stroke-width="2" fill="yellow" />
+                            <circle cx="188" cy="165" r="15" stroke="green" stroke-width="2" fill="yellow" />
+                            <circle cx="237" cy="165" r="15" stroke="green" stroke-width="2" fill="yellow" />
+                            <circle cx="285" cy="165" r="15" stroke="green" stroke-width="2" fill="yellow" />
+
+                            <line x1="130" y1="125" x2="290" y2="125" style="stroke:rgb(255,0,155);stroke-width:4" />
 
                             <text x="120" y="205" fill="red">Level 1 – Individual level</text>
                             <text x="55" y="140" fill="red" transform="rotate(-52,50,60)">Rating level(s)</text>
 
                             <!-- first level first 2 groups animation -->
+                            <!--
                             <circle cx="120" cy="175" stroke="green" stroke-width="2" fill="yellow">
                                 <animate attributeName="cx" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="120" to="150" />
                                 <animate attributeName="cy" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="175" to="160" />
@@ -424,8 +486,11 @@ if(!isset($_REQUEST['save']))	{
                                 <animate attributeName="fill" attributeType="CSS" from="yellow" to="purple" begin="0s" dur="2s" fill="freeze" />
                                 <set attributeName="visibility" attributeType="CSS" to="hidden" begin="2s" dur="5s" fill="freeze" />
                             </circle>
+                -->
+                            <!--circle cx="170" cy="120" r="17" stroke="green" stroke-width="2" fill="yellow"-->
 
                             <!-- first level next 2 groups animation -->
+                            <!--
                             <circle cx="240" cy="180" r="12" stroke="green" stroke-width="2" fill="yellow">
                                 <animate attributeName="cx" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="240" to="270" />
                                 <animate attributeName="cy" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="180" to="160" />
@@ -441,42 +506,22 @@ if(!isset($_REQUEST['save']))	{
                                 <animate attributeName="fill" attributeType="CSS" from="yellow" to="purple" begin="0s" dur="2s" fill="freeze" />
                                 <set attributeName="visibility" attributeType="CSS" to="hidden" begin="2s" dur="5s" fill="freeze" />
                             </circle>
-
-                            <g class="level1">
-                                <circle id="click-circle2"  r="17" stroke="black" stroke-width="2" visibility="hidden">
-                                    <set attributeName="visibility" attributeType="CSS" to="visible" begin="2s" dur="2s" fill="freeze" />
-                                    <animate attributeName="cx" attributeType="XML" begin="2s" dur="2s" fill="freeze" from="270" to="230" />
-                                    <animate attributeName="cy" attributeType="XML" begin="2s" dur="2s" fill="freeze" from="160" to="120" />
-                                    <animate attributeName="r" attributeType="XML" begin="2s" dur="2s" from="16" to="17" />
-                                    <animate attributeName="fill" attributeType="CSS" from="yellow" to="green" begin="2s" dur="4s" fill="freeze" />
-                                </circle>
-
-                                <circle id="click-circle1" r="17" stroke="black" stroke-width="2" fill="purple" visibility="hidden">
-                                    <set attributeName="visibility" attributeType="CSS" to="visible" begin="2s" dur="2s" fill="freeze" />
-                                    <animate attributeName="cx" attributeType="XML" begin="2s" dur="2s" fill="freeze" from="150" to="180" />
-                                    <animate attributeName="cy" attributeType="XML" begin="2s" dur="2s" fill="freeze" from="160" to="120" />
-                                    <animate attributeName="r" attributeType="XML" begin="2s" dur="2s" from="16" to="17" />
-                                    <animate attributeName="fill" attributeType="CSS" begin="2s" dur="2s" fill="freeze" />
-                                </circle>
-                            </g>
-
-
-                            <line x1="149" y1="95" x2="271" y2="95" style="stroke:rgb(255,0,155);stroke-width:4" />
+                            -->
 
                             <circle stroke="blue" stroke-width="2" visibility="hidden">
-                                <set attributeName="visibility" attributeType="CSS" to="visible" begin="4.5s" dur="2s" fill="freeze" />
-                                <animate attributeName="cx" attributeType="XML" begin="4.5s" dur="3s" fill="freeze" from="180" to="210" />
-                                <animate attributeName="cy" attributeType="XML" begin="4.5s" dur="3s" fill="freeze" from="120" to="62" />
-                                <animate attributeName="r" attributeType="XML" begin="4.5s" dur="3s" fill="freeze" from="17" to="23" />
-                                <animate attributeName="fill" attributeType="CSS" from="purple" to="red" begin="4.5s" dur="2s" fill="freeze" />
+                                <set attributeName="visibility" attributeType="CSS" to="visible" begin="0.2s" dur="2s" fill="freeze" />
+                                <animate attributeName="cx" attributeType="XML" begin="0.2s" dur="2s" fill="freeze" from="180" to="210" />
+                                <animate attributeName="cy" attributeType="XML" begin="0.2s" dur="2s" fill="freeze" from="120" to="85" />
+                                <animate attributeName="r" attributeType="XML" begin="0.2s" dur="2s" fill="freeze" from="17" to="23" />
+                                <animate attributeName="fill" attributeType="CSS" from="yellow" to="red" begin="0.2s" dur="2s" fill="freeze" />
                             </circle>
 
                             <circle stroke="blue" stroke-width="2" visibility="hidden">
-                                <set attributeName="visibility" attributeType="CSS" to="visible" begin="4.5s" dur="2s" fill="freeze" />
-                                <animate attributeName="cx" attributeType="XML" begin="4.5s" dur="3s" fill="freeze" from="230" to="210" />
-                                <animate attributeName="cy" attributeType="XML" begin="4.5s" dur="3s" fill="freeze" from="120" to="62" />
-                                <animate attributeName="r" attributeType="XML" begin="4.5s" dur="3s" fill="freeze" from="17" to="23" />
-                                <animate attributeName="fill" attributeType="CSS" from="green" to="red" begin="4.5s" dur="2s" fill="freeze" />
+                                <set attributeName="visibility" attributeType="CSS" to="visible" begin="0.2s" dur="2s" fill="freeze" />
+                                <animate attributeName="cx" attributeType="XML" begin="0.2s" dur="2s" fill="freeze" from="230" to="210" />
+                                <animate attributeName="cy" attributeType="XML" begin="0.2s" dur="2s" fill="freeze" from="120" to="85" />
+                                <animate attributeName="r" attributeType="XML" begin="0.2s" dur="2s" fill="freeze" from="17" to="23" />
+                                <animate attributeName="fill" attributeType="CSS" from="yellow" to="red" begin="0.2s" dur="2s" fill="freeze" />
                             </circle>
                         </svg>
                     </div>
@@ -951,7 +996,7 @@ if(!isset($_REQUEST['save']))	{
                         </div><!--popup-->
                         <br>
                         <div class="ui-input-btn ui-btn ui-btn-inline ui-shadow ui-corner-all ui-icon-check ui-btn-icon-left ui-btn-a">
-                            Create<input name="create_flow" type="submit" data-enhanced="true" value="Create">
+                            <?=(($edit) ? 'Update' : 'Create')?><input name="create_flow" type="submit" data-enhanced="true" value="<?=(($edit) ? 'update' : 'create')?>">
                         </div>
 
                         <div id="popup-clearance"></div>
@@ -967,6 +1012,9 @@ if(!isset($_REQUEST['save']))	{
                         <input type="hidden" name="h_rating">
 
                         <input type="hidden" name="flow_data">
+                        <?php if($edit):?>
+                         <input type="hidden" name="fid" value="<?=$fid?>">
+                        <?php endif;?>
                     </div>
 
                     <div style="clear: both;"></div>
@@ -1026,7 +1074,7 @@ if(!isset($_REQUEST['save']))	{
 
     var edit = <?=(isset($edit)) ? 'true' : 'false'?>;
     <?php if(isset($edit)):?>
-    var flow_edit_data = <?=json_encode($json_edit)?>;
+    var flow_edit_data = <?=json_encode($flow_object)?>;
     var current_default = flow_edit_data;
     var default_flow_fields = edit_flow_fields;
     var sync = default_flow_fields.sync;
@@ -1038,7 +1086,7 @@ if(!isset($_REQUEST['save']))	{
 
     function time_field_to_seconds(field) {
         var unit_time = get_field_integer(field + '_unit_value');
-        var unit = $('[name="' + field + '_unit' + '"]').val();
+        var unit = $('[name="' + field + '_unit' + '"]:checked').val();
         var unit_seconds = units_in_seconds[unit];
         var seconds_time = unit_time * unit_seconds;
 
@@ -1224,6 +1272,8 @@ if(!isset($_REQUEST['save']))	{
             discussion = discussion_table[discussion_setting];
             current_default = defaults[sync][discussion];
             flow_load_fields();
+        } else {
+            update_fields();
         }
 
         $('#page-1').fadeOut(400,'swing', function() {

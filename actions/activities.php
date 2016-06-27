@@ -132,6 +132,7 @@ SQL;
     <link rel="stylesheet" href="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
     <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="elements/resources/css/teacher/styles.css">
 </head>
 <body>
 <div data-role="page">
@@ -139,48 +140,71 @@ SQL;
         <h1>View Pyramid details</h1>
     </div>
     <div data-role="main" class="ui-content">
-        <form>
-            <div class="ui-field-contain">
-                <label for="select-native-1">Activity name:</label>
-                <select name="select-native-1" id="select-native-1">
-                    <?php foreach($flows as $flow_option):?>
-                    <option value="<?=$flow_option['id']?>"><?=htmlspecialchars($flow_option['name'])?></option>
-                    <?php endforeach;?>
-                </select>
+        <div id="activity-info-main">
+            <div id="activity-select-block">
+                <div class="ui-field-contain">
+                    <label for="select-activity">Activity name:</label>
+                    <select name="select-activity" id="select-activity">
+                        <?php foreach($flows as $flow_option):?>
+                        <option value="<?=$flow_option['id']?>"><?=htmlspecialchars($flow_option['name'])?></option>
+                        <?php endforeach;?>
+                    </select>
+                </div>
             </div>
+
 
             <div id="activity-winning-answers-block">
             <div id="activity-winning-answers-block-title"><?=TS("Most popular options:")?></div>
             <?php foreach($flow as $pkey => $pyramid):?>
-                <?php if(count($flow) > 1):?>
-                <div class="activity-winning-answers-block-pyramid-number"><?=TS("Pyramid") . ' ' . ($pkey+1)?></div>
+                <?php if(count($flow) > 1 and isset($pyramid['answers'])):?>
+                <div class="activity-winning-answers-block-pyramid-block">
+                    <div class="activity-winning-answers-block-pyramid-number"><?=TS("Pyramid") . ' ' . ($pkey+1)?></div>
                 <?php endif;?>
-                <?php foreach($pyramid['answers'] as $answer):?>
-                    <li><?=htmlspecialchars($answer)?></li>
-                <?php endforeach ;?>
-            <?php endforeach; ?>
+                    <ul class="activity-winning-answers-block-pyramid-list">
+                    <?php foreach($pyramid['answers'] as $answer):?>
+                        <li class="activity-winning-answers-block-pyramid-list-item"><?=htmlspecialchars($answer)?></li>
+                    <?php endforeach ;?>
+                    </ul>
+                <?php if(count($flow) > 1):?>
+                </div>
+                <?php endif;?>
+
+                <?php endforeach; ?>
             </div>
 
             <?php foreach($flow as $pkey => $pyramid): ?>
                 <div class="activity-pyramid-block">
-                    <div class="activity-pyramid-block-number">Pyramid <?=($pkey+1)?></div>
+
                     <?php foreach($pyramid['levels'] as $lkey => $level):?>
                         <div class="activity-pyramid-level-block">
+                            <div class="activity-pyramid-group-block-number">Pyramid <?=($pkey+1)?> level <?=($lkey+1)?></div>
+
+                            <div class="activity-pyramid-group-block-list">
                             <?php foreach($level['groups'] as $gkey => $group):?>
                                 <div class="activity-pyramid-level-group-block">
                                     <a href="#grp<?=($pkey+1)?>2<?=($gkey+1)?>" data-rel="popup" class="ui-btn ui-corner-all">Group <?=($gkey+1)?> </a>
                                     <div data-role="popup" id="grp<?=($pkey+1)?>2<?=($gkey+1)?>" data-theme="a" class="group-popup ui-corner-all">
-                                        <?=implode('<br>', explode(',', $group['members']))?>
+                                        <div class="popup-members-title"><?=TS("Members")?></div>
+                                        <ul class="popup-members-list">
+                                        <?php $members = explode(',', $group['members']);?>
+                                        <?php foreach($members as $mkey => $member):?>
+                                            <li><?=$member?></li>
+                                        <?php endforeach; ?>
+                                        </ul>
 
                                         <div class="ranking">
-                                        <?php $i=0; foreach($group['ranking'] as $ar):?>
-                                            <?=(($i++)+1)?> <?=htmlspecialchars($ar['answer'])?> <?=$ar['rating']?><br>
-                                        <?php endforeach;?>
+                                            <div class="popup-ranking-title"><?=TS("Ranking")?></div>
+                                            <ul>
+                                            <?php $i=0; foreach($group['ranking'] as $ar):?>
+                                                <li><div class="ranking-position"><?=(($i++)+1)?></div><div class="ranking-text"><?=htmlspecialchars($ar['answer'])?></div><div class="ranking-score"><?=$ar['rating']?></div></li>
+                                            <?php endforeach;?>
+                                            </ul>
                                         </div>
                                     </div>
                                     <?=htmlspecialchars($group['answer'])?>
                                 </div>
                             <?php endforeach;?>
+                            </div>
                         </div>
                     <?php endforeach;?>
                 </div>
@@ -267,7 +291,7 @@ SQL;
                 <?php endforeach;?>
 
             </div>
-        </form>
+        </div>
     </div>
 </div>
 
