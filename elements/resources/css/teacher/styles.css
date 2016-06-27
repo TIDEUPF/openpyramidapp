@@ -189,7 +189,7 @@ select[name="discussion"]~[role="application"] {
 .summary-field-block {
     padding: 10px;
     margin: 10px auto 10px auto;
-    width: 900px;
+    width: 700px;
 }
 
 .summary-field-title {
@@ -236,4 +236,9 @@ select[name="discussion"]~[role="application"] {
 .activity-pyramid-block {
     width: 900px;
     margin: 0 auto 0 auto;
+}
+
+label.missing {
+    color: red;
+    font-weight: bold;
 }

@@ -328,39 +328,39 @@ if(!isset($_REQUEST['save']))	{
             <form data-ajax="false" method="post" action="teacher.php">
                 <div id="page-1" class="page">
                     <div class="ui-field-contain">
-                        <label for="activity">Activity name:</label>
-                        <input type="text" name="activity" id="activity" placeholder="Activity name" value="" data-clear-btn="true">
+                        <label for="activity"><?=TS("Activity name")?>:</label>
+                        <input type="text" name="activity" id="activity" placeholder="<?=TS("Activity name")?>" value="" data-clear-btn="true">
                     </div>
 
                     <div class="ui-field-contain">
-                        <label for="task_description">Task Description:<a href="#popupInfo1" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
+                        <label for="task_description"><?=TS("Task Description")?>:<a href="#popupInfo1" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
                             <div data-role="popup" id="popupInfo1" class="ui-content" data-theme="a" style="max-width:350px;">
-                                <p>This is the task description that will appear for students when they access the pyramid activity.</p>
+                                <p><?=TS("This is the task description that will appear for students when they access the pyramid activity")?>.</p>
                             </div></label>
                         <textarea name="task_description" id="task_description"></textarea>
                     </div>
 
                     <div class="ui-field-contain">
                         <fieldset id="learning_setting_fieldset" data-role="controlgroup">
-                            <legend>Learning setting:<a href="#popupInfo7" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
+                            <legend><?=TS("Learning setting")?>:<a href="#popupInfo7" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
                                 <div data-role="popup" id="popupInfo7" class="ui-content" data-theme="a" style="max-width:700px;">
-                                    <p>This field specifies whether the classroom setting is a face-to-face or virtual learning context.</p>
+                                    <p><?=TS("This field specifies whether the classroom setting is a face-to-face or virtual learning context")?>.</p>
                                 </div></legend>
                             <input type="radio" name="learning_setting" id="learning_setting-a" value="classroom" checked <?=$data_disabled?>>
-                            <label for="learning_setting-a">Classroom</label>
+                            <label for="learning_setting-a"><?=TS("Classroom")?></label>
                             <input type="radio" name="learning_setting" id="learning_setting-b" value="distance" <?=$data_disabled?>>
-                            <label for="learning_setting-b">Distance</label>
+                            <label for="learning_setting-b"><?=TS("Distance")?></label>
                         </fieldset>
                     </div>
 
                     <div class="ui-field-contain">
-                        <label for="discussion">Discussion :<a href="#popupInfo6" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
+                        <label for="discussion"><?=TS("Discussion")?> :<a href="#popupInfo6" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
                             <div data-role="popup" id="popupInfo6" class="ui-content" data-theme="a" style="max-width:700px;">
-                                <p>If discussion is enabled, students can discussion with peers to clarify and negotiate their options during rating phases.</p>
+                                <p><?=TS("If discussion is enabled, students can discussion with peers to clarify and negotiate their options during rating phases")?>.</p>
                             </div></label>
                         <select name="discussion" id="discussion" data-role="slider" <?=$data_disabled?>>
-                            <option value="0">No</option>
-                            <option value="1" selected="selected">Yes</option>
+                            <option value="0"><?=TS("No")?></option>
+                            <option value="1" selected="selected"><?=TS("Yes")?></option>
                         </select>
                     </div>
 
@@ -378,8 +378,8 @@ if(!isset($_REQUEST['save']))	{
                             <circle cx="300" cy="175" r="12" stroke="green" stroke-width="2" fill="yellow" />
                             <line x1="112" y1="150" x2="308" y2="150" style="stroke:rgb(255,0,155);stroke-width:4" />
 
-                            <text x="120" y="205" fill="red">Level 1 – Individual level</text>
-                            <text x="55" y="140" fill="red" transform="rotate(-52,50,60)">Rating level(s)</text>
+                            <text x="120" y="205" fill="red"><?=TS('Level 1 – Individual level')?></text>
+                            <text x="55" y="140" fill="red" transform="rotate(-52,50,60)"><?=TS('Rating level(s)')?></text>
 
                             <!-- first level first 2 groups animation -->
                             <circle cx="120" cy="175" stroke="green" stroke-width="2" fill="yellow">
@@ -466,8 +466,8 @@ if(!isset($_REQUEST['save']))	{
 
                             <line x1="130" y1="125" x2="290" y2="125" style="stroke:rgb(255,0,155);stroke-width:4" />
 
-                            <text x="120" y="205" fill="red">Level 1 – Individual level</text>
-                            <text x="55" y="140" fill="red" transform="rotate(-52,50,60)">Rating level(s)</text>
+                            <text x="120" y="205" fill="red"><?=TS('Level 1 – Individual level')?></text>
+                            <text x="55" y="140" fill="red" transform="rotate(-52,50,60)"><?=TS('Rating level(s)')?></text>
 
                             <!-- first level first 2 groups animation -->
                             <!--
@@ -542,7 +542,7 @@ if(!isset($_REQUEST['save']))	{
                                 <circle cx="270" r="12" stroke="green" stroke-width="2" fill="yellow" />
                                 <circle cx="300" r="12" stroke="green" stroke-width="2" fill="yellow" />
                                 <circle cx="330" r="12" stroke="green" stroke-width="2" fill="yellow" />
-                                <text x="120" y="30" fill="red">Level 1 – Individual level</text>
+                                <text x="120" y="30" fill="red"><?=TS('Level 1 – Individual level')?></text>
 
                                 <!-- first level first 2 groups animation -->
                                 <circle cx="120" stroke="green" stroke-width="2" fill="yellow">
@@ -632,7 +632,7 @@ if(!isset($_REQUEST['save']))	{
                                 </g>
                             </g>
 
-                            <text x="55" y="140" fill="red" transform="rotate(-52,50,60)">Rating level(s)</text>
+                            <text x="55" y="140" fill="red" transform="rotate(-52,50,60)"><?=TS('Rating level(s)')?></text>
 
                             <!--circle cx="170" cy="120" r="17" stroke="green" stroke-width="2" fill="yellow"-->
 
@@ -674,7 +674,7 @@ if(!isset($_REQUEST['save']))	{
                                 <circle cx="285" r="12" stroke="green" stroke-width="2" fill="yellow" />
                                 <circle cx="325" r="12" stroke="green" stroke-width="2" fill="yellow" />
                                 <circle cx="360" r="12" stroke="green" stroke-width="2" fill="yellow" />
-                                <text x="120" y="30" fill="red">Level 1 – Individual level</text>
+                                <text x="120" y="30" fill="red"><?=TS('Level 1 – Individual level')?></text>
 
                                 <!-- first level first 2 groups animation -->
                                 <circle cx="120" stroke="green" stroke-width="2" fill="yellow">
@@ -815,7 +815,7 @@ if(!isset($_REQUEST['save']))	{
                                 </g>
                             </g>
 
-                            <text x="55" y="140" fill="red" transform="rotate(-52,50,60)">Rating level(s)</text>
+                            <text x="55" y="140" fill="red" transform="rotate(-52,50,60)"><?=TS('Rating level(s)')?></text>
 
                             <!--circle cx="170" cy="120" r="17" stroke="green" stroke-width="2" fill="yellow"-->
 
@@ -841,80 +841,80 @@ if(!isset($_REQUEST['save']))	{
                     </div>
 
                     <div id="popup" style="position: relative;float: left;width:500px;">
-                        <h4>Pyramid Configurations</h4>
+                        <h4><?=TS("Pyramid Configurations")?></h4>
 
                         <div class="ui-field-contain">
-                            <label for="expected_students">Total number of students:<a href="#popupInfo2" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
+                            <label for="expected_students"><?=TS("Total number of students")?>:<a href="#popupInfo2" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
                                 <div data-role="popup" id="popupInfo2" class="ui-content" data-theme="a" style="max-width:350px;">
-                                    <p>This is the total number of expected students in the class available for the activity. This could be an estimated value (specially during a massive open online course case).</p>
+                                    <p><?=TS("This is the total number of expected students in the class available for the activity. This could be an estimated value (specially during a massive open online course case)")?>.</p>
                                 </div></label>
-                            <input type="number" name="expected_students" id="expected_students" placeholder="Total class size" data-clear-btn="true">
+                            <input type="number" name="expected_students" id="expected_students" placeholder="<?=TS("Total class size")?>" data-clear-btn="true">
                         </div>
 
                         <div class="ui-field-contain ui-mini">
-                                <label for="first_group_size">No. of students per group at rating level 1:<a href="#popupInfo" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
+                                <label for="first_group_size"><?=TS("No. of students per group at rating level 1")?>:<a href="#popupInfo" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
                                     <div data-role="popup" id="popupInfo" class="ui-content" data-theme="a" style="max-width:700px;">
-                                        <p>This specifies the initial group size at level 2 (first rating level) after option submission level. This size will be doubled when groups propagate to upper levels.</p>
+                                        <p><?=TS("This specifies the initial group size at level 2 (first rating level) after option submission level. This size will be doubled when groups propagate to upper levels")?>.</p>
                                     </div>
                                 </label>
                                 <input type="range" name="first_group_size" id="first_group_size" value="3" min="2" max="10" data-highlight="true">
                             </div>
 
                             <div class="ui-field-contain">
-                                <label for="n_levels">No. of levels:<a href="#popupInfo5" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
+                                <label for="n_levels"><?=TS("No. of levels")?>:<a href="#popupInfo5" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
                                     <div data-role="popup" id="popupInfo5" class="ui-content" data-theme="a" style="max-width:700px;">
-                                        <p>This includes both option submission level and rating levels. It is recommended to have 3 to 4 levels for active participation.</p>
+                                        <p><?=TS("This includes both option submission level and rating levels. It is recommended to have 3 to 4 levels for active participation")?>.</p>
                                     </div></label>
-                                <input type="range" name="n_levels" id="n_levels" value="3" min="2" max="4" data-highlight="true">
+                                <input type="range" name="n_levels" id="n_levels" value="3" min="2" max="5" data-highlight="true">
                             </div>
 
                             <div id="multiple_pyramids_block" class="ui-field-contain">
-                                <label for="multiple_pyramids">Allow multiple pyramids:<a href="#popupInfo4" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
+                                <label for="multiple_pyramids"><?=TS("Allow multiple pyramids")?>:<a href="#popupInfo4" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
                                     <div data-role="popup" id="popupInfo4" class="ui-content" data-theme="a" style="max-width:700px;">
-                                        <p>If your class is relatively large class, it would be better to enable this feature, so several pyramids will be created and students will be automatically allocated.</p>
+                                        <p><?=TS("If your class is relatively large class, it would be better to enable this feature, so several pyramids will be created and students will be automatically allocated")?>.</p>
                                     </div>
                                 </label>
                                 <select name="multiple_pyramids" id="multiple_pyramids" data-role="slider">
-                                    <option value="0">No</option>
-                                    <option value="1" selected="selected">Yes</option>
+                                    <option value="0"><?=TS("No")?></option>
+                                    <option value="1" selected="selected"><?=TS("Yes")?></option>
                                 </select>
-                                <label for="n_levels">No. of pyramids created:<a href="#popupInfo52" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
+                                <label for="n_levels"><?=TS("No. of pyramids created")?>:<a href="#popupInfo52" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
                                     <div data-role="popup" id="popupInfo52" class="ui-content" data-theme="a" style="max-width:700px;">
-                                        <p>This fields show the number of pyramids the app will create based on the total number of students and students per pyramid.</p>
+                                        <p><?=TS("This fields show the number of pyramids the app will create based on the total number of students and students per pyramid")?>.</p>
                                     </div></label>
                                 <input type="number" name="n_pyramids" id="n_pyramids" value="" data-highlight="true" readonly>
                             </div>
 
                             <div class="ui-field-contain">
-                                <label for="minInfo">Minimum students per pyramid:<a href="#popupInfo3" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
+                                <label for="minInfo"><?=TS("Minimum students per pyramid")?>:<a href="#popupInfo3" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
                                     <div data-role="popup" id="popupInfo3" class="ui-content" data-theme="a" style="max-width:700px;">
-                                        <p>Number of students allowed to be grouped into a single pyramid. Based on the total number of students and this value, several pyramids may require and it will be automatically suggested by the system.</p>
+                                        <p><?=TS("Number of students allowed to be grouped into a single pyramid. Based on the total number of students and this value, several pyramids may require and it will be automatically suggested by the system")?>.</p>
                                     </div></label>
                                 <input type="number" name="min_students_per_pyramid" id="min_students_per_pyramid" value="12" data-clear-btn="true">
                             </div>
 
                             <div class="ui-field-contain">
-                                <label for="n_final_outcomes">Final outcomes :<a href="#popupInfoOutcomes" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
+                                <label for="n_final_outcomes"><?=TS("Final outcomes")?> :<a href="#popupInfoOutcomes" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
                                     <div data-role="popup" id="popupInfoOutcomes" class="ui-content" data-theme="a" style="max-width:700px;">
-                                        <p>Total number of outcomes taking in account all pyramids.</p>
+                                        <p><?=TS("Total number of outcomes taking in account all pyramids")?>.</p>
                                     </div></label>
                                 <input type="number" name="n_final_outcomes" id="n_final_outcomes" value="" readonly>
                             </div>
 
                         <!--<div class="ui-field-contain">-->
-                        <a href="#popupAdvanced" data-rel="popup" data-position-to="window" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-transition="pop">Advanced Settings</a>
+                        <a href="#popupAdvanced" data-rel="popup" data-position-to="window" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-transition="pop"><?=TS("Advanced Settings")?></a>
                         <div data-role="popup" id="popupAdvanced" data-theme="a" class="ui-corner-all">
 
                             <div style="padding:10px 20px;">
-                                <h4>Advanced Pyramid Configurations</h4>
-                                <h5>It is optional to change these default values.</h5>
+                                <h4><?=TS("Advanced Pyramid Configurations")?></h4>
+                                <h5><?=TS("It is optional to change these default values")?>.</h5>
 
                                 <div id="pop-background"></div>
 
-                                <label for="s_question">Option submission timer:<a text-data="#cpopup1" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
-                                                                                title="This timer specifies the time permitted for initial option (artifact) submission for students">More</a>
+                                <label for="s_question"><?=TS("Option submission timer")?>:<a text-data="#cpopup1" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
+                                                                                title="This timer specifies the time permitted for initial option (artifact) submission for students"><?=TS("More")?>/a>
                                     <div id="cpopup1-text" class="ui-content tooltip-popup" data-theme="a" style="display:none">
-                                        <p>If discussion is enabled, students can discussion with peers to clarify and negotiate their options during rating phases.</p>
+                                        <p><?=TS("This timer specifies the time permitted for initial option (artifact) submission for students")?>.</p>
                                     </div>
                                 </label>
                                 <div style="position:relative;float:left;">
@@ -924,16 +924,20 @@ if(!isset($_REQUEST['save']))	{
                                 <div style="position:relative;float:left; margin-left:10px; margin-top:2px;">
                                     <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
                                         <input type="radio" name="s_question_unit" id="s_question_unit-a" value="m" checked="checked">
-                                        <label for="s_question_unit-a">Minutes</label>
+                                        <label for="s_question_unit-a"><?=TS("Minutes")?></label>
                                         <input type="radio" name="s_question_unit" id="s_question_unit-b" value="h">
-                                        <label for="s_question_unit-b">Hours</label>
+                                        <label for="s_question_unit-b"><?=TS("Hours")?></label>
                                         <input type="radio" name="s_question_unit" id="s_question_unit-c" value="d">
-                                        <label for="s_question_unit-c">Days</label>
+                                        <label for="s_question_unit-c"><?=TS("Days")?></label>
                                     </fieldset></div>
                                 <div style="clear:both;"></div>
 
-                                <label for="h_question">Option submission hard timer:<a href="#popup2" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
-                                                                                       title="This timer specifies the maximum time permitted for initial option (artifact) submission for students. Once expired, every student will be promoted next level."></a>
+                                <label for="h_question"><?=TS("Option submission hard timer")?>:<a text-data="#cpopup2" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
+                                       title="This timer specifies the maximum time permitted for initial option (artifact) submission for students. Once expired, every student will be promoted next level."><?=TS("More")?></a>
+                                    <div id="cpopup2-text" class="ui-content tooltip-popup" data-theme="a" style="display:none">
+                                        <p><?=TS("This timer specifies the maximum time permitted for initial option (artifact) submission for students. Once expired, every student will be promoted next level")?>.</p>
+                                    </div>
+
                                 </label>
                                 <div style="position:relative;float:left;">
                                     <input type="number" name="h_question_unit_value" id="h_question_unit_value" data-wrapper-class="numk" value="" data-clear-btn="true" />
@@ -942,16 +946,20 @@ if(!isset($_REQUEST['save']))	{
                                 <div style="position:relative;float:left; margin-left:10px; margin-top:2px;">
                                     <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
                                         <input type="radio" name="h_question_unit" id="h_question_unit-a" value="m" checked="checked">
-                                        <label for="h_question_unit-a">Minutes</label>
+                                        <label for="h_question_unit-a"><?=TS("Minutes")?></label>
                                         <input type="radio" name="h_question_unit" id="h_question_unit-b" value="h">
-                                        <label for="h_question_unit-b">Hours</label>
+                                        <label for="h_question_unit-b"><?=TS("Hours")?></label>
                                         <input type="radio" name="h_question_unit" id="h_question_unit-c" value="d">
-                                        <label for="h_question_unit-c">Days</label>
+                                        <label for="h_question_unit-c"><?=TS("Days")?></label>
                                     </fieldset></div>
                                 <div style="clear:both;"></div>
 
-                                <label for="s_rating">Rating timer:<a href="#popup3" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
-                                                                     title="This timer specifies the time permitted for rating at each level including discussion time."></a>
+                                <label for="s_rating"><?=TS("Rating timer")?>:<a text-data="#cpopup3" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
+                                       title="This timer specifies the time permitted for rating at each level including discussion time."><?=TS("More")?></a>
+                                    <div id="cpopup3-text" class="ui-content tooltip-popup" data-theme="a" style="display:none">
+                                        <p><?=TS("This timer specifies the time permitted for rating at each level including discussion time")?>.</p>
+                                    </div>
+
                                 </label>
                                 <div style="position:relative;float:left;">
                                     <input type="number" name="s_rating_unit_value" id="s_rating_unit_value" data-wrapper-class="numk" value="" data-clear-btn="true">
@@ -960,16 +968,20 @@ if(!isset($_REQUEST['save']))	{
                                 <div style="position:relative;float:left; margin-left:10px; margin-top:2px;">
                                     <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
                                         <input type="radio" name="s_rating_unit" id="s_rating_unit-a" value="m" checked="checked">
-                                        <label for="s_rating_unit-a">Minutes</label>
+                                        <label for="s_rating_unit-a"><?=TS("Minutes")?></label>
                                         <input type="radio" name="s_rating_unit" id="s_rating_unit-b" value="h">
-                                        <label for="s_rating_unit-b">Hours</label>
+                                        <label for="s_rating_unit-b"><?=TS("Hours")?></label>
                                         <input type="radio" name="s_rating_unit" id="s_rating_unit-c" value="d">
-                                        <label for="s_rating_unit-c">Days</label>
+                                        <label for="s_rating_unit-c"><?=TS("Days")?></label>
                                     </fieldset></div>
                                 <div style="clear:both;"></div>
 
-                                <label for="h_rating">Rating hard timer:<a href="#popup4" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
-                                                                              title="This is the maximum time allowed for rating and discussion at each level. Once expired everyone is promoted to next level."></a>
+                                <label for="h_rating"><?=TS("Rating hard timer")?>:<a text-data="#cpopup4" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
+                                       title="This is the maximum time allowed for rating and discussion at each level. Once expired everyone is promoted to next level."><?=TS("More")?></a>
+                                    <div id="cpopup4-text" class="ui-content tooltip-popup" data-theme="a" style="display:none">
+                                        <p><?=TS("This is the maximum time allowed for rating and discussion at each level. Once expired everyone is promoted to next level")?>.</p>
+                                    </div>
+
                                 </label>
                                 <div style="position:relative;float:left;">
                                     <input type="number" name="h_rating_unit_value" id="h_rating_unit_value" data-wrapper-class="numk" value="" data-clear-btn="true">
@@ -978,25 +990,29 @@ if(!isset($_REQUEST['save']))	{
                                 <div style="position:relative;float:left; margin-left:10px; margin-top:2px;">
                                     <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
                                         <input type="radio" name="h_rating_unit" id="h_rating_unit-a" value="m" checked="checked">
-                                        <label for="h_rating_unit-a">Minutes</label>
+                                        <label for="h_rating_unit-a"><?=TS("Minutes")?></label>
                                         <input type="radio" name="h_rating_unit" id="h_rating_unit-b" value="h">
-                                        <label for="h_rating_unit-b">Hours</label>
+                                        <label for="h_rating_unit-b"><?=TS("Hours")?></label>
                                         <input type="radio" name="h_rating_unit" id="h_rating_unit-c" value="d">
-                                        <label for="h_rating_unit-c">Days</label>
+                                        <label for="h_rating_unit-c"><?=TS("Days")?></label>
                                     </fieldset></div>
                                 <div style="clear:both;"></div>
 
-                                <label for="satisfaction">Satisfaction percentage:<a href="#popup5" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
-                                                                                  title="When this percentage is reached, students will be promoted for the next level. This is important when longer timer values are defined at MOOC scenarios with less participation."></a>
+                                <label for="satisfaction"><?=TS("Satisfaction percentage")?>:<a text-data="#cpopup5" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
+                                       title="When this percentage is reached, students will be promoted for the next level. This is important when longer timer values are defined at MOOC scenarios with less participation."><?=TS("More")?></a>
+                                    <div id="cpopup5-text" class="ui-content tooltip-popup" data-theme="a" style="display:none">
+                                        <p><?=TS("When this percentage is reached, students will be promoted for the next level. This is important when longer timer values are defined at MOOC scenarios with less participation")?>.</p>
+                                    </div>
+
                                 </label>
                                 <input type="range" name="satisfaction" id="satisfaction" value="60" min="30" max="100" data-highlight="true">
 
-                                <a data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-check">Submit</a>
+                                <a data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-check"><?=TS("Submit")?></a>
                             </div>
                         </div><!--popup-->
                         <br>
                         <div class="ui-input-btn ui-btn ui-btn-inline ui-shadow ui-corner-all ui-icon-check ui-btn-icon-left ui-btn-a">
-                            <?=(($edit) ? 'Update' : 'Create')?><input name="create_flow" type="submit" data-enhanced="true" value="<?=(($edit) ? 'update' : 'create')?>">
+                            <?=(($edit) ? TS('Update') : TS('Create'))?><input name="create_flow" type="submit" data-enhanced="true" value="<?=(($edit) ? 'update' : 'create')?>">
                         </div>
 
                         <div id="popup-clearance"></div>
@@ -1027,6 +1043,8 @@ if(!isset($_REQUEST['save']))	{
 
 
 <script>
+
+    //validation
 
     //timers in seconds
     var timers = [
@@ -1220,6 +1238,33 @@ if(!isset($_REQUEST['save']))	{
 
     //calculate the remaining variables before submitting
     $('form').submit(function() {
+        //validate
+        $page2_fields = $('#page-2').find('input[type="text"], input[type="number"], textarea').not('[readonly]');
+
+        var successful_validation = true;
+        $page2_fields.each(function() {
+            $('label[for="' + $(this).attr("name") + '"]').removeClass("missing");
+        });
+
+        $page2_fields.each(function() {
+            if($(this).val() == "") {
+                $('label[for="' + $(this).attr("name") + '"]').addClass("missing");
+                successful_validation = false;
+            }
+
+            if($(this).attr("name") == "number") {
+                try {
+                    get_field_integer($(this).attr("name"));
+                } catch (e) {
+                    $('label[for="' + $(this).attr("name") + '"]').addClass("missing");
+                    successful_validation = false;
+                }
+            }
+        });
+
+        if(!successful_validation)
+            return false;
+
         timers_to_seconds();
 
         //sync
@@ -1262,6 +1307,24 @@ if(!isset($_REQUEST['save']))	{
     $('.create-flow-next').click(function(event) {
         event.stopPropagation();
         event.preventDefault();
+
+        //validate the fields
+        $page1_fields = $('#page-1').find('input[type="text"], input[type="number"], textarea');
+
+        var successful_validation = true;
+        $page1_fields.each(function() {
+            $('label[for="' + $(this).attr("name") + '"]').removeClass("missing");
+        });
+
+        $page1_fields.each(function() {
+            if($(this).val() == "") {
+                $('label[for="' + $(this).attr("name") + '"]').addClass("missing");
+                successful_validation = false;
+            }
+        });
+
+        if(!successful_validation)
+            return false;
 
         var goto = $(this).attr('goto');
 
