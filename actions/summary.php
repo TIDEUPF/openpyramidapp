@@ -28,20 +28,15 @@ $flow_fields = [
 $flow_summary_fields = [
     'activity' => T("Activity name"),
     'task_description' => T("Task Description"),
-    'learning_setting' => T("Learning setting"),
-    'discussion' => T("Discussion"),
+    'n_final_outcomes' => T("Final outcomes"),
     'expected_students' => T("Total number of students"),
     'first_group_size' => T("No. of students per group at rating level 1"),
-    'n_levels' => T("No. of levels"),
-    'multiple_pyramids' => T("Allow multiple pyramids"),
-    'n_pyramids' => T("No. of pyramids created"),
-    'min_students_per_pyramid' => T("Minimum students per pyramid"),
-    'satisfaction' => T("Satisfaction percentage"),
+];
+
+$flow_summary_timer_fields = [
     's_question_summary' => T("Option submission timer"),
-    'h_question_summary' => T("Option submission hard timer"),
     's_rating_summary' => T("Rating timer"),
-    'h_rating_summary' => T("Rating hard timer"),
-    'n_final_outcomes' => T("Final outcomes"),
+    'satisfaction' => T("Satisfaction percentage"),
 ];
 
 if(isset($_SESSION['user'])) {
@@ -821,10 +816,20 @@ header('Content-Type: text/html; charset=utf-8');
     </div>
     <?php endforeach;?>
 
+    <div>
+    <?php foreach($flow_summary_timer_fields as $kfield => $field):?>
+        <div class="summary-timer-field-block">
+            <div class="summary-timer-field-title"><?=$field?></div>
+            <div id="<?=$kfield?>" class="summary-timer-field-data"></div>
+        </div>
+    <?php endforeach;?>
+    </div>
+
 
     <input type="hidden" name="sync">
     <input type="hidden" name="random_selection">
     <input type="hidden" name="n_selected_answers">
+    <div id="n_levels" style="display: none;"></div>
 
     <input type="hidden" name="s_question">
     <input type="hidden" name="h_question">
@@ -846,6 +851,12 @@ header('Content-Type: text/html; charset=utf-8');
         'h_rating'
     ];
 
+    var timers_summary = [
+        's_question',
+        'h_question',
+        'satisfaction',
+    ];
+
     var new_flow_fields = [
         'satisfaction',
         'n_selected_answers',
@@ -862,6 +873,7 @@ header('Content-Type: text/html; charset=utf-8');
 
     var edit_flow_fields = <?=json_encode($flow_fields)?>;
     var flow_summary_fields = <?=json_encode($flow_summary_fields)?>;
+    var flow_summary_timer_fields = <?=json_encode($flow_summary_timer_fields)?>;
 
     var units_in_seconds = {
         'days': 86400,

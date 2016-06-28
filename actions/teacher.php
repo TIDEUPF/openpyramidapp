@@ -57,6 +57,7 @@ SQL;
 
         $edit = true;
     } elseif(isset($_POST['create_flow'])) {
+        \Util\log_submit();
         $action = $_POST['create_flow'];
         $flow_data_decoded = json_decode($_POST['flow_data']);
 
@@ -316,6 +317,12 @@ if(!isset($_REQUEST['save']))	{
     <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
     <link rel="stylesheet" type="text/css" href="elements/resources/css/teacher/styles.css">
+
+    <script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
+    <script src="lib/actions.js"></script>
+    <script type="text/javascript">
+        var socket = io({multiplex : false, 'reconnection': true,'reconnectionDelay': 3000,'maxReconnectionAttempts':Infinity, path: '/socket.io/'});
+    </script>
 </head>
 
 <body>
@@ -1340,6 +1347,9 @@ if(!isset($_REQUEST['save']))	{
         }
 
         $('#page-1').fadeOut(400,'swing', function() {
+            var n_levels_setting = $('[name="n_levels"]').val();
+            var figure = $('#pyramid-levels-' + n_levels_setting).html();
+            $('#pyramid-levels-' + n_levels_setting).html(figure);
             $('#page-' + goto).fadeIn();
         });
     });

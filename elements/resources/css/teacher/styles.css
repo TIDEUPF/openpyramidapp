@@ -192,13 +192,36 @@ select[name="discussion"]~[role="application"] {
     width: 700px;
 }
 
+.summary-timer-field-block {
+    padding: 10px;
+    margin: 10px auto 10px auto;
+    width: 500px;
+}
+
 .summary-field-title {
     font-weight: bold;
     font-size: 120%;
+    width: 500px;
+    float: left;
 }
 
 .summary-field-data {
     margin: 5px 0 0 10px;
+    width: 100px;
+    float: left;
+}
+
+.summary-timer-field-title {
+    font-weight: bold;
+    font-size: 120%;
+    width: 300px;
+    float: left;
+}
+
+.summary-timer-field-data {
+    margin: 5px 0 0 10px;
+    width: 100px;
+    float: left;
 }
 
 #pyramid-summary-levels-block {
