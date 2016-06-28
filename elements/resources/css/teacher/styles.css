@@ -265,3 +265,32 @@ label.missing {
     color: red;
     font-weight: bold;
 }
+
+#activity-body {
+    width: 1000px;
+}
+
+#activity-left-pane {
+    width: 150px;
+    float: left;
+}
+
+#activity-left-pane button {
+    display: block;
+}
+
+#activity-iframe {
+    width: 800px;
+    float: right;
+}
+
+#activity-teacher-id {
+
+}
+
+button.current-activity {
+    background-color: red !important;
+    color: #e8e8e8 !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+}

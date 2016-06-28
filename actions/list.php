@@ -5,7 +5,20 @@ include('dbvar.php');
 if(isset($_SESSION['user'])) {
     $teacher_id = $_SESSION['user'];
 }
-    
+
+
+//obtain the flows pertaining to the current teacher
+$flows = [];
+$teacher_id = $_SESSION['user'];
+$flow_query = mysqli_query($link, "select * from flow where teacher_id = '$teacher_id'");
+if(mysqli_num_rows($flow_query) > 0) {
+    while ($flow_query_row = mysqli_fetch_assoc($flow_query)) {
+        $flow['id'] = $flow_query_row["fid"];
+        $flow['name'] = $flow_query_row["fname"];
+        $flows[] = $flow;
+    }
+}
+
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,6 +32,12 @@ if(isset($_SESSION['user'])) {
 <body>
 
 <div data-role="page">
+
+    <div class="activity-list-item">
+        <div><a href="teacher.php?edit=<?=$flow?>"><?=TS("Edit")?></a></div>
+        <div><a href="activity.php?edit=<?=$flow?>"><?=TS("Activity")?></a></div>
+    </div>
+
     <div data-role="main" class="ui-content">
         <div id="activity-body">
             <div id="activity-left-pane">
