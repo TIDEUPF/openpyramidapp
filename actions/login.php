@@ -15,7 +15,7 @@ if(!isset($_SESSION['user'])){
             if($count_login > 0){
                 //$_SESSION['token'] = $token;
                 $_SESSION['user'] = $uname;
-                header("location: teacher.php");
+                header("location: activity.php");
                 exit(0);
             }
             else{
@@ -23,9 +23,8 @@ if(!isset($_SESSION['user'])){
             }
         }
     }
-}
-else{
-    header("location: teacher.php");
+} else {
+    header("location: activity.php");
     exit(0);
 }
 
@@ -42,6 +41,21 @@ else{
         form {
             width: 500px;
             margin: 0 auto 0 auto
+        }
+
+        /* teacher login */
+        .login-pyramid-block {
+            display: table;
+            margin: 0 auto 0 auto;
+        }
+
+        [data-role="main"] {
+            margin: 0 auto 0 auto;
+            width: 900px;
+        }
+
+        .ui-field-contain {
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -76,6 +90,8 @@ else{
             <div class="ui-field-contain">
                 <label for="uid">User ID:</label>
                 <input type="text" name="usr" id="usr">
+            </div>
+            <div class="ui-field-contain">
                 <label for="password">Password:</label>
                 <input type="password" name="pwd" id="pwd">
             </div>

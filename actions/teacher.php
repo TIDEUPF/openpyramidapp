@@ -32,14 +32,11 @@ if(isset($_SESSION['user'])) {
         $fid = (int)$_REQUEST['edit'];
 
         $sql = <<<SQL
-select * from `flow` 
-where 
-`fid` = {$fid} AND 
-`teacher_id` = '{$teacher_id}'
+select * from `flow` where `fid` = '{$fid}' AND `teacher_id` = '{$teacher_id}'
 SQL;
 
         $flow_result = mysqli_query($link, $sql);
-        if(!(mysqli_affected_rows($link) > 0)) {
+        if(!(mysqli_num_rows($flow_result) > 0)) {
             $error = true;
         }
 
@@ -138,7 +135,7 @@ SQL;
 
             $insert_result = mysqli_query($link, $sql);
 
-            if (!mysqli_insert_id($link))
+            if (!$fid = mysqli_insert_id($link))
                 $error = true;
         } else {
             $fid = (int)$_REQUEST['fid'];
@@ -195,6 +192,10 @@ SQL;
                 $min_pyramid = $expe;
         }
 */
+        if(!$error) {
+            header("location: summary.php?edit=" . $fid);
+            exit(0);
+        }
     }
 } else {
     header("location: login.php");
@@ -327,9 +328,6 @@ if(!isset($_REQUEST['save']))	{
 
 <body>
 <div data-role="page">
-    <div data-role="header">
-        <h1>Create Pyramid Activity</h1>
-    </div>
     <div data-role="main" class="ui-content">
         <div id="center-frame">
             <form data-ajax="false" method="post" action="teacher.php">
@@ -1022,7 +1020,7 @@ if(!isset($_REQUEST['save']))	{
                             <?=(($edit) ? TS('Update') : TS('Create'))?><input name="create_flow" type="submit" data-enhanced="true" value="<?=(($edit) ? 'update' : 'create')?>">
                         </div>
 
-                        <div id="popup-clearance"></div>
+                        <!--<div id="popup-clearance"></div>-->
 
                         <!--fields not enetred by the user -->
                         <input type="hidden" name="sync">

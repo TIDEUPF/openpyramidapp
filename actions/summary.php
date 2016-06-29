@@ -53,7 +53,7 @@ where
 SQL;
 
         $flow_result = mysqli_query($link, $sql);
-        if(!(mysqli_affected_rows($link) > 0)) {
+        if(!(mysqli_num_rows($flow_result) > 0)) {
             $error = true;
         }
 
@@ -816,6 +816,7 @@ header('Content-Type: text/html; charset=utf-8');
     </div>
     <?php endforeach;?>
 
+    <br>
     <div>
     <?php foreach($flow_summary_timer_fields as $kfield => $field):?>
         <div class="summary-timer-field-block">

@@ -33,22 +33,15 @@ if(mysqli_num_rows($flow_query) > 0) {
 
 <div data-role="page">
 
+    <?php foreach($flows as $flow):?>
     <div class="activity-list-item">
-        <div><a href="teacher.php?edit=<?=$flow?>"><?=TS("Edit")?></a></div>
-        <div><a href="activity.php?edit=<?=$flow?>"><?=TS("Activity")?></a></div>
+        <div class="activity-list-entry-text"><a data-ajax="false" href="teacher.php?edit=<?=$flow['id']?>"><?=TS("Edit")?></a></div>
+        <div class="activity-list-entry-text"><a data-ajax="false" href="activities.php?edit=<?=$flow['id']?>"><?=TS("Activity")?></a></div>
+        <div class="activity-list-entry-text activity-list-entry-text-name"><?=$flow['name']?></div>
+        <div style="clear:both;"></div>
     </div>
+    <?php endforeach;?>
 
-    <div data-role="main" class="ui-content">
-        <div id="activity-body">
-            <div id="activity-left-pane">
-                <div id="activity-teacher-id"><?=$teacher_id?></div>
-                <button activity="teacher"><?=TS("Create activity")?></button>
-                <button activity="activities"><?=TS("View activities")?></button>
-                <button activity="logout"><?=TS("Logout")?></button>
-            </div>
-            <iframe src id="activity-iframe"></iframe>
-        </div>
-    </div>
 </div>
 <script>
     $('button').on('click', function() {

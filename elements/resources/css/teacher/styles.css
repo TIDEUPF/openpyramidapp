@@ -1,5 +1,5 @@
 #center-frame {
-    width: 900px;
+    width: 850px;
     margin: 20px auto 0 auto;
 }
 
@@ -10,11 +10,11 @@
 .numk{ width: 150px !important; }
 
 .ui-field-contain>label~[class*=ui-] {
-    width: 65% !important;
+    width: 60% !important;
 }
 
 .ui-field-contain>label {
-    width: 33% !important;
+    width: 37% !important;
 }
 
 .tooltip-popup {
@@ -45,7 +45,7 @@
 }
 
 #learning_setting_fieldset .ui-controlgroup-controls {
-    width: 65%;
+    width: 61%;
     float: right;
 }
 
@@ -226,7 +226,7 @@ select[name="discussion"]~[role="application"] {
 
 #pyramid-summary-levels-block {
     margin: 10px auto 10px auto;
-    width: 600px;
+    display: table;
     height: 230px;
 }
 
@@ -267,25 +267,40 @@ label.missing {
 }
 
 #activity-body {
-    width: 1000px;
+    width: 1050px;
+    margin: 0 auto 0 auto;
 }
 
 #activity-left-pane {
-    width: 150px;
+    width: 160px;
     float: left;
+    background-color: #dde7ff;
 }
 
 #activity-left-pane button {
     display: block;
+    width: 150px;
+    margin-left: 5px;
+}
+
+#activity-left-pane [logout] {
+    margin-top: 100px;
 }
 
 #activity-iframe {
-    width: 800px;
+    width: 888px;
     float: right;
+    height: 850px;
 }
 
 #activity-teacher-id {
-
+    background-color: #bfe7ff;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 50px;
+    font-size: 130%;
+    text-shadow: none;
+    margin-bottom: 50px;
 }
 
 button.current-activity {
@@ -293,4 +308,29 @@ button.current-activity {
     color: #e8e8e8 !important;
     text-shadow: none !important;
     box-shadow: none !important;
+}
+
+
+/*activity list*/
+.activity-list-item {
+    margin: 20px auto 0 auto;
+    width: 700px;
+    padding: 20px;
+    background-color: #f1f1f1;
+    border-radius: 10px;
+    box-shadow: 0px 2px 12px -3px rgba(0,0,0,0.75);
+}
+
+.activity-list-item:hover {
+    background-color: #f9f9f9;
+}
+
+.activity-list-item .activity-list-entry-text {
+    float: left;
+    margin-left: 20px;
+    line-height: 30px;
+}
+
+.activity-list-entry-text-name {
+    font-size: 130%;
 }
