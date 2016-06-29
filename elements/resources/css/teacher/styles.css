@@ -290,7 +290,7 @@ label.missing {
 #activity-iframe {
     width: 888px;
     float: right;
-    height: 850px;
+    /*min-height: 350px;*/
 }
 
 #activity-teacher-id {
@@ -304,7 +304,7 @@ label.missing {
 }
 
 button.current-activity {
-    background-color: red !important;
+    background-color: #75acff !important;
     color: #e8e8e8 !important;
     text-shadow: none !important;
     box-shadow: none !important;

@@ -27,7 +27,7 @@ $flow_fields = [
 
 $flow_summary_fields = [
     'activity' => T("Activity name"),
-    'task_description' => T("Task Description"),
+    'task_description' => T("Student task"),
     'n_final_outcomes' => T("Final outcomes"),
     'expected_students' => T("Total number of students"),
     'first_group_size' => T("No. of students per group at rating level 1"),

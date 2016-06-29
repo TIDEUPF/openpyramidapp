@@ -38,20 +38,25 @@ if(isset($_SESSION['user'])) {
                 <button activity="list"><?=TS("Activities")?></button>
                 <button logout="logout"><?=TS("Logout")?></button>
             </div>
-            <iframe src id="activity-iframe" frameborder="0" height="700px"></iframe>
+            <div style="clear:both"></div>
         </div>
     </div>
 </div>
 <script>
-    $('#activity-iframe, #activity-left-pane').height($(window).height());
+    $('#activity-left-pane').height($(window).height()-1);
+    $('#activity-iframe').attr("height", Math.floor($(window).height()/2) * 2);
     $(window).resize(function() {
-        $('#activity-iframe, #activity-left-pane').height($(window).height());
+        $('#activity-left-pane').height($(window).height()-1);
+        $('#activity-iframe').attr("height", Math.floor($(window).height()/2) * 2);
     });
 
     $('button[activity]').on('click', function() {
         $('button').removeClass('current-activity');
         $(this).addClass('current-activity');
-        $('iframe').attr("src" , $(this).attr("activity") + '.php')
+        $('iframe').attr("src" , $(this).attr("activity") + '.php');
+
+        $('#activity-iframe').remove();
+        $('#activity-left-pane').after('<iframe id="activity-iframe" src="' + $(this).attr("activity") + '.php' + '" frameborder="0" height="' + (Math.floor($(window).height()/2) * 2) + '"></iframe>');
     });
 
     $('button[logout]').on('click', function() {
@@ -59,6 +64,17 @@ if(isset($_SESSION['user'])) {
         $(this).addClass('current-activity');
         window.location = $(this).attr("logout") + '.php';
     });
+
+    $(window).on('popstate', function (e) {
+        return false;
+        var state = e.originalEvent.state;
+        if (state !== null) {
+            //load content with ajax
+            return false;
+        }
+    });
+
+    $('[activity="teacher"]').click();
 
 </script>
 

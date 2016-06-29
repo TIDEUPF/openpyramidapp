@@ -338,7 +338,7 @@ if(!isset($_REQUEST['save']))	{
                     </div>
 
                     <div class="ui-field-contain">
-                        <label for="task_description"><?=TS("Task Description")?>:<a href="#popupInfo1" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
+                        <label for="task_description"><?=TS("Student task")?>:<a href="#popupInfo1" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext" title="More info">More</a>
                             <div data-role="popup" id="popupInfo1" class="ui-content" data-theme="a" style="max-width:350px;">
                                 <p><?=TS("This is the task description that will appear for students when they access the pyramid activity")?>.</p>
                             </div></label>
@@ -917,7 +917,7 @@ if(!isset($_REQUEST['save']))	{
                                 <div id="pop-background"></div>
 
                                 <label for="s_question"><?=TS("Option submission timer")?>:<a text-data="#cpopup1" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
-                                                                                title="This timer specifies the time permitted for initial option (artifact) submission for students"><?=TS("More")?>/a>
+                                                                                title="This timer specifies the time permitted for initial option (artifact) submission for students"><?=TS("More")?></a>
                                     <div id="cpopup1-text" class="ui-content tooltip-popup" data-theme="a" style="display:none">
                                         <p><?=TS("This timer specifies the time permitted for initial option (artifact) submission for students")?>.</p>
                                     </div>
