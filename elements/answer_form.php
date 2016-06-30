@@ -101,11 +101,24 @@
         /*display: none;*/
     }
 
+    #pyramid-icon {
+        position:fixed;
+        top : 3px;
+        left: 55%;
+        padding: 0 !important;
+    }
+
+    #pyramid-icon img {
+        height: 25px;
+    }
 </style>
 <div id="answer-frame">
     <form method="post" action="student.php" data-ajax="false">
     <div id="answer-header-frame">
 
+        <div id="pyramid-icon">
+            <img src="elements/resources/pyramid_icons/<?=($hidden_input_array['levels']+1)?>l_l<?=($hidden_input_array['level'])?>.png">
+        </div>
         <div>
             <div id="answer-header-user" class="topbar_item"><?=$username?></div>
             <div id="answer-header-level" class="topbar_item"><?=$level?></div>

@@ -13,6 +13,7 @@ include_once(__DIR__ . '/lib/action.php');
 
 include_once(__DIR__ . '/lib/group.php');
 include_once(__DIR__ . '/lib/pyramid.php');
+include_once(__DIR__ . '/lib/flow.php');
 include_once(__DIR__ . '/lib/answer.php');
 include_once(__DIR__ . '/lib/student.php');
 include_once(__DIR__ . '/lib/request.php');

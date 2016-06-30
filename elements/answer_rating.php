@@ -117,12 +117,26 @@
         /*display: none;*/
     }
 
+    #pyramid-icon {
+        position:fixed;
+        top : 5px;
+        left: 55%;
+        padding: 0 !important;
+    }
+
+    #pyramid-icon img {
+        height: 20px;
+    }
+
 </style>
 <div id="answer-frame">
     <div id="countdown"><span id="countdown-text"></span>s left</div>
     <form method="post" action="student.php" data-ajax="false">
     <div id="answer-header-frame">
 
+        <div id="pyramid-icon">
+            <img src="elements/resources/pyramid_icons/<?=($hidden_input_array['levels']+1)?>l_l<?=($hidden_input_array['level']+1)?>.png">
+        </div>
         <div id="topbar">
             <div id="answer-header-user" class="topbar_item"><?=$username?></div>
             <div id="answer-header-level" class="topbar_item"><?=$level?></div>

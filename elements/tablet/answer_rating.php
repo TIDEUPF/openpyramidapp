@@ -248,6 +248,17 @@
     html {
         overflow-x: auto;
     }
+
+    #pyramid-icon {
+        position:fixed;
+        top : 3px;
+        left: 55%;
+        padding: 0 !important;
+    }
+
+    #pyramid-icon img {
+        height: 25px;
+    }
 </style>
 
 <link rel="stylesheet" href="vendors/perfect-scrollbar/css/perfect-scrollbar.min.css">
@@ -262,6 +273,10 @@
         </div>
 
     <div id="answer-header-frame">
+
+        <div id="pyramid-icon">
+            <img src="elements/resources/pyramid_icons/<?=($hidden_input_array['levels']+1)?>l_l<?=($hidden_input_array['level']+1)?>.png">
+        </div>
 
         <div id="topbar">
             <div id="answer-header-user" class="topbar_item"><?=$username?></div>

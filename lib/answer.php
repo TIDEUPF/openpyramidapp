@@ -108,7 +108,7 @@ function request($params) {
 
     $timeout = get_answer_timeout();
     $petition = (empty($flow_data['question'])) ? 'Write a question' : $flow_data['question'];
-    $level_text = (\Pyramid\get_current_level() >= 0) ? T('Level') . ' ' . \Pyramid\get_current_level() .'/' . $levels : '';
+    $level_text = (\Pyramid\get_current_level() >= 0) ? T('Level') . ' ' . \Pyramid\get_current_level() .'/' . ($levels+1) : '';
     $username_text = (count(\Group\get_status_bar_peers()) > 0) ? $sname . ' + ' . (count(\Group\get_status_bar_peers())-1) : $sname;
 
     $peers = implode(', ', \group\get_peers_sname());
@@ -136,6 +136,8 @@ function request($params) {
     $hidden_input_array['level'] = $level_text;
     $hidden_input_array['group_id'] = $peer_group_id;
     $hidden_input_array['page'] = "answer_form";
+    $hidden_input_array['levels'] = $levels;
+    $hidden_input_array['level'] = \Pyramid\get_current_level();
 
     $vars['hidden_input_array'] = array_merge($vars['hidden_input_array'], $hidden_input_array);
 
@@ -190,6 +192,7 @@ function request_rate($params) {
     $hidden_input_array['group_id'] = $peer_group_id;
     $hidden_input_array['level'] = \Pyramid\get_current_level();
     $hidden_input_array['page'] = "answer_rating";
+    $hidden_input_array['levels'] = $levels;
 
     $peers = implode(', ', \group\get_peers_sname());
     if(strlen($peers) > $peer_toolbar_strlen)
@@ -217,7 +220,7 @@ function request_rate($params) {
     $vars = array(
         'username'              => $sname . ' + ' . (count(\Group\get_status_bar_peers())-1),
         'username'              => $sname . ' + ' . $peers,
-        'level'                 => T('Level') . ' '. \Pyramid\get_current_level() .'/' . $levels,
+        'level'                 => T('Level') . ' '. (\Pyramid\get_current_level()+1) .'/' . ($levels+1),
         'header_text'           => T('Rate the following answers'),
         'answer_text_array'     => $answer_text_array,
         'answer_rate_submit'    => T('Rate'),
@@ -450,7 +453,7 @@ function view_final_answer($params) {
 
     $vars = array(
         'username' 					=> $sname . ' + ' . (count(\Group\get_status_bar_peers())-1),
-        'level' 					=> T('Level') . ' ' . \Pyramid\get_current_level() .'/' . $levels,
+        'level' 					=> T('Level') . ' ' . (\Pyramid\get_current_level()+1) .'/' . ($levels+1),
         'header_text' 			    => $winning_text,
         'other_header_text' 	    => $other_header_text,
         'final_answer_array' 		=> $params['final_answer_array'],
@@ -465,6 +468,7 @@ function view_final_answer($params) {
     $hidden_input_array['fid'] = $fid;
     $hidden_input_array['pid'] = $pid;
     $hidden_input_array['level'] = \Pyramid\get_current_level();
+    $hidden_input_array['levels'] = $levels;
     $hidden_input_array['page'] = "winning_answers";
     $hidden_input_array['group_id'] = $peer_group_id;
 

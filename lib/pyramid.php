@@ -355,7 +355,7 @@ function get_current_flow() {
     else{
         //throw new Exception("There are no flows");
         //show activity explanation
-        return false;
+        return  -1;
     }
 }
 
@@ -372,7 +372,7 @@ function wait($params) {
     $vars = array(
         'username' 					=> $sname . ' + ' . (count(\Group\get_status_bar_peers())-1),
         'username' 					=> $sname . ' + ' . $peers,
-        'level' 				    => T('Level') . ' ' . \Pyramid\get_current_level() .'/' . $levels,
+        'level' 				    => T('Level') . ' ' . (\Pyramid\get_current_level()+1) .'/' . ($levels+1),
         'answer_text' 			=> 'Write a question',
         'answer_submit_button' 	=> 'Submit your question',
         'hidden_input_array' 		=> array(
@@ -398,6 +398,7 @@ function wait($params) {
     $hidden_input_array['username'] = $sname;
     $hidden_input_array['fid'] = $fid;
     $hidden_input_array['level'] = \Pyramid\get_current_level();
+    $hidden_input_array['levels'] = $levels;
     $hidden_input_array['page'] = "waiting";
     $hidden_input_array['group_id'] = $peer_group_id;
 
@@ -420,7 +421,7 @@ function wait_pyramid($params) {
 
     $vars = array(
         'username' 					=> $sname,
-        'level' 				    => 'Level 1' . '/' . $levels,
+        'level' 				    => 'Level 1' . '/' . ($levels+1),
         'answer_text' 			=> 'Write a question',
         'answer_submit_button' 	=> 'Submit your question',
         'hidden_input_array' 		=> array(
@@ -432,6 +433,7 @@ function wait_pyramid($params) {
     $hidden_input_array['username'] = $sname;
     $hidden_input_array['fid'] = $fid;
     $hidden_input_array['level'] = 1;
+    $hidden_input_array['levels'] = $levels;
     $hidden_input_array['page'] = "pyramid_creation_waiting";
 
     $vars['hidden_input_array'] = array_merge($vars['hidden_input_array'], $hidden_input_array);

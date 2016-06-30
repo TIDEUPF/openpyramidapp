@@ -33,19 +33,15 @@
     #answer-header-level {
         float: left;
         text-align: center;
-        width: 20%;
     }
 
     #answer-header-user {
         float: left;
-        width: 40%;
     }
 
     #answer-header-logout {
         float: right;
         text-align: right;
-        width: 20%;
-        cursor: pointer;
     }
 
     .topbar_item {
@@ -69,41 +65,20 @@
         font-size: 1.35em;
         margin-top: 0.5em;
     }
-
-    #pyramid-icon {
-        position:fixed;
-        top : 3px;
-        left: 55%;
-        padding: 0 !important;
-    }
-
-    #pyramid-icon img {
-        height: 25px;
-    }
 </style>
 <div id="answer-frame">
     <form method="post">
         <div id="answer-header-frame">
 
-            <div id="pyramid-icon">
-                <img src="elements/resources/pyramid_icons/<?=($hidden_input_array['levels']+1)?>l_l<?=($hidden_input_array['level']+1)?>.png">
-            </div>
-
             <div id="topbar">
                 <div id="answer-header-user" class="topbar_item"><?=$username?></div>
-                <div id="answer-header-level" class="topbar_item"><?=$level?></div>
+                <!--<div id="answer-header-level" class="topbar_item"><?=$level?></div>-->
                 <div id="answer-header-logout" class="topbar_item"><?=TS("Logout")?></div>
                 <div style="clear:both"></div>
             </div>
 
             <div>
-                <?php if(isset($inactive_peers_count)):?>
-                <div id="answer-header-text">Waiting for <?=$inactive_peers_count?> peer(s) to continue...</div>
-                <?php endif;?>
-
-                <?php if(isset($inactive_groups_count)):?>
-                <div id="answer-header-text">Waiting for <?=$inactive_groups_count?> group(s) to continue...</div>
-                <?php endif;?>
+                <div id="answer-header-text">Waiting for a flow to continue...</div>
             </div>
 
         </div>

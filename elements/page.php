@@ -14,11 +14,11 @@
         <link rel="stylesheet" href="vendors/jquery-bar-rating/themes/font-awesome.min.css">
         <link rel="stylesheet" href="vendors/jquery-bar-rating/themes/fontawesome-stars.css">
         <script src="vendors/jquery-bar-rating/jquery.barrating.min.js"></script>
-        <script src="/<?=$node_path?>/socket.io/socket.io.js"></script>
+        <script src="/<?=$node_path?>/socket.io.js"></script>
         <script src="lib/actions.js"></script>
         <script>
             <?php if(!isset($nosocket)):?>
-            var socket = io({multiplex : false, 'reconnection': true,'reconnectionDelay': 3000,'maxReconnectionAttempts':Infinity, path: '/<?=$node_path?>/socket.io/'});
+            var socket = io({multiplex : false, 'reconnection': true,'reconnectionDelay': 3000,'maxReconnectionAttempts':Infinity, path: '/<?=$node_path?>/'});
             <?php endif;?>
             var timeoutPeriod = 10000;
             function del_vali(){ if(confirm('Submit Answer?')) { return true; }else{ return false; } }

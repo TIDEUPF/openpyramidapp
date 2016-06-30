@@ -92,6 +92,10 @@ SQL;
             }
         }
 
+        //encode the json object before making the flow safety checks
+        $flow_object_json = json_encode($flow_object);
+        $flow_object_json_sql = mysqli_real_escape_string($link, $flow_object_json);
+
         $min_students_per_pyramid = $flow_object->min_students_per_pyramid;
         if(!$flow_object->multiple_pyramids)
             $min_students_per_pyramid = $flow_object->expected_students;
@@ -101,9 +105,9 @@ SQL;
 
         //number of levels
         $n_levels = floor(log(floor($min_students_per_pyramid / $flow_object->first_group_size), 2)) + 2;
-        /*if ($flow_object->n_levels -1 > $n_levels)
+        if ($flow_object->n_levels -1 > $n_levels)
             $flow_object->n_levels = $n_levels + 1;
-*/
+
         //sanitize sql
         $flow_data = [];
         foreach ($flow_fields as $field) {
@@ -113,9 +117,6 @@ SQL;
         //substract the individual level
         $flow_data['n_levels']--;
         $flow_data['min_students_per_pyramid'] = $min_students_per_pyramid;
-
-        $flow_object_json = json_encode($flow_object);
-        $flow_object_json_sql = mysqli_real_escape_string($link, $flow_object_json);
 
         $datestamp = time();
 
@@ -913,7 +914,7 @@ if(!isset($_REQUEST['save']))	{
                                     <div data-role="popup" id="popupInfo3" class="ui-content" data-theme="a" style="max-width:700px;">
                                         <p><?=TS("Number of students allowed to be grouped into a single pyramid. Based on the total number of students and this value, several pyramids may require and it will be automatically suggested by the system")?>.</p>
                                     </div></label>
-                                <input type="number" name="min_students_per_pyramid" id="min_students_per_pyramid" value="12" data-clear-btn="true">
+                                <input type="number" name="min_students_per_pyramid" id="min_students_per_pyramid" value="20" data-clear-btn="true">
                             </div>
 
                             <div class="ui-field-contain">
@@ -1159,6 +1160,7 @@ if(!isset($_REQUEST['save']))	{
             set_field(timers[timer] + '_unit_value', converted_value.value);
             set_field(timers[timer] + '_unit', converted_value.unit);
         }
+        $('#popupAdvanced-popup fieldset').controlgroup();
     }
 
     function timers_to_seconds() {
@@ -1251,12 +1253,12 @@ if(!isset($_REQUEST['save']))	{
     function update_first_group_size() {
         var expected_students_setting = get_field_integer("expected_students");
         var number_of_pyramids = get_number_of_pyramids();
-        var number_of_pyramids_setting = get_field_integer("first_group_size");
+        var first_group_size_setting = get_field_integer("first_group_size");
         var expected_students_per_pyramid = Math.floor(expected_students_setting / number_of_pyramids);
 
         var max_possible_size = Math.min(10, Math.floor(expected_students_per_pyramid/2));
 
-        if(number_of_pyramids_setting > max_possible_size)
+        if(first_group_size_setting > max_possible_size)
             set_field("first_group_size", max_possible_size);
 
         $('[name="first_group_size"]').attr("max", max_possible_size);
@@ -1310,7 +1312,8 @@ if(!isset($_REQUEST['save']))	{
         var flow_data = {};
         for(var i in edit_flow_fields) {
             var field = edit_flow_fields[i];
-            flow_data[field] = $('[name="' + field +'"]').val();
+            //flow_data[field] = $('[name="' + field +'"]').val();
+            flow_data[field] = get_field(field);
         }
 
         $('[name="flow_data"]').val(JSON.stringify(flow_data));
@@ -1362,14 +1365,17 @@ if(!isset($_REQUEST['save']))	{
             discussion = discussion_table[discussion_setting];
             current_default = defaults[sync][discussion];
             flow_load_fields();
+            restore_timers();
         } else {
             update_fields();
         }
 
         $('#page-1').fadeOut(400,'swing', function() {
             var n_levels_setting = $('[name="n_levels"]').val();
+            $('.pyramid-animation').hide();
             var figure = $('#pyramid-levels-' + n_levels_setting).html();
             $('#pyramid-levels-' + n_levels_setting).html(figure);
+            $('#pyramid-levels-' + n_levels_setting).show();
             $('#page-' + goto).fadeIn();
         });
     });
@@ -1380,7 +1386,31 @@ if(!isset($_REQUEST['save']))	{
     });
 
     $(document).on('pagecreate', function() {
+        flow_load_fields();
         restore_timers();
+
+        $('a[data-rel="popup"]').attr('tabindex', '-1');
+
+        //disable enter submit
+        $('input').keypress(function(event) {
+
+            try {
+                update_fields();
+            } catch (e) {
+
+            }
+            if(event.keyCode == 13) {
+                return false;
+            }
+        });
+
+        setInterval(function () {
+            try {
+                update_fields();
+            } catch (e) {
+
+            }
+        }, 700);
 
         //update sliders
         $('[data-role="slider"], [data-type="range"]').slider('refresh');
@@ -1455,6 +1485,16 @@ if(!isset($_REQUEST['save']))	{
             $('[name="' + field + '"] [value="' + value + '"]').prop("selected", true);
         } else {
             $('[name="' + field + '"]').val(value);
+        }
+    }
+
+    function get_field(field) {
+        if($('[name="' + field + '"][type="radio"]').length) {
+            return $('[name="' + field + '"]:checked').val();
+        } else if($('select[name="' + field + '"]').length) {
+            return $('[name="' + field + '"] option:selected').val();
+        } else {
+            return $('[name="' + field + '"]').val();
         }
     }
 

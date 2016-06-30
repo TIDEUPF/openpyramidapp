@@ -7,8 +7,9 @@ $sid = $_SESSION['student'];
 global $fid, $flow_data;
 
 // $levels, $fname, $fdes, $fid, $fid_timestamp
-if(!\Pyramid\get_current_flow()) {
-    //flow changed
+if(\Pyramid\get_current_flow() === -1) {
+    //no flow
+    \Flow\wait_flow();
 }
 
 if((int)$flow_data['sync'] == 0) {

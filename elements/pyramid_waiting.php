@@ -65,10 +65,25 @@
         font-size: 1.35em;
         margin-top: 0.5em;
     }
+
+    #pyramid-icon {
+        position:fixed;
+        top : 3px;
+        left: 55%;
+        padding: 0 !important;
+    }
+
+    #pyramid-icon img {
+        height: 25px;
+    }
 </style>
 <div id="answer-frame">
     <form method="post">
         <div id="answer-header-frame">
+
+            <div id="pyramid-icon">
+                <img src="elements/resources/pyramid_icons/<?=($hidden_input_array['levels']+1)?>l_l<?=($hidden_input_array['level'])?>.png">
+            </div>
 
             <div id="topbar">
                 <div id="answer-header-user" class="topbar_item"><?=$username?></div>

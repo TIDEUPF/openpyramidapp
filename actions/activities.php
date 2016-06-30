@@ -44,6 +44,7 @@ foreach($flows as $flow) {
 
     //obtain the data for every pyramid in the current flow
     $pyramid_data = [];
+    $final_answers = false;
     for($i=0;$i<=$npid;$i++) {
 
         $pyramid_query = mysqli_query($link, "select fname, pg_level, pg_group, pg_group_id, pg_pid from pyramid_groups, flow where pg_fid = fid and pg_fid = '$fid' and pg_pid = '{$i}' order by pg_level ASC, pg_group_id ASC");
@@ -55,11 +56,12 @@ foreach($flows as $flow) {
 
         if(!$py_created) {
             $pyramid_data[$i] = null;
+            continue;
         } else {
 
         }
 
-        //check if the pyramid has finished with the desired number of answers
+        //check if the pyramid has finished with the desired number of answers and get the final answers
         if (mysqli_num_rows(mysqli_query($link, "select * from pyramid_groups where pg_fid = '$fid' and pg_pid = '{$i}'")) == mysqli_num_rows(mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_pid = '{$i}'"))) {
 
             $pyramid_level_answers = mysqli_query($link, "select * from flow where fid = '$fid'");
@@ -74,6 +76,8 @@ foreach($flows as $flow) {
                 $data_t_12 = mysqli_fetch_assoc($result_12);
                 $pyramid_data[$i]['answers'][] = $data_t_12['fs_answer'];
             }
+
+            $final_answers = true;
         } else {
             $pyramid_data[$i]['finished'] = false;
         }
@@ -135,7 +139,7 @@ SQL;
 }
 
 $flow = $flow_query_row;
-if(!$npid) {
+if($npid === null) {
     $pyramid = [];
     for($i=0;$i<$flow['levels'];$i++) {
         $groups = [];
@@ -179,23 +183,21 @@ header('Content-Type: text/html; charset=utf-8');
     <div data-role="main" class="ui-content">
         <div id="activity-info-main">
 
-            <?php if(isset($answer)):?>
+            <?php if(isset($final_answers)):?>
             <div id="activity-winning-answers-block">
                 <div id="activity-winning-answers-block-title"><?=TS("Most popular options:")?></div>
                 <?php foreach($flow as $pkey => $pyramid):?>
-                    <?php if(count($flow) > 1 and isset($pyramid['answers'])):?>
+                    <?php if(isset($pyramid['answers'])):?>
                     <div class="activity-winning-answers-block-pyramid-block">
                         <div class="activity-winning-answers-block-pyramid-number"><?=TS("Pyramid") . ' ' . ($pkey+1)?></div>
-                    <?php endif;?>
+
                         <ul class="activity-winning-answers-block-pyramid-list">
                     <?php foreach($pyramid['answers'] as $answer):?>
                             <li class="activity-winning-answers-block-pyramid-list-item"><?=htmlspecialchars($answer)?></li>
                     <?php endforeach ;?>
                         </ul>
-                    <?php if(count($flow) > 1):?>
                     </div>
                     <?php endif;?>
-
                 <?php endforeach; ?>
             </div>
             <?php endif;?>
@@ -205,13 +207,13 @@ header('Content-Type: text/html; charset=utf-8');
 
                     <?php foreach($pyramid['levels'] as $lkey => $level):?>
                         <div class="activity-pyramid-level-block">
-                            <div class="activity-pyramid-group-block-number">Pyramid <?=($pkey+1)?> level <?=($lkey+1)?></div>
+                            <div class="activity-pyramid-group-block-number">Pyramid <?=($pkey+1)?> level <?=($lkey+2)?></div>
 
                             <div class="activity-pyramid-group-block-list">
                             <?php foreach($level['groups'] as $gkey => $group):?>
                                 <div class="activity-pyramid-level-group-block">
-                                    <a href="#grp<?=($pkey+1)?>2<?=($gkey+1)?>" data-rel="popup" class="ui-btn ui-corner-all">Group <?=($gkey+1)?> </a>
-                                    <div data-role="popup" id="grp<?=($pkey+1)?>2<?=($gkey+1)?>" data-theme="a" class="group-popup ui-corner-all">
+                                    <a href="#grp<?=($pkey+1)?><?=$lkey?><?=($gkey+1)?>" data-rel="popup" class="ui-btn ui-corner-all">Group <?=($gkey+1)?> </a>
+                                    <div data-role="popup" id="grp<?=($pkey+1)?><?=$lkey?><?=($gkey+1)?>" data-theme="a" class="group-popup ui-corner-all">
                                         <div class="popup-members-title"><?=TS("Members")?></div>
                                         <ul class="popup-members-list">
                                         <?php $members = explode(',', $group['members']);?>
@@ -224,7 +226,7 @@ header('Content-Type: text/html; charset=utf-8');
                                             <div class="popup-ranking-title"><?=TS("Ranking")?></div>
                                             <ul>
                                             <?php $i=0; foreach($group['ranking'] as $ar):?>
-                                                <li><div class="ranking-position"><?=(($i++)+1)?></div><div class="ranking-text"><?=htmlspecialchars($ar['answer'])?></div><div class="ranking-score"><?=$ar['rating']?></div></li>
+                                                <li><div class="ranking-position"><?=(($i++)+1)?></div><div class="ranking-text"><?=htmlspecialchars($ar['answer'])?></div><div class="ranking-score"><?=$ar['rating']?></div><div style="clear:both"></div></li>
                                             <?php endforeach;?>
                                             </ul>
                                         </div>

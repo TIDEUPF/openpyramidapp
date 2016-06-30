@@ -124,7 +124,7 @@ select[name="discussion"]~[role="application"] {
 }
 
 .activity-pyramid-level-group-block {
-    width: 300px;
+    width: 280px;
     display: inline-block;
     vertical-align: text-top;
     margin: 10px 40px;
@@ -142,7 +142,6 @@ select[name="discussion"]~[role="application"] {
 
 .ranking ul li {
     display:block;
-    height: 20px;
     padding: 0;
 }
 
@@ -168,7 +167,7 @@ select[name="discussion"]~[role="application"] {
 }
 
 .ranking ul li .ranking-text {
-    width: 450px;
+    width: 410px;
     margin-left: 10px;
     float: left;
     display: block;
@@ -231,7 +230,7 @@ select[name="discussion"]~[role="application"] {
 }
 
 #activity-info-main {
-    width: 900px;
+    width: 800px;
     margin: 0 auto 0 auto;
 }
 
@@ -257,7 +256,7 @@ select[name="discussion"]~[role="application"] {
 }
 
 .activity-pyramid-block {
-    width: 900px;
+    width: 800px;
     margin: 0 auto 0 auto;
 }
 
