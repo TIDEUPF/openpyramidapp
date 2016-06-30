@@ -1,6 +1,7 @@
 <?php
 session_start();
 include('dbvar.php');
+global $node_path;
 
 //include('inc_pyramid_func.php');
 
@@ -54,6 +55,9 @@ SQL;
 
         $edit = true;
     } elseif(isset($_POST['create_flow'])) {
+        global $sname;
+
+        $sname = $teacher_id;
         \Util\log_submit();
         $action = $_POST['create_flow'];
         $flow_data_decoded = json_decode($_POST['flow_data']);
@@ -62,6 +66,7 @@ SQL;
         $error = false;
         $flow_object = new stdClass();
         foreach ($flow_fields as $field) {
+            /*
             if (!isset($flow_data_decoded->$field)) {
                 $error = true;
                 break;
@@ -70,7 +75,7 @@ SQL;
             if (empty($flow_data_decoded->$field) and $flow_data_decoded->$field !== "0" and $flow_data_decoded->$field !== 0) {
                 $error = true;
                 break;
-            }
+            }*/
 
             $flow_object->$field = is_numeric($flow_data_decoded->$field) ? ((int)$flow_data_decoded->$field) : $flow_data_decoded->$field;
         }
@@ -83,20 +88,31 @@ SQL;
 
         foreach ($n_levels_fields as $field) {
             if (!(is_integer($flow_object->$field) and $flow_object->$field > 0)) {
-                $error = true;
+                //$error = true;
             }
         }
 
+        $min_students_per_pyramid = $flow_object->min_students_per_pyramid;
+        if(!$flow_object->multiple_pyramids)
+            $min_students_per_pyramid = $flow_object->expected_students;
+
+        if($min_students_per_pyramid > $flow_object->expected_students)
+            $min_students_per_pyramid = $flow_object->expected_students;
+
         //number of levels
-        $n_levels = floor(log(floor($flow_object->min_students_per_pyramid / $flow_object->first_group_size), 2)) + 2;
-        if ($flow_object->n_levels > $n_levels)
-            $flow_object->n_levels = $n_levels;
+        $n_levels = floor(log(floor($min_students_per_pyramid / $flow_object->first_group_size), 2)) + 2;
+        if ($flow_object->n_levels -1 > $n_levels)
+            $flow_object->n_levels = $n_levels + 1;
 
         //sanitize sql
         $flow_data = [];
         foreach ($flow_fields as $field) {
             $flow_data[$field] = mysqli_real_escape_string($link, $flow_object->$field);
         }
+
+        //substract the individual level
+        $flow_data['n_levels']--;
+        $flow_data['min_students_per_pyramid'] = $min_students_per_pyramid;
 
         $flow_object_json = json_encode($flow_object);
         $flow_object_json_sql = mysqli_real_escape_string($link, $flow_object_json);
@@ -322,11 +338,13 @@ if(!isset($_REQUEST['save']))	{
     <script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
     <script src="lib/actions.js"></script>
     <script type="text/javascript">
-        var socket = io({multiplex : false, 'reconnection': true,'reconnectionDelay': 3000,'maxReconnectionAttempts':Infinity, path: '/socket.io/'});
+        var socket = io({multiplex : false, 'reconnection': true,'reconnectionDelay': 3000,'maxReconnectionAttempts':Infinity, path: '/<?=$node_path?>/'});
     </script>
 </head>
 
 <body>
+<input name="page" type="hidden" value="create"/>
+<input name="username" type="hidden" value="<?=htmlspecialchars($teacher_id)?>"/>
 <div data-role="page">
     <div data-role="main" class="ui-content">
         <div id="center-frame">
@@ -1233,9 +1251,13 @@ if(!isset($_REQUEST['save']))	{
     function update_first_group_size() {
         var expected_students_setting = get_field_integer("expected_students");
         var number_of_pyramids = get_number_of_pyramids();
+        var number_of_pyramids_setting = get_field_integer("first_group_size");
         var expected_students_per_pyramid = Math.floor(expected_students_setting / number_of_pyramids);
 
         var max_possible_size = Math.min(10, Math.floor(expected_students_per_pyramid/2));
+
+        if(number_of_pyramids_setting > max_possible_size)
+            set_field("first_group_size", max_possible_size);
 
         $('[name="first_group_size"]').attr("max", max_possible_size);
         $('[name="first_group_size"]').slider("refresh");
@@ -1274,7 +1296,7 @@ if(!isset($_REQUEST['save']))	{
 
         //sync
         var learning_setting = $('[name="learning_setting"]:checked').val();
-        var sync = (learning_setting === "on") ? 1 : 0;
+        var sync = (learning_setting === "classroom") ? 1 : 0;
         $('[name="sync"]').val(sync);
 
         //random_selection

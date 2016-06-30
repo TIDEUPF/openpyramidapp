@@ -220,7 +220,7 @@
 <div id="answer-frame">
     <form method="post" action="student.php" data-ajax="false">
         <div id="submit-confirmation">
-            <span id="confirm-text">><?=TS("Are you sure that you want to finish rating and discussion for this level?")?><</span>
+            <span id="confirm-text"><?=TS("Are you sure that you want to finish rating and discussion for this level?")?></span>
             <button id="yes-submit" type="submit" name="rate"><?=TS("Yes")?></button>
             <button id="no-submit"><?=TS("No")?></button>
         </div>

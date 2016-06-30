@@ -174,7 +174,7 @@
                 <!--<li><?php echo TS("It is recommended to provide an <span class=\"bold\">email address</span> here so that you will be automatically notified about the activity progression to make it much easier. This email address does not necessarily have to be the same as your FutureLearn course email.")?></li>-->
                 <!--<li><?php echo TS("If you do not like to provide an email, you can use a preferred username.")?></li>-->
                 <!--<li><?php echo TS("You can see activity notifications from the step comments also.")?></li>-->
-                <li><?php echo TS("Please do remember the e-mail or username you're using for this app! You will need to use it when accessing to participate in other levels of the pyramid. If you use another username you will be added with a different pyramid and affect your activity progress.")?></li>
+                <!--<li><?php echo TS("Please do remember the e-mail or username you're using for this app! You will need to use it when accessing to participate in other levels of the pyramid. If you use another username you will be added with a different pyramid and affect your activity progress.")?></li>-->
                 <li><?php echo TS("For more information on how the app works, you can watch the following video.")?></li>
             </ul>
             <div id="contact"><a href="mailto:ssp.clfp@upf.edu?Subject=Pyramid%20App"><?=TS("Contact address")?>: ssp.clfp@upf.edu</a></div>

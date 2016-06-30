@@ -3,5 +3,6 @@ php_value short_open_tag 1
 RewriteEngine on
 
 RewriteRule ^jslib/chatvars\.js$ index.php?action=chatjs [L,QSA]
+RewriteRule ^Activity$ index.php?action=activity [L,QSA]
 RewriteRule ^([A-Za-z_]+)\.php$ index.php?action=$1 [L,QSA]
 RewriteRule ^([A-Za-z_]+)\.php?\(.*\)$ index.php?action=$1&$2 [L,QSA]

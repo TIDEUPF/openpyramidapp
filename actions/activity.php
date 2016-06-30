@@ -1,6 +1,7 @@
 <?php
 session_start();
 include('dbvar.php');
+global $node_path;
 
 if(isset($_SESSION['user'])) {
     $teacher_id = $_SESSION['user'];
@@ -18,8 +19,17 @@ if(isset($_SESSION['user'])) {
     <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
     <link rel="stylesheet" type="text/css" href="elements/resources/css/teacher/styles.css">
+
+    <script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
+    <script src="lib/actions.js"></script>
+    <script type="text/javascript">
+        var socket = io({multiplex : false, 'reconnection': true,'reconnectionDelay': 3000,'maxReconnectionAttempts':Infinity, path: '/<?=$node_path?>/'});
+    </script>
+
 </head>
 <body style="width:1050px;overflow-x: auto;margin: 0 auto 0 auto;">
+<input name="page" type="hidden" value="teacher_main_menu"/>
+<input name="username" type="hidden" value="<?=htmlspecialchars($teacher_id)?>"/>
 <style>
     [data-role="main"] {
         width: 1050px !important;
@@ -65,6 +75,7 @@ if(isset($_SESSION['user'])) {
         window.location = $(this).attr("logout") + '.php';
     });
 
+    /*
     $(window).on('popstate', function (e) {
         return false;
         var state = e.originalEvent.state;
@@ -72,6 +83,11 @@ if(isset($_SESSION['user'])) {
             //load content with ajax
             return false;
         }
+    });
+    */
+    history.pushState(null, null, document.title);
+    window.addEventListener('popstate', function () {
+        history.pushState(null, null, document.title);
     });
 
     $('[activity="teacher"]').click();

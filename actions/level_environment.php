@@ -3,7 +3,7 @@ Student\enforce_login();
 
 $sname = Student\get_username();
 $sid = $_SESSION['student'];
-global $fid, $link, $ps;
+global $fid, $link, $ps, $flow_data;
 
 // $levels, $fname, $fdes, $fid, $fid_timestamp
 $reset_flow = !\Pyramid\get_current_flow();

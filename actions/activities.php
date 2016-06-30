@@ -1,18 +1,28 @@
 <?php
+include('dbvar.php');
+global $node_path;
 $flow_data = [];
 //$fid_array = [10,11,12];
 
 //obtain the flows pertaining to the current teacher
 $flows = [];
 $teacher_id = $_SESSION['user'];
-$flow_query = mysqli_query($link, "select * from flow where teacher_id = '$teacher_id'");
+$fid = (int)$_REQUEST['edit'];
+$flow_query = mysqli_query($link, "select * from flow where fid = '{$fid}' and teacher_id = '$teacher_id'");
 if(mysqli_num_rows($flow_query) > 0) {
-    while ($flow_query_row = mysqli_fetch_assoc($flow_query)) {
-        $flow['id'] = $flow_query_row["fid"];
-        $flow['name'] = $flow_query_row["fname"];
-        $flows[] = $flow;
-    }
+    $flow_query_row = mysqli_fetch_assoc($flow_query);
+    $flow_query_row['id'] = $flow_query_row["fid"];
+    $flow_query_row['name'] = $flow_query_row["fname"];
+    $flows[] = $flow_query_row;
 }
+
+$flow = $flow_query_row;
+$n_groups = floor($flow['pyramid_size']/$flow['nostupergrp']);
+if($flow['multi_py'])
+    $n_pyramids = floor($flow['expected_students']/$flow['pyramid_size']);
+else
+    $n_pyramids = 1;
+
 //obtain the data for every flow
 foreach($flows as $flow) {
 
@@ -22,8 +32,10 @@ foreach($flows as $flow) {
     $npid = null;
     $result = mysqli_query($link,"select * from pyramid_students where fid='$fid' order by pid desc limit 1");
 
-    if(!mysqli_num_rows($result))
+    if(!mysqli_num_rows($result)) {
         $npid = null;
+        break;
+    }
     else {
         $result_row = mysqli_fetch_assoc($result);
         $npid = (int)$result_row['pid'];
@@ -119,11 +131,27 @@ SQL;
         }
     }
 
-    $flow_data[$flow_name] = $pyramid_data;
+    $flow_data = $pyramid_data;
 }
 
-    $flow = $flow_data['forest2chat'];
-    header('Content-Type: text/html; charset=utf-8');
+$flow = $flow_query_row;
+if(!$npid) {
+    $pyramid = [];
+    for($i=0;$i<$flow['levels'];$i++) {
+        $groups = [];
+        for($j=0; $j < floor($n_groups/pow(2, $i)); $j++) {
+            $groups['groups'][] = [];
+        }
+        $pyramid['levels'][] = $groups;
+    }
+
+    for($y=0; $y<$n_pyramids; $y++) {
+        $flow_data[] = $pyramid;
+    }
+}
+
+$flow = $flow_data;
+header('Content-Type: text/html; charset=utf-8');
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -133,44 +161,44 @@ SQL;
     <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
     <link rel="stylesheet" type="text/css" href="elements/resources/css/teacher/styles.css">
+
+    <script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
+    <script src="lib/actions.js"></script>
+    <script type="text/javascript">
+        var socket = io({multiplex : false, 'reconnection': true,'reconnectionDelay': 3000,'maxReconnectionAttempts':Infinity, path: '/<?=$node_path?>/'});
+    </script>
+
 </head>
 <body>
+<input name="page" type="hidden" value="activity_tracking"/>
+<input name="username" type="hidden" value="<?=htmlspecialchars($teacher_id)?>"/>
 <div data-role="page">
     <div data-role="header">
         <h1>View Pyramid details</h1>
     </div>
     <div data-role="main" class="ui-content">
         <div id="activity-info-main">
-            <div id="activity-select-block">
-                <div class="ui-field-contain">
-                    <label for="select-activity">Activity name:</label>
-                    <select name="select-activity" id="select-activity">
-                        <?php foreach($flows as $flow_option):?>
-                        <option value="<?=$flow_option['id']?>"><?=htmlspecialchars($flow_option['name'])?></option>
-                        <?php endforeach;?>
-                    </select>
-                </div>
-            </div>
 
-
+            <?php if(isset($answer)):?>
             <div id="activity-winning-answers-block">
-            <div id="activity-winning-answers-block-title"><?=TS("Most popular options:")?></div>
-            <?php foreach($flow as $pkey => $pyramid):?>
-                <?php if(count($flow) > 1 and isset($pyramid['answers'])):?>
-                <div class="activity-winning-answers-block-pyramid-block">
-                    <div class="activity-winning-answers-block-pyramid-number"><?=TS("Pyramid") . ' ' . ($pkey+1)?></div>
-                <?php endif;?>
-                    <ul class="activity-winning-answers-block-pyramid-list">
+                <div id="activity-winning-answers-block-title"><?=TS("Most popular options:")?></div>
+                <?php foreach($flow as $pkey => $pyramid):?>
+                    <?php if(count($flow) > 1 and isset($pyramid['answers'])):?>
+                    <div class="activity-winning-answers-block-pyramid-block">
+                        <div class="activity-winning-answers-block-pyramid-number"><?=TS("Pyramid") . ' ' . ($pkey+1)?></div>
+                    <?php endif;?>
+                        <ul class="activity-winning-answers-block-pyramid-list">
                     <?php foreach($pyramid['answers'] as $answer):?>
-                        <li class="activity-winning-answers-block-pyramid-list-item"><?=htmlspecialchars($answer)?></li>
+                            <li class="activity-winning-answers-block-pyramid-list-item"><?=htmlspecialchars($answer)?></li>
                     <?php endforeach ;?>
-                    </ul>
-                <?php if(count($flow) > 1):?>
-                </div>
-                <?php endif;?>
+                        </ul>
+                    <?php if(count($flow) > 1):?>
+                    </div>
+                    <?php endif;?>
 
                 <?php endforeach; ?>
             </div>
+            <?php endif;?>
 
             <?php foreach($flow as $pkey => $pyramid): ?>
                 <div class="activity-pyramid-block">
@@ -216,81 +244,6 @@ SQL;
 
 
 
-
-
-
-
-
-
-
-
-
-            <div class="ui-corner-all custom-corners">
-                <div class="ui-bar ui-bar-a">
-                    <div class="ui-grid-a">
-                        <div class="ui-block-a" style="width:300px"><div class="ui-bar ui-bar-a" style="height:30px">Most popular options:</div></div>
-                        <div class="ui-block-b" style="width:950px"><div class="ui-bar ui-bar-a">
-                                <ul data-role="listview">
-                                    <?php foreach($flow as $pyramid):?>
-                                        <?php foreach($pyramid['answers'] as $answer):?>
-                                    <li><?=htmlspecialchars($answer)?></li>
-                                        <?php endforeach ;?>
-                                    <?php endforeach; ?>
-                                </ul>
-                            </div></div>
-                    </div><!-- /grid-a -->
-                </div>
-
-                <style>
-                    .group-popup {
-                        padding: 15px;
-                        font-weight: bold;
-                        line-height: 18px;;
-
-                    }
-                </style>
-
-                <?php foreach($flow as $pkey => $pyramid): ?>
-                    <?php $block_letters = ['a', 'a', 'a', 'b', 'c', 'd', 'e', 'f', 'g'] ?>
-                <div class="ui-bar ui-bar-a" style="height:30px">Pyramid No : <?=($pkey+1)?></div>
-                <div class="ui-grid-<?=$block_letters[count($pyramid['levels'])-1]?>">
-                    <div class="ui-block-a"><div class="ui-bar ui-bar-a" style="height:30px">Level: 2 &nbsp;&nbsp;  No of groups : <?=count($pyramid['levels'][1]['groups'])?></div>
-                        <div class="ui-grid-<?=$block_letters[count($pyramid['levels'][1]['groups'])]?>"><!-- ui-grid-X where X depends of the no of columns needed -->
-                            <?php foreach($pyramid['levels'][1]['groups'] as $key => $group): ?>
-                            <div class="ui-block-<?=$block_letters[$key+2]?>">
-                                <div class="ui-bar ui-bar-a">
-                                    <a href="#grp<?=($pkey+1)?>2<?=($key+1)?>" data-rel="popup" class="ui-btn ui-corner-all">Group <?=($key+1)?> </a>
-                                    <div data-role="popup" id="grp<?=($pkey+1)?>2<?=($key+1)?>" data-theme="a" class="group-popup ui-corner-all">
-                                    <?=implode('<br>', explode(',', $group[0]))?>
-                                    </div>
-                                    <?=htmlspecialchars($group[1])?>
-                                </div>
-                            </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-
-                    <div class="ui-block-b"><div class="ui-bar ui-bar-a" style="height:30px">Level: 3 &nbsp;&nbsp;  No of groups : <?=count($pyramid['levels'][2]['groups'])?></div>
-                        <div class="ui-grid-<?=$block_letters[count($pyramid['levels'][2]['groups'])]?>">
-                            <?php foreach($pyramid['levels'][2]['groups'] as $key => $group): ?>
-                            <div class="ui-block-<?=$block_letters[$key+2]?>">
-                                <div class="ui-bar ui-bar-a">
-                                    <a href="#grp<?=($pkey+1)?>3<?=($key+1)?>" data-rel="popup" class="ui-btn ui-corner-all">Group <?=($key+1)?> </a>
-                                    <div data-role="popup" id="grp<?=($pkey+1)?>3<?=($key+1)?>" data-theme="a" class="group-popup ui-corner-all">
-                                        <?=implode('<br>', explode(',', $group[0]))?>
-                                    </div>
-                                    <?=htmlspecialchars($group[1])?>
-                                </div>
-                            </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="ui-bar ui-bar-a" style="height:10px"></div>
-                <?php endforeach;?>
-
-            </div>
         </div>
     </div>
 </div>

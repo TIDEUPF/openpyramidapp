@@ -3,7 +3,7 @@
 Namespace View;
 
 function element($path, $vars, $filter = true) {
-    global $device, $flow_data;
+    global $device, $flow_data, $node_path;
 
     $current_path = __DIR__;
 

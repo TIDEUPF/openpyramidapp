@@ -1,7 +1,8 @@
 <?php
 session_start();
 include('dbvar.php');
-
+global $node_path;
+    
 //include('inc_pyramid_func.php');
 
 
@@ -330,16 +331,24 @@ header('Content-Type: text/html; charset=utf-8');
     <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
     <link rel="stylesheet" type="text/css" href="elements/resources/css/teacher/styles.css">
+
+    <script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
+    <script src="lib/actions.js"></script>
+    <script type="text/javascript">
+        var socket = io({multiplex : false, 'reconnection': true,'reconnectionDelay': 3000,'maxReconnectionAttempts':Infinity, path: '/<?=$node_path?>/'});
+    </script>
 </head>
 
 <body>
+<input name="page" type="hidden" value="summary"/>
+<input name="username" type="hidden" value="<?=htmlspecialchars($teacher_id)?>"/>
 <div data-role="page">
     <div data-role="header">
         <h1>Activity Summary</h1>
     </div>
 
     <div id="pyramid-summary-levels-block">
-        <div id="pyramid-levels-3" class="pyramid-animation" style="position: relative;float: left;margin-left: 15px;">
+        <div id="pyramid-levels-2" class="pyramid-animation" style="position: relative;float: left;margin-left: 15px;">
             <svg viewBox="70 5 280 210">
                 <polygon points="210,5 350,210 70,210" style="fill:pink;stroke:purple;stroke-width:2" />
                 <circle cx="140" cy="165" r="15" stroke="green" stroke-width="2" fill="yellow" />
@@ -348,10 +357,10 @@ header('Content-Type: text/html; charset=utf-8');
                 <circle cx="285" cy="165" r="15" stroke="green" stroke-width="2" fill="yellow" />
 
                 <line x1="130" y1="125" x2="290" y2="125" style="stroke:rgb(255,0,155);stroke-width:4" />
-    
-                <text x="120" y="205" fill="red">Level 1 – Individual level</text>
-                <text x="55" y="140" fill="red" transform="rotate(-52,50,60)">Rating level(s)</text>
-    
+
+                <text x="120" y="205" fill="red"><?=TS('Level 1 – Individual level')?></text>
+                <text x="55" y="140" fill="red" transform="rotate(-52,50,60)"><?=TS('Rating level(s)')?></text>
+
                 <!-- first level first 2 groups animation -->
                 <!--
                 <circle cx="120" cy="175" stroke="green" stroke-width="2" fill="yellow">
@@ -361,7 +370,7 @@ header('Content-Type: text/html; charset=utf-8');
                     <animate attributeName="fill" attributeType="CSS" from="yellow" to="purple" begin="0s" dur="2s" fill="freeze" />
                     <set attributeName="visibility" attributeType="CSS" to="hidden" begin="2s" dur="5s" fill="freeze" />
                 </circle>
-    
+
                 <circle cx="180" cy="175" stroke="green" stroke-width="2" fill="yellow">
                     <animate attributeName="cx" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="180" to="150" />
                     <animate attributeName="cy" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="175" to="160" />
@@ -371,7 +380,7 @@ header('Content-Type: text/html; charset=utf-8');
                 </circle>
     -->
                 <!--circle cx="170" cy="120" r="17" stroke="green" stroke-width="2" fill="yellow"-->
-    
+
                 <!-- first level next 2 groups animation -->
                 <!--
                 <circle cx="240" cy="180" r="12" stroke="green" stroke-width="2" fill="yellow">
@@ -381,7 +390,7 @@ header('Content-Type: text/html; charset=utf-8');
                     <animate attributeName="fill" attributeType="CSS" from="yellow" to="purple" begin="0s" dur="2s" fill="freeze" />
                     <set attributeName="visibility" attributeType="CSS" to="hidden" begin="2s" dur="5s" fill="freeze" />
                 </circle>
-    
+
                 <circle cx="300" cy="180" r="16" stroke="green" stroke-width="2" fill="yellow">
                     <animate attributeName="cx" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="300" to="270" />
                     <animate attributeName="cy" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="180" to="160" />
@@ -390,26 +399,12 @@ header('Content-Type: text/html; charset=utf-8');
                     <set attributeName="visibility" attributeType="CSS" to="hidden" begin="2s" dur="5s" fill="freeze" />
                 </circle>
                 -->
-    
-                <circle stroke="blue" stroke-width="2" visibility="hidden">
-                    <set attributeName="visibility" attributeType="CSS" to="visible" begin="0.2s" dur="2s" fill="freeze" />
-                    <animate attributeName="cx" attributeType="XML" begin="0.2s" dur="2s" fill="freeze" from="180" to="210" />
-                    <animate attributeName="cy" attributeType="XML" begin="0.2s" dur="2s" fill="freeze" from="120" to="85" />
-                    <animate attributeName="r" attributeType="XML" begin="0.2s" dur="2s" fill="freeze" from="17" to="23" />
-                    <animate attributeName="fill" attributeType="CSS" from="yellow" to="red" begin="0.2s" dur="2s" fill="freeze" />
-                </circle>
-    
-                <circle stroke="blue" stroke-width="2" visibility="hidden">
-                    <set attributeName="visibility" attributeType="CSS" to="visible" begin="0.2s" dur="2s" fill="freeze" />
-                    <animate attributeName="cx" attributeType="XML" begin="0.2s" dur="2s" fill="freeze" from="230" to="210" />
-                    <animate attributeName="cy" attributeType="XML" begin="0.2s" dur="2s" fill="freeze" from="120" to="85" />
-                    <animate attributeName="r" attributeType="XML" begin="0.2s" dur="2s" fill="freeze" from="17" to="23" />
-                    <animate attributeName="fill" attributeType="CSS" from="yellow" to="red" begin="0.2s" dur="2s" fill="freeze" />
-                </circle>
+
+                <circle cx="210" cy="85" r="23" fill="red" stroke="blue" stroke-width="2"></circle>
             </svg>
         </div>
     
-        <div id="pyramid-levels-2" class="pyramid-animation" style="position: relative;float: left;margin-left: 15px;">
+        <div id="pyramid-levels-3" class="pyramid-animation" style="position: relative;float: left;margin-left: 15px;">
             <svg viewBox="70 5 280 210">
                 <polygon points="210,5 350,210 70,210" style="fill:pink;stroke:purple;stroke-width:2" />
                 <circle cx="120" cy="175" r="12" stroke="green" stroke-width="2" fill="yellow" />
@@ -421,76 +416,15 @@ header('Content-Type: text/html; charset=utf-8');
                 <text x="120" y="205" fill="red">Level 1 – Individual level</text>
                 <text x="55" y="140" fill="red" transform="rotate(-52,50,60)">Rating level(s)</text>
     
-                <!-- first level first 2 groups animation -->
-                <circle cx="120" cy="175" stroke="green" stroke-width="2" fill="yellow">
-                    <animate attributeName="cx" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="120" to="150" />
-                    <animate attributeName="cy" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="175" to="160" />
-                    <animate attributeName="r" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="12" to="16" />
-                    <animate attributeName="fill" attributeType="CSS" from="yellow" to="purple" begin="0s" dur="2s" fill="freeze" />
-                    <set attributeName="visibility" attributeType="CSS" to="hidden" begin="2s" dur="5s" fill="freeze" />
-                </circle>
-    
-                <circle cx="180" cy="175" stroke="green" stroke-width="2" fill="yellow">
-                    <animate attributeName="cx" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="180" to="150" />
-                    <animate attributeName="cy" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="175" to="160" />
-                    <animate attributeName="r" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="12" to="16" />
-                    <animate attributeName="fill" attributeType="CSS" from="yellow" to="purple" begin="0s" dur="2s" fill="freeze" />
-                    <set attributeName="visibility" attributeType="CSS" to="hidden" begin="2s" dur="5s" fill="freeze" />
-                </circle>
-    
-                <!-- first level next 2 groups animation -->
-                <circle cx="240" cy="180" r="12" stroke="green" stroke-width="2" fill="yellow">
-                    <animate attributeName="cx" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="240" to="270" />
-                    <animate attributeName="cy" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="180" to="160" />
-                    <animate attributeName="r" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="12" to="16" />
-                    <animate attributeName="fill" attributeType="CSS" from="yellow" to="purple" begin="0s" dur="2s" fill="freeze" />
-                    <set attributeName="visibility" attributeType="CSS" to="hidden" begin="2s" dur="5s" fill="freeze" />
-                </circle>
-    
-                <circle cx="300" cy="180" r="16" stroke="green" stroke-width="2" fill="yellow">
-                    <animate attributeName="cx" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="300" to="270" />
-                    <animate attributeName="cy" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="180" to="160" />
-                    <animate attributeName="r" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="12" to="16" />
-                    <animate attributeName="fill" attributeType="CSS" from="yellow" to="purple" begin="0s" dur="2s" fill="freeze" />
-                    <set attributeName="visibility" attributeType="CSS" to="hidden" begin="2s" dur="5s" fill="freeze" />
-                </circle>
-    
                 <g class="level1">
-                    <circle id="click-circle2"  r="17" stroke="black" stroke-width="2" visibility="hidden">
-                        <set attributeName="visibility" attributeType="CSS" to="visible" begin="2s" dur="2s" fill="freeze" />
-                        <animate attributeName="cx" attributeType="XML" begin="2s" dur="2s" fill="freeze" from="270" to="230" />
-                        <animate attributeName="cy" attributeType="XML" begin="2s" dur="2s" fill="freeze" from="160" to="120" />
-                        <animate attributeName="r" attributeType="XML" begin="2s" dur="2s" from="16" to="17" />
-                        <animate attributeName="fill" attributeType="CSS" from="yellow" to="green" begin="2s" dur="4s" fill="freeze" />
-                    </circle>
-    
-                    <circle id="click-circle1" r="17" stroke="black" stroke-width="2" fill="purple" visibility="hidden">
-                        <set attributeName="visibility" attributeType="CSS" to="visible" begin="2s" dur="2s" fill="freeze" />
-                        <animate attributeName="cx" attributeType="XML" begin="2s" dur="2s" fill="freeze" from="150" to="180" />
-                        <animate attributeName="cy" attributeType="XML" begin="2s" dur="2s" fill="freeze" from="160" to="120" />
-                        <animate attributeName="r" attributeType="XML" begin="2s" dur="2s" from="16" to="17" />
-                        <animate attributeName="fill" attributeType="CSS" begin="2s" dur="2s" fill="freeze" />
-                    </circle>
+                    <circle id="click-circle2" cx="230" cy="120" r="17" fill="green" stroke="black" stroke-width="2"></circle>
+                    <circle id="click-circle1" cx="180" cy="120" r="17" fill="green" stroke="black" stroke-width="2"></circle>
                 </g>
     
     
                 <line x1="149" y1="95" x2="271" y2="95" style="stroke:rgb(255,0,155);stroke-width:4" />
     
-                <circle stroke="blue" stroke-width="2" visibility="hidden">
-                    <set attributeName="visibility" attributeType="CSS" to="visible" begin="4.5s" dur="2s" fill="freeze" />
-                    <animate attributeName="cx" attributeType="XML" begin="4.5s" dur="3s" fill="freeze" from="180" to="210" />
-                    <animate attributeName="cy" attributeType="XML" begin="4.5s" dur="3s" fill="freeze" from="120" to="62" />
-                    <animate attributeName="r" attributeType="XML" begin="4.5s" dur="3s" fill="freeze" from="17" to="23" />
-                    <animate attributeName="fill" attributeType="CSS" from="purple" to="red" begin="4.5s" dur="2s" fill="freeze" />
-                </circle>
-    
-                <circle stroke="blue" stroke-width="2" visibility="hidden">
-                    <set attributeName="visibility" attributeType="CSS" to="visible" begin="4.5s" dur="2s" fill="freeze" />
-                    <animate attributeName="cx" attributeType="XML" begin="4.5s" dur="3s" fill="freeze" from="230" to="210" />
-                    <animate attributeName="cy" attributeType="XML" begin="4.5s" dur="3s" fill="freeze" from="120" to="62" />
-                    <animate attributeName="r" attributeType="XML" begin="4.5s" dur="3s" fill="freeze" from="17" to="23" />
-                    <animate attributeName="fill" attributeType="CSS" from="green" to="red" begin="4.5s" dur="2s" fill="freeze" />
-                </circle>
+                <circle cx="210" cy="62" r="23" fill="red" stroke="blue" stroke-width="2"></circle>
             </svg>
         </div>
     
@@ -512,116 +446,24 @@ header('Content-Type: text/html; charset=utf-8');
                     <circle cx="330" r="12" stroke="green" stroke-width="2" fill="yellow" />
                     <text x="120" y="30" fill="red">Level 1 – Individual level</text>
     
-                    <!-- first level first 2 groups animation -->
-                    <circle cx="120" stroke="green" stroke-width="2" fill="yellow">
-                        <animate attributeName="cx" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="120" to="150" />
-                        <animate attributeName="cy" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="0" to="-15" />
-                        <animate attributeName="r" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="12" to="16" />
-                        <animate attributeName="fill" attributeType="CSS" from="yellow" to="purple" begin="0s" dur="2s" fill="freeze" />
-                        <set attributeName="visibility" attributeType="CSS" to="hidden" begin="2s" dur="5s" fill="freeze" />
-                    </circle>
-    
-                    <circle cx="180" stroke="green" stroke-width="2" fill="yellow">
-                        <animate attributeName="cx" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="180" to="150" />
-                        <animate attributeName="cy" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="0" to="-15" />
-                        <animate attributeName="r" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="12" to="16" />
-                        <animate attributeName="fill" attributeType="CSS" from="yellow" to="purple" begin="0s" dur="2s" fill="freeze" />
-                        <set attributeName="visibility" attributeType="CSS" to="hidden" begin="2s" dur="5s" fill="freeze" />
-                    </circle>
-    
-                    <!-- first level next 2 groups animation -->
-                    <circle cx="240" r="12" stroke="green" stroke-width="2" fill="yellow">
-                        <animate attributeName="cx" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="240" to="270" />
-                        <animate attributeName="cy" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="0" to="-15" />
-                        <animate attributeName="r" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="12" to="16" />
-                        <animate attributeName="fill" attributeType="CSS" from="yellow" to="purple" begin="0s" dur="2s" fill="freeze" />
-                        <set attributeName="visibility" attributeType="CSS" to="hidden" begin="2s" dur="5s" fill="freeze" />
-                    </circle>
-    
-                    <circle cx="300" r="16" stroke="green" stroke-width="2" fill="yellow">
-                        <animate attributeName="cx" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="300" to="270" />
-                        <animate attributeName="cy" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="0" to="-15" />
-                        <animate attributeName="r" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="12" to="16" />
-                        <animate attributeName="fill" attributeType="CSS" from="yellow" to="purple" begin="0s" dur="2s" fill="freeze" />
-                        <set attributeName="visibility" attributeType="CSS" to="hidden" begin="2s" dur="5s" fill="freeze" />
-                    </circle>
-    
                     <g class="level1">
-                        <circle id="click-circle1" r="17" stroke="black" stroke-width="2" fill="purple" visibility="hidden">
-                            <set attributeName="visibility" attributeType="CSS" to="visible" begin="2s" dur="2s" fill="freeze" />
-                            <animate attributeName="cx" attributeType="XML" begin="2s" dur="2s" fill="freeze" from="150" to="180" />
-                            <animate attributeName="cy" attributeType="XML" begin="2s" dur="2s" fill="freeze" from="-15" to="-45" />
-                            <animate attributeName="r" attributeType="XML" begin="2s" dur="2s" from="16" to="17" />
-                            <animate attributeName="fill" attributeType="CSS" begin="2s" dur="2s" fill="freeze" />
-                        </circle>
-    
-                        <circle id="click-circle2" r="17" stroke="black" stroke-width="2" visibility="hidden">
-                            <set attributeName="visibility" attributeType="CSS" to="visible" begin="2s" dur="2s" fill="freeze" />
-                            <animate attributeName="cx" attributeType="XML" begin="2s" dur="2s" fill="freeze" from="270" to="230" />
-                            <animate attributeName="cy" attributeType="XML" begin="2s" dur="2s" fill="freeze" from="-15" to="-45" />
-                            <animate attributeName="r" attributeType="XML" begin="2s" dur="2s" from="16" to="17" />
-                            <animate attributeName="fill" attributeType="CSS" from="yellow" to="green" begin="2s" dur="4s" fill="freeze" />
-                        </circle>
-    
-                        <circle id="click-circle3" r="17" stroke="black" stroke-width="2" fill="green" visibility="hidden">
-                            <set attributeName="visibility" attributeType="CSS" to="visible" begin="4s" dur="2s" fill="freeze" />
-                            <animate attributeName="cx" attributeType="XML" begin="2s" dur="2s" fill="freeze" from="150" to="130" />
-                            <animate attributeName="cy" attributeType="XML" begin="2s" dur="2s" fill="freeze" from="-15" to="-45" />
-                            <animate attributeName="r" attributeType="XML" begin="2s" dur="2s" from="16" to="17" />
-                            <animate attributeName="fill" attributeType="CSS" begin="2s" dur="2s" fill="freeze" />
-                        </circle>
-    
-                        <circle id="click-circle4" r="17" stroke="black" stroke-width="2" fill="purple" visibility="hidden">
-                            <set attributeName="visibility" attributeType="CSS" to="visible" begin="4s" dur="2s" fill="freeze" />
-                            <animate attributeName="cx" attributeType="XML" begin="2s" dur="2s" fill="freeze" from="150" to="280" />
-                            <animate attributeName="cy" attributeType="XML" begin="2s" dur="2s" fill="freeze" from="-15" to="-45" />
-                            <animate attributeName="r" attributeType="XML" begin="2s" dur="2s" from="16" to="17" />
-                            <animate attributeName="fill" attributeType="CSS" begin="2s" dur="2s" fill="freeze" />
-                        </circle>
-    
+                        <circle id="click-circle1" cx="180" cy="-45" r="17" fill="purple" stroke="black" stroke-width="2"></circle>
+                        <circle id="click-circle1" cx="230" cy="-45" r="17" fill="green" stroke="black" stroke-width="2"></circle>
+                        <circle id="click-circle1" cx="130" cy="-45" r="17" fill="green" stroke="black" stroke-width="2"></circle>
+                        <circle id="click-circle1" cx="280" cy="-45" r="17" fill="purple" stroke="black" stroke-width="2"></circle>
                     </g>
     
                     <g>
-                        <circle id="click-circle5" r="17" stroke="black" stroke-width="2" fill="purple" visibility="hidden">
-                            <set attributeName="visibility" attributeType="CSS" to="visible" begin="4s" dur="2s" fill="freeze" />
-                            <animate attributeName="cx" attributeType="XML" begin="4s" dur="2s" fill="freeze" from="150" to="180" />
-                            <animate attributeName="cy" attributeType="XML" begin="4s" dur="2s" fill="freeze" from="-55" to="-105" />
-                            <animate attributeName="r" attributeType="XML" begin="4s" dur="2s" fill="freeze" from="16" to="17" />
-                            <animate attributeName="fill" attributeType="CSS" begin="2s" dur="2s" fill="freeze" />
-                        </circle>
-    
-                        <circle id="click-circle6" r="17" stroke="black" stroke-width="2" visibility="hidden">
-                            <set attributeName="visibility" attributeType="CSS" to="visible" begin="4s" dur="2s" fill="freeze" />
-                            <animate attributeName="cx" attributeType="XML" begin="4s" dur="2s" fill="freeze" from="270" to="230" />
-                            <animate attributeName="cy" attributeType="XML" begin="4s" dur="2s" fill="freeze" from="-55" to="-105" />
-                            <animate attributeName="r" attributeType="XML" begin="4s" dur="2s" fill="freeze" from="16" to="17" />
-                            <animate attributeName="fill" attributeType="CSS" from="yellow" to="green" begin="2s" dur="4s" fill="freeze" />
-                        </circle>
+                        <circle id="click-circle1" cx="180" cy="-105" r="17" fill="purple" stroke="black" stroke-width="2"></circle>
+                        <circle id="click-circle1" cx="230" cy="-105" r="17" fill="green" stroke="black" stroke-width="2"></circle>
                     </g>
                 </g>
     
                 <text x="55" y="140" fill="red" transform="rotate(-52,50,60)">Rating level(s)</text>
     
-                <!--circle cx="170" cy="120" r="17" stroke="green" stroke-width="2" fill="yellow"-->
-    
-    
                 <line x1="149" y1="95" x2="271" y2="95" style="stroke:rgb(255,0,155);stroke-width:4" />
-    
-                <circle stroke="blue" stroke-width="2" visibility="hidden">
-                    <set attributeName="visibility" attributeType="CSS" to="visible" begin="4.5s" dur="2s" fill="freeze" />
-                    <animate attributeName="cx" attributeType="XML" begin="6s" dur="3s" fill="freeze" from="180" to="210" />
-                    <animate attributeName="cy" attributeType="XML" begin="6s" dur="3s" fill="freeze" from="120" to="62" />
-                    <animate attributeName="r" attributeType="XML" begin="6s" dur="3s" fill="freeze" from="17" to="23" />
-                    <animate attributeName="fill" attributeType="CSS" from="purple" to="red" begin="6s" dur="2s" fill="freeze" />
-                </circle>
-    
-                <circle stroke="blue" stroke-width="2" visibility="hidden">
-                    <set attributeName="visibility" attributeType="CSS" to="visible" begin="4.5s" dur="2s" fill="freeze" />
-                    <animate attributeName="cx" attributeType="XML" begin="6s" dur="3s" fill="freeze" from="230" to="210" />
-                    <animate attributeName="cy" attributeType="XML" begin="6s" dur="3s" fill="freeze" from="120" to="62" />
-                    <animate attributeName="r" attributeType="XML" begin="6s" dur="3s" fill="freeze" from="17" to="23" />
-                    <animate attributeName="fill" attributeType="CSS" from="green" to="red" begin="4.5s" dur="2s" fill="freeze" />
-                </circle>
+
+                <circle cx="210" cy="62" r="23" fill="red" stroke="blue" stroke-width="2"></circle>
             </svg>
         </div>
     
@@ -644,142 +486,25 @@ header('Content-Type: text/html; charset=utf-8');
                     <circle cx="360" r="12" stroke="green" stroke-width="2" fill="yellow" />
                     <text x="120" y="30" fill="red">Level 1 – Individual level</text>
     
-                    <!-- first level first 2 groups animation -->
-                    <circle cx="120" stroke="green" stroke-width="2" fill="yellow">
-                        <animate attributeName="cx" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="120" to="150" />
-                        <animate attributeName="cy" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="0" to="-15" />
-                        <animate attributeName="r" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="12" to="16" />
-                        <animate attributeName="fill" attributeType="CSS" from="yellow" to="purple" begin="0s" dur="2s" fill="freeze" />
-                        <set attributeName="visibility" attributeType="CSS" to="hidden" begin="2s" dur="5s" fill="freeze" />
-                    </circle>
-    
-                    <circle cx="180" stroke="green" stroke-width="2" fill="yellow">
-                        <animate attributeName="cx" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="180" to="150" />
-                        <animate attributeName="cy" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="0" to="-15" />
-                        <animate attributeName="r" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="12" to="16" />
-                        <animate attributeName="fill" attributeType="CSS" from="yellow" to="purple" begin="0s" dur="2s" fill="freeze" />
-                        <set attributeName="visibility" attributeType="CSS" to="hidden" begin="2s" dur="5s" fill="freeze" />
-                    </circle>
-    
-                    <!-- first level next 2 groups animation -->
-                    <circle cx="240" r="12" stroke="green" stroke-width="2" fill="yellow">
-                        <animate attributeName="cx" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="240" to="270" />
-                        <animate attributeName="cy" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="0" to="-15" />
-                        <animate attributeName="r" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="12" to="16" />
-                        <animate attributeName="fill" attributeType="CSS" from="yellow" to="purple" begin="0s" dur="2s" fill="freeze" />
-                        <set attributeName="visibility" attributeType="CSS" to="hidden" begin="2s" dur="5s" fill="freeze" />
-                    </circle>
-    
-                    <circle cx="300" r="16" stroke="green" stroke-width="2" fill="yellow">
-                        <animate attributeName="cx" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="300" to="270" />
-                        <animate attributeName="cy" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="0" to="-15" />
-                        <animate attributeName="r" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="12" to="16" />
-                        <animate attributeName="fill" attributeType="CSS" from="yellow" to="purple" begin="0s" dur="2s" fill="freeze" />
-                        <set attributeName="visibility" attributeType="CSS" to="hidden" begin="2s" dur="5s" fill="freeze" />
-                    </circle>
-    
                     <g class="level1">
-                        <circle id="click-circle1" r="17" stroke="black" stroke-width="2" fill="purple" visibility="hidden">
-                            <set attributeName="visibility" attributeType="CSS" to="visible" begin="2s" dur="2s" fill="freeze" />
-                            <animate attributeName="cx" attributeType="XML" begin="2s" dur="2s" fill="freeze" from="150" to="180" />
-                            <animate attributeName="cy" attributeType="XML" begin="2s" dur="2s" fill="freeze" from="-15" to="-45" />
-                            <animate attributeName="r" attributeType="XML" begin="2s" dur="2s" from="16" to="17" />
-                            <animate attributeName="fill" attributeType="CSS" begin="2s" dur="2s" fill="freeze" />
-                        </circle>
-    
-                        <circle id="click-circle2" r="17" stroke="black" stroke-width="2" visibility="hidden">
-                            <set attributeName="visibility" attributeType="CSS" to="visible" begin="2s" dur="2s" fill="freeze" />
-                            <animate attributeName="cx" attributeType="XML" begin="2s" dur="2s" fill="freeze" from="270" to="230" />
-                            <animate attributeName="cy" attributeType="XML" begin="2s" dur="2s" fill="freeze" from="-15" to="-45" />
-                            <animate attributeName="r" attributeType="XML" begin="2s" dur="2s" from="16" to="17" />
-                            <animate attributeName="fill" attributeType="CSS" from="yellow" to="green" begin="2s" dur="4s" fill="freeze" />
-                        </circle>
-    
-                        <circle id="click-circle3" r="17" stroke="black" stroke-width="2" fill="green" visibility="hidden">
-                            <set attributeName="visibility" attributeType="CSS" to="visible" begin="4s" dur="2s" fill="freeze" />
-                            <animate attributeName="cx" attributeType="XML" begin="2s" dur="2s" fill="freeze" from="150" to="130" />
-                            <animate attributeName="cy" attributeType="XML" begin="2s" dur="2s" fill="freeze" from="-15" to="-45" />
-                            <animate attributeName="r" attributeType="XML" begin="2s" dur="2s" from="16" to="17" />
-                            <animate attributeName="fill" attributeType="CSS" begin="2s" dur="2s" fill="freeze" />
-                        </circle>
-    
-                        <circle id="click-circle4" r="17" stroke="black" stroke-width="2" fill="purple" visibility="hidden">
-                            <set attributeName="visibility" attributeType="CSS" to="visible" begin="4s" dur="2s" fill="freeze" />
-                            <animate attributeName="cx" attributeType="XML" begin="2s" dur="2s" fill="freeze" from="150" to="280" />
-                            <animate attributeName="cy" attributeType="XML" begin="2s" dur="2s" fill="freeze" from="-15" to="-45" />
-                            <animate attributeName="r" attributeType="XML" begin="2s" dur="2s" from="16" to="17" />
-                            <animate attributeName="fill" attributeType="CSS" begin="2s" dur="2s" fill="freeze" />
-                        </circle>
-    
-                        <circle id="click-circle13" r="17" stroke="black" stroke-width="2" fill="purple" visibility="hidden">
-                            <set attributeName="visibility" attributeType="CSS" to="visible" begin="4s" dur="2s" fill="freeze" />
-                            <animate attributeName="cx" attributeType="XML" begin="2s" dur="2s" fill="freeze" from="150" to="85" />
-                            <animate attributeName="cy" attributeType="XML" begin="2s" dur="2s" fill="freeze" from="-15" to="-45" />
-                            <animate attributeName="r" attributeType="XML" begin="2s" dur="2s" from="16" to="17" />
-                            <animate attributeName="fill" attributeType="CSS" begin="2s" dur="2s" fill="freeze" />
-                        </circle>
-    
-                        <circle id="click-circle14" r="17" stroke="black" stroke-width="2" fill="green" visibility="hidden">
-                            <set attributeName="visibility" attributeType="CSS" to="visible" begin="4s" dur="2s" fill="freeze" />
-                            <animate attributeName="cx" attributeType="XML" begin="2s" dur="2s" fill="freeze" from="150" to="330" />
-                            <animate attributeName="cy" attributeType="XML" begin="2s" dur="2s" fill="freeze" from="-15" to="-45" />
-                            <animate attributeName="r" attributeType="XML" begin="2s" dur="2s" from="16" to="17" />
-                            <animate attributeName="fill" attributeType="CSS" begin="2s" dur="2s" fill="freeze" />
-                        </circle>
-    
+                        <circle id="click-circle1" cx="180" cy="-45" r="17" fill="purple" stroke="black" stroke-width="2"></circle>
+                        <circle id="click-circle1" cx="230" cy="-45" r="17" fill="green" stroke="black" stroke-width="2"></circle>
+                        <circle id="click-circle1" cx="130" cy="-45" r="17" fill="green" stroke="black" stroke-width="2"></circle>
+                        <circle id="click-circle1" cx="280" cy="-45" r="17" fill="purple" stroke="black" stroke-width="2"></circle>
+                        <circle id="click-circle1" cx="85" cy="-45" r="17" fill="purple" stroke="black" stroke-width="2"></circle>
+                        <circle id="click-circle1" cx="330" cy="-45" r="17" fill="green" stroke="black" stroke-width="2"></circle>
                     </g>
     
                     <g>
-                        <circle id="click-circle5" r="17" stroke="black" stroke-width="2" fill="purple" visibility="hidden">
-                            <set attributeName="visibility" attributeType="CSS" to="visible" begin="4s" dur="2s" fill="freeze" />
-                            <animate attributeName="cx" attributeType="XML" begin="4s" dur="2s" fill="freeze" from="150" to="180" />
-                            <animate attributeName="cy" attributeType="XML" begin="4s" dur="2s" fill="freeze" from="-55" to="-100" />
-                            <animate attributeName="r" attributeType="XML" begin="4s" dur="2s" fill="freeze" from="16" to="17" />
-                            <animate attributeName="fill" attributeType="CSS" begin="2s" dur="2s" fill="freeze" />
-                        </circle>
-    
-                        <circle id="click-circle6" r="17" stroke="black" stroke-width="2" visibility="hidden">
-                            <set attributeName="visibility" attributeType="CSS" to="visible" begin="4s" dur="2s" fill="freeze" />
-                            <animate attributeName="cx" attributeType="XML" begin="4s" dur="2s" fill="freeze" from="270" to="230" />
-                            <animate attributeName="cy" attributeType="XML" begin="4s" dur="2s" fill="freeze" from="-55" to="-100" />
-                            <animate attributeName="r" attributeType="XML" begin="4s" dur="2s" fill="freeze" from="16" to="17" />
-                            <animate attributeName="fill" attributeType="CSS" from="yellow" to="green" begin="2s" dur="4s" fill="freeze" />
-                        </circle>
-    
-                        <circle id="click-circle23" r="17" stroke="black" stroke-width="2" fill="purple" visibility="hidden">
-                            <set attributeName="visibility" attributeType="CSS" to="visible" begin="6s" dur="2s" fill="freeze" />
-                            <animate attributeName="cx" attributeType="XML" begin="2s" dur="2s" fill="freeze" from="230" to="280" />
-                            <animate attributeName="cy" attributeType="XML" begin="2s" dur="2s" fill="freeze" from="-15" to="-100" />
-                            <animate attributeName="r" attributeType="XML" begin="2s" dur="2s" fill="freeze" from="16" to="17" />
-                            <animate attributeName="fill" attributeType="CSS" begin="2s" dur="2s" fill="freeze" />
-                        </circle>
-    
-                        <circle id="click-circle24" r="17" stroke="black" stroke-width="2" fill="green" visibility="hidden">
-                            <set attributeName="visibility" attributeType="CSS" to="visible" begin="6s" dur="2s" fill="freeze" />
-                            <animate attributeName="cx" attributeType="XML" begin="2s" dur="2s" fill="freeze" from="230" to="130" />
-                            <animate attributeName="cy" attributeType="XML" begin="2s" dur="2s" fill="freeze" from="-15" to="-100" />
-                            <animate attributeName="r" attributeType="XML" begin="2s" dur="2s" fill="freeze" from="16" to="17" />
-                            <animate attributeName="fill" attributeType="CSS" begin="2s" dur="2s" fill="freeze" />
-                        </circle>
-    
+                        <circle id="click-circle1" cx="180" cy="-100" r="17" fill="purple" stroke="black" stroke-width="2"></circle>
+                        <circle id="click-circle1" cx="230" cy="-100" r="17" fill="green" stroke="black" stroke-width="2"></circle>
+                        <circle id="click-circle1" cx="280" cy="-100" r="17" fill="purple" stroke="black" stroke-width="2"></circle>
+                        <circle id="click-circle1" cx="130" cy="-100" r="17" fill="green" stroke="black" stroke-width="2"></circle>
                     </g>
     
                     <g>
-                        <circle id="click-circle7" r="17" stroke="black" stroke-width="2" fill="purple" visibility="hidden">
-                            <set attributeName="visibility" attributeType="CSS" to="visible" begin="6s" dur="2s" fill="freeze" />
-                            <animate attributeName="cx" attributeType="XML" begin="6s" dur="2s" fill="freeze" from="150" to="180" />
-                            <animate attributeName="cy" attributeType="XML" begin="6s" dur="2s" fill="freeze" from="-100" to="-150" />
-                            <animate attributeName="r" attributeType="XML" begin="6s" dur="2s" fill="freeze" from="16" to="17" />
-                            <animate attributeName="fill" attributeType="CSS" begin="2s" dur="2s" fill="freeze" />
-                        </circle>
-    
-                        <circle id="click-circle8" r="17" stroke="black" stroke-width="2" visibility="hidden">
-                            <set attributeName="visibility" attributeType="CSS" to="visible" begin="6s" dur="2s" fill="freeze" />
-                            <animate attributeName="cx" attributeType="XML" begin="6s" dur="2s" fill="freeze" from="270" to="230" />
-                            <animate attributeName="cy" attributeType="XML" begin="6s" dur="2s" fill="freeze" from="-100" to="-150" />
-                            <animate attributeName="r" attributeType="XML" begin="6s" dur="2s" fill="freeze" from="16" to="17" />
-                            <animate attributeName="fill" attributeType="CSS" from="yellow" to="green" begin="2s" dur="4s" fill="freeze" />
-                        </circle>
+                        <circle id="click-circle1" cx="180" cy="-150" r="17" fill="purple" stroke="black" stroke-width="2"></circle>
+                        <circle id="click-circle1" cx="230" cy="-150" r="17" fill="green" stroke="black" stroke-width="2"></circle>
                     </g>
                 </g>
     
@@ -789,22 +514,9 @@ header('Content-Type: text/html; charset=utf-8');
     
     
                 <line x1="149" y1="95" x2="271" y2="95" style="stroke:rgb(255,0,155);stroke-width:4" />
-    
-                <circle stroke="blue" stroke-width="2" visibility="hidden">
-                    <set attributeName="visibility" attributeType="CSS" to="visible" begin="4.5s" dur="2s" fill="freeze" />
-                    <animate attributeName="cx" attributeType="XML" begin="8s" dur="3s" fill="freeze" from="180" to="210" />
-                    <animate attributeName="cy" attributeType="XML" begin="8s" dur="3s" fill="freeze" from="120" to="62" />
-                    <animate attributeName="r" attributeType="XML" begin="8s" dur="3s" fill="freeze" from="17" to="23" />
-                    <animate attributeName="fill" attributeType="CSS" from="purple" to="red" begin="6s" dur="2s" fill="freeze" />
-                </circle>
-    
-                <circle stroke="blue" stroke-width="2" visibility="hidden">
-                    <set attributeName="visibility" attributeType="CSS" to="visible" begin="4.5s" dur="2s" fill="freeze" />
-                    <animate attributeName="cx" attributeType="XML" begin="8s" dur="3s" fill="freeze" from="230" to="210" />
-                    <animate attributeName="cy" attributeType="XML" begin="8s" dur="3s" fill="freeze" from="120" to="62" />
-                    <animate attributeName="r" attributeType="XML" begin="8s" dur="3s" fill="freeze" from="17" to="23" />
-                    <animate attributeName="fill" attributeType="CSS" from="green" to="red" begin="4.5s" dur="2s" fill="freeze" />
-                </circle>
+
+                <circle cx="210" cy="62" r="23" fill="red" stroke="blue" stroke-width="2"></circle>
+
             </svg>
         </div>
     </div>
