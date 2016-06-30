@@ -101,9 +101,9 @@ SQL;
 
         //number of levels
         $n_levels = floor(log(floor($min_students_per_pyramid / $flow_object->first_group_size), 2)) + 2;
-        if ($flow_object->n_levels -1 > $n_levels)
+        /*if ($flow_object->n_levels -1 > $n_levels)
             $flow_object->n_levels = $n_levels + 1;
-
+*/
         //sanitize sql
         $flow_data = [];
         foreach ($flow_fields as $field) {
