@@ -15,39 +15,6 @@ $an->setDevices($devices);
 
 global $link, $fid, $pid, $pyramid_minsize, $levels, $flow_data, $activity_level, $peer_group_id, $n_selected_answers, $random_selection;
 
-$init_day = 1459720800;//
-$day_duration = 24 * 60 * 60;
-
-$level_timestamps = [
-    $init_day + 2*$day_duration,
-    $init_day + 3*$day_duration,
-    $init_day + 4*$day_duration,
-    $init_day + 5*$day_duration,
-];
-
-
-/*
-$init_day = 1459686922-300;
-$day_duration = 5 * 60;
-
-$level_timestamps = [
-    $init_day + 1*$day_duration,
-    $init_day + 2*$day_duration,
-    $init_day + 3*$day_duration,
-    $init_day + 4*$day_duration,
-];
-*/
-
-
-/*
-$level_timestamps = [
-    $init_day + 1*$day_duration,
-    $init_day + 2*$day_duration,
-    $init_day + 3*$day_duration,
-    $init_day + 4*$day_duration,
-];
-*/
-
 //email
 $email_sent = [
     false,
@@ -55,15 +22,6 @@ $email_sent = [
     false,
     false,
 ];
-
-/*
-$email_sent = [
-    true,
-    true,
-    true,
-    true,
-];
-*/
 
 echo "init passed\n";
 while(true) {
@@ -75,9 +33,22 @@ while(true) {
     if (!\Pyramid\get_current_flow())
         continue;
 
+
+    $init_day = (int)$flow_data['start_timestamp'];
+    $submission_timer = (int)$flow_data['question_timeout'];
+    $rating_timer = (int)$flow_data['rating_timeout'];
+
+    $level_timestamps = [
+        $init_day + $submission_timer,
+        $init_day + $submission_timer + 1*$rating_timer,
+        $init_day + $submission_timer + 2*$rating_timer,
+        $init_day + $submission_timer + 3*$rating_timer,
+        $init_day + $submission_timer + 4*$rating_timer,
+    ];
+
     $time = time();
 
-    //add the latecomers
+    //add the latecomers if there are pyramids created
     $result = mysqli_query($link, "select pg_pid as pid from pyramid_groups where pg_fid='$fid' order by pg_pid desc limit 1");
     if(mysqli_num_rows($result)>0) {
         $result_avail = mysqli_query($link, "select distinct * from flow_available_students where fid='$fid' and sid not in (select sid from pyramid_students where fid = '$fid')");
@@ -136,7 +107,7 @@ while(true) {
         if (!($npy_students > 0)) {
             $nleft_to_assign = $nflow_students;
 
-            $new_pyramid_size = $flow_data['expected_students'];
+            $new_pyramid_size = $flow_data['pyramid_size'];
             mysqli_query($link, "start transaction");
             mysqli_query($link, "start transaction");
             while ($nleft_to_assign >= $new_pyramid_size) {
@@ -194,11 +165,11 @@ while(true) {
                 if ($created and !$email_sent[$step]) {
                     $email_sent[$step] = true;
                     $recipients = \Util\get_users_email();
-                    $html = \Util\get_html($step);
+                    $html = \Util\get_html($step, $level_timestamps[1]);
                     if (!empty($recipients))
                         \Util\notification_mail($recipients, $html);
 
-                    $response = $an->send("Next level is ready! Start discussing. Rating is allowed till 27th, 6pm CET.");
+                    //$response = $an->send("Next level is ready! Start discussing. Rating is allowed till 27th, 6pm CET.");
                 }
             } catch(Exception $e) {}
             continue;
@@ -236,7 +207,7 @@ while(true) {
             if ($created and !$email_sent[$step]) {
                 $email_sent[$step] = true;
                 $recipients = \Util\get_users_email();
-                $html = \Util\get_html($step);
+                $html = \Util\get_html($step, $level_timestamps[1]);
                 if (!empty($recipients))
                     \Util\notification_mail($recipients, $html);
 

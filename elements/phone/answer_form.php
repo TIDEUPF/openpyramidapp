@@ -120,7 +120,7 @@
 
         <div>
 
-            <div><h2><?= $answer_text?></h2></div>
+            <div><h4><?= $answer_text?></h4></div>
             <div id="answer-textarea">
                 <textarea name="qa" rows="10"></textarea>
             </div>

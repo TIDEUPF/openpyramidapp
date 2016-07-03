@@ -34,8 +34,8 @@ if(!isset($_SESSION['student'])) {
                 //else{
             $sname = strtolower($uname);
             $sname[0] = strtoupper($sname[0]);
-            $sname = str_replace(array('*', "'", ',', ' ', '"', '(', ')', '<', '>', '=', ';', '-', '#', '/', '$', '%', '\\', '`'), '', $sname);
-            $uname = str_replace(array('*', "'", ',', ' ', '"', '(', ')', '<', '>', '=', ';', '-', '#', '/', '$', '%', '\\', '`'), '', $uname);
+            $sname = str_replace(array('*', "'", ',', ' ', '"', '(', ')', '<', '>', '=', ';', '#', '/', '$', '%', '\\', '`'), '', $sname);
+            $uname = str_replace(array('*', "'", ',', ' ', '"', '(', ')', '<', '>', '=', ';', '#', '/', '$', '%', '\\', '`'), '', $uname);
 
             $is_email = false;
             if(filter_var($sname, FILTER_VALIDATE_EMAIL)) {

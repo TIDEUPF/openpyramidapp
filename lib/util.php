@@ -138,8 +138,11 @@ function get_users_email() {
 }
 
 function get_html($step) {
+    $date_string = \Flow\end_date_string($step);
+
     if($step == 1) {
-        /*$html = <<<HTML
+
+        $html = <<<HTML
 <html>
 <body>
 <p>Hi,</p>
@@ -148,7 +151,7 @@ function get_html($step) {
 
 <p>In this new level you can see the submitted questions and you can use chat feature to discuss with other group members regarding their questions.</p>
 
-<p>You have time till 11:59 pm, Wednesday, 9th (from Central European Time) to discuss and rate. You can modify previously submitted rating till this deadline. &nbsp;</p>
+<p>You have time till {$date_string} (from Central European Time) to discuss and rate. You can modify previously submitted rating till this deadline. &nbsp;</p>
 
 <p>Hope you will have a nice time in the app!</p>
 
@@ -160,7 +163,7 @@ Barcelona</p>
 </body>
 </html>
 HTML;
-        */
+        /*
         $html = <<<HTML
 <html>
 <body>
@@ -182,30 +185,8 @@ Barcelona</p>
 </body>
 </html>
 HTML;
-
+*/
     } elseif($step == 2) {
-        $html = <<<HTML
-<html>
-<body>
-<p>Hi,</p>
-
-<p>It’s the final stage of the PyramidApp. You can login to the app using the same email address or the username that you used previously. This is the link to the app: <a href="http://sos.gti.upf.edu/app/student_login.php">pyramid app</a>.</p>
-
-<p>In this level you will see final highly rated questions promoted from the previous level. You can discuss about these questions and rate the best.</p>
-
-<p>You have time till 11:59 pm, Tuesday, 15th (from Central European Time) to discuss and rate. You can modify previously submitted rating till this deadline.</p>
-
-<p>Thank you for being in the app!</p>
-
-<p>&nbsp;</p>
-
-<p>Best Regards<br />
-GTI - UPF<br />
-Barcelona</p>
-</body>
-</html>
-HTML;
-} elseif($step == 3) {
         $html = <<<HTML
 <html>
 <body>
@@ -215,7 +196,7 @@ HTML;
 
 <p>In this new level you can see the submitted questions and you can use chat feature to discuss with other group members regarding their questions.</p>
 
-<p>You have time till 12 midnight, Thursday, 25th (from Central European Time) to discuss and rate. You can modify previously submitted rating till this deadline. &nbsp;</p>
+<p>You have time till {$date_string} (from Central European Time) to discuss and rate. You can modify previously submitted rating till this deadline. &nbsp;</p>
 
 <p>Hope you will have a nice time in the app!</p>
 
@@ -227,6 +208,30 @@ Barcelona</p>
 </body>
 </html>
 HTML;
+
+} elseif($step == 3) {
+        $html = <<<HTML
+<html>
+<body>
+<p>Hi,</p>
+
+<p>It’s the final stage of the PyramidApp. You can login to the app using the same email address or the username that you used previously. This is the link to the app: <a href="http://sos.gti.upf.edu/app/student_login.php">pyramid app</a>.</p>
+
+<p>In this level you will see final highly rated questions promoted from the previous level. You can discuss about these questions and rate the best.</p>
+
+<p>You have time till {$date_string} (from Central European Time) to discuss and rate. You can modify previously submitted rating till this deadline.</p>
+
+<p>Thank you for being in the app!</p>
+
+<p>&nbsp;</p>
+
+<p>Best Regards<br />
+GTI - UPF<br />
+Barcelona</p>
+</body>
+</html>
+HTML;
+
     } elseif($step == 4) {
         $html = <<<HTML
 <html>
@@ -253,15 +258,16 @@ HTML;
 }
 
 function notification_mail($recipients, $html) {
-    $from = "Pyramid Interaction App <ssp.clfp@upf.edu>";
+    global $email;
+
+    $from = "Pyramid Interaction App <{$email['address']}>";
+    $host = $email['host'];
+    $port = $email['port'];
+    $username = $email['username'];
+    $password = $email['password'];
 
     $subject = "PyramidApp notification";
     $crlf = "\n";
-
-    $host = "ssl://smtp.gmail.com";
-    $port = "465";
-    $username = "ssp.clfp@upf.edu";
-    $password = "sos14Gti!";
 
     $smtp = \Mail::factory('smtp',
         [   'host' => $host,
@@ -291,7 +297,7 @@ function notification_mail($recipients, $html) {
         $mail = $smtp->send($recipient, $headers, $body);
 
         if (\PEAR::isError($mail)) {
-            echo("error delevering to {$recipient}: " . $mail->getMessage() . "\n");
+            echo("Error delivering to {$recipient}: " . $mail->getMessage() . "\n");
         } else {
             echo("Message successfully sent message to {$recipient}\n");
         }
@@ -299,4 +305,33 @@ function notification_mail($recipients, $html) {
     }
 
     unset($smtp);
+}
+
+/** Extracted from: http://codeaid.net/php/convert-seconds-to-hours-minutes-and-seconds-%28php%29
+ * Convert number of seconds into hours, minutes and seconds
+ * and return an array containing those values
+ *
+ * @param integer $seconds Number of seconds to parse
+ * @return array
+ */
+function secondsToTime($seconds)
+{
+    // extract hours
+    $hours = floor($seconds / (60 * 60));
+
+    // extract minutes
+    $divisor_for_minutes = $seconds % (60 * 60);
+    $minutes = floor($divisor_for_minutes / 60);
+
+    // extract the remaining seconds
+    $divisor_for_seconds = $divisor_for_minutes % 60;
+    $seconds = ceil($divisor_for_seconds);
+
+    // return the final array
+    $obj = array(
+        "h" => (int) $hours,
+        "m" => (int) $minutes,
+        "s" => (int) $seconds,
+    );
+    return $obj;
 }

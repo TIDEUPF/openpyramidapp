@@ -205,7 +205,7 @@
 
         <div id="answer-footer-frame">
             <?php if(empty($no_feedback)): ?>
-                <div id="pre-feedback-form">Please make sure to submit your feedback by clicking the below link!</div>
+             <div id="pre-feedback-form">Please make sure to submit your feedback by clicking the below link!</div>
             <div id="feedback-form"><span data-ajax="false" href="#" goto="<?=htmlspecialchars("https://docs.google.com/forms/d/1xNvjBcpp4vsS1J-jxTfbO21gqLDQwZ4Vjc1XDnb_6Dw/viewform")?>">Feedback form</span></div>
             <!--<div id="feedback-form"><a target="_blank" href="https://google.com">Feedback form</a></div>-->
             <?php endif; ?>

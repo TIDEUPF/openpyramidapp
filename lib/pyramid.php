@@ -480,6 +480,42 @@ function no_questions_available($params) {
     exit;
 }
 
+function activity_status($params) {
+    global $link, $sid,  $fid, $ps, $sname, $levels, $activity_level, $peer_group_id, $peer_array, $peer_group_combined_ids;
+
+    $initial_level = $activity_level;
+    upgrade_level();
+
+    $vars = array(
+        'username' 				=> $sname,
+        'n_inactive_peers'      => $params['n_inactive_peers'],
+        'time_remaining'        => $params['time_remaining'],
+        'ui_level'              => $params['level'],
+        'levels'                => $params['levels'],
+        'question_submitted'    => $params['question_submitted'],
+        'level' 				=> T('Level') . ' '. $params['level'] . '/' . ($levels+1),
+        'hidden_input_array' 	=> array(
+            'a_lvl' 			=> $activity_level,
+            'a_peer_group_id'	=> $peer_group_id,
+        ),
+    );
+
+    $hidden_input_array['username'] = $sname;
+    $hidden_input_array['fid'] = $fid;
+    $hidden_input_array['level'] = 1;
+    $hidden_input_array['page'] = "no_available_questions";
+
+    $vars['hidden_input_array'] = array_merge($vars['hidden_input_array'], $hidden_input_array);
+
+    $body = \View\element("activity_status", $vars);
+
+    \View\page(array(
+        'title' => 'Question',
+        'body' => $body,
+    ));
+    exit;
+}
+
 //remove users that didn't submit due the timeout in the previous level
 function set_previous_level_peer_active_group_ids() {
     global $link, $sid,  $fid, $ps, $sname, $levels, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
@@ -578,13 +614,27 @@ function update_pyramid($fid, $pid, $number = 0) {
         add_student($fid, $pid, $pyramidstudent);
 }
 
+function is_rating_started() {
+    global $link, $sid,  $fid, $pid, $ps, $sname, $levels, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+
+    //rating has started(even if still is not submitted by anyone)
+    $result = mysqli_query($link, "select * from pyramid_groups where pg_fid = {$fid} and pg_pid = '{$pid}' and pg_group_id = '{$peer_group_id}' and pg_level='0' and pg_started=1");
+    if(mysqli_num_rows($result) > 0)
+        $rating = true;
+    else
+        $rating = false;
+
+    return $rating;
+}
+
 function get_inactive_level_group_peers() {
     global $link, $sid,  $fid, $ps, $sname, $levels, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
     //$peer_group_combined_ids_array = explode(',',$peer_group_combined_ids);
     $peer_array_sql = implode("','", \Util\sanitize_array($peer_array));
 
-    if($activity_level == 0 and !\Student\level_is_rated())
+    //if($activity_level == 0 and !\Student\level_is_rated())
+    if($activity_level == 0 and !is_rating_started()) //TODO: test this solution
         $inactive_peers_result = mysqli_query($link, "select distinct sid from students where sid in ('{$peer_array_sql}') and sid not in (select distinct sid as active_sid from flow_student where fid = '$fid' and sid in ('{$peer_array_sql}'))");
     else
         $inactive_peers_result = mysqli_query($link, "select distinct sid from students where sid in ('{$peer_array_sql}') and sid not in (select distinct fsr_sid as active_sid from flow_student_rating where {$ps['fsr']} and fsr_level='{$activity_level}' and fsr_group_id = '$peer_group_id')");

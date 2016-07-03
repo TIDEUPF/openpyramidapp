@@ -46,6 +46,7 @@
     #answer-header-logout {
         float: left;
         text-align: right;
+        cursor: pointer;
     }
 
     .topbar_item {
@@ -111,6 +112,18 @@
     #pyramid-icon img {
         height: 25px;
     }
+
+    #activity-status {
+        position:fixed;
+        left: 65%;
+        padding: 0 !important;
+        height: 32px;
+        line-height: 32px;
+    }
+
+    #activity-status a {
+        text-decoration: none;
+    }
 </style>
 <div id="answer-frame">
     <form method="post" action="student.php" data-ajax="false">
@@ -118,6 +131,9 @@
 
         <div id="pyramid-icon">
             <img src="elements/resources/pyramid_icons/<?=($hidden_input_array['levels']+1)?>l_l<?=($hidden_input_array['level'])?>.png">
+        </div>
+        <div id="activity-status">
+            <a target="_blank" href="status.php">Activity Status</a>
         </div>
         <div>
             <div id="answer-header-user" class="topbar_item"><?=$username?></div>

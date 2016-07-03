@@ -4,16 +4,16 @@ include('dbvar.php');
 
 if(!isset($_SESSION['user'])){
     if(isset($_POST['loginBtn'])) {
-        if(empty($_POST['usr'])/* || empty($_POST['pwd'])*/) {
+        if(empty($_POST['usr']) || empty($_POST['pwd'])) {
             $error = "Username and Password can not be empty!";
         }
         else{
             $uname = mysqli_real_escape_string($link, stripslashes(trim(strip_tags($_POST['usr']))));
 
-            $_SESSION['user'] = $uname;
+            /*$_SESSION['user'] = $uname;
             header("location: activity.php");
             exit(0);
-
+            */
             $pass =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['pwd']))));
 
             $count_login = mysqli_num_rows(mysqli_query($link, "select uname from teacher where uname = '$uname' and pass = '$pass' limit 1 "));
@@ -95,12 +95,10 @@ if(!isset($_SESSION['user'])){
                 <label for="uid">User ID:</label>
                 <input type="text" name="usr" id="usr">
             </div>
-            <!--
             <div class="ui-field-contain">
                 <label for="password">Password:</label>
                 <input type="password" name="pwd" id="pwd">
             </div>
-            -->
             <input type="submit" data-inline="true" value="Login" name="loginBtn">
         </form>
     </div>

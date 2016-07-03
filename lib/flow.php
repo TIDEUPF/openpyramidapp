@@ -42,3 +42,31 @@ function wait_flow($params) {
     ));
     exit;
 }
+
+function get_timestamps() {
+    global $flow_data;
+
+    $init_day = (int)$flow_data['start_timestamp'];
+    $submission_timer = (int)$flow_data['question_timeout'];
+    $rating_timer = (int)$flow_data['rating_timeout'];
+
+    $level_timestamps = [
+        $init_day + $submission_timer,
+        $init_day + $submission_timer + 1*$rating_timer,
+        $init_day + $submission_timer + 2*$rating_timer,
+        $init_day + $submission_timer + 3*$rating_timer,
+        $init_day + $submission_timer + 4*$rating_timer,
+    ];
+
+    return $level_timestamps;
+}
+
+function end_date_string($level) {
+    $timestamps = \Flow\get_timestamps();
+
+    $start_timestamp = $timestamps[$level];
+
+    $date_string = date("l jS G:i", $start_timestamp);
+
+    return $date_string;
+}

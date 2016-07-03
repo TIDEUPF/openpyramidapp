@@ -30,6 +30,8 @@ function init_cfg() {
             $device = 'phone';
     }
 
+    \Util\log(['activity' => 'device', 'device' => $device]);
+
     if(empty($node_path))
         $node_path = 'socket.io';
 

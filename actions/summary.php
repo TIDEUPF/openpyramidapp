@@ -2,7 +2,7 @@
 session_start();
 include('dbvar.php');
 global $node_path;
-    
+
 //include('inc_pyramid_func.php');
 
 
@@ -360,45 +360,6 @@ header('Content-Type: text/html; charset=utf-8');
 
                 <text x="120" y="205" fill="red"><?=TS('Level 1 – Individual level')?></text>
                 <text x="55" y="140" fill="red" transform="rotate(-52,50,60)"><?=TS('Rating level(s)')?></text>
-
-                <!-- first level first 2 groups animation -->
-                <!--
-                <circle cx="120" cy="175" stroke="green" stroke-width="2" fill="yellow">
-                    <animate attributeName="cx" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="120" to="150" />
-                    <animate attributeName="cy" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="175" to="160" />
-                    <animate attributeName="r" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="12" to="16" />
-                    <animate attributeName="fill" attributeType="CSS" from="yellow" to="purple" begin="0s" dur="2s" fill="freeze" />
-                    <set attributeName="visibility" attributeType="CSS" to="hidden" begin="2s" dur="5s" fill="freeze" />
-                </circle>
-
-                <circle cx="180" cy="175" stroke="green" stroke-width="2" fill="yellow">
-                    <animate attributeName="cx" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="180" to="150" />
-                    <animate attributeName="cy" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="175" to="160" />
-                    <animate attributeName="r" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="12" to="16" />
-                    <animate attributeName="fill" attributeType="CSS" from="yellow" to="purple" begin="0s" dur="2s" fill="freeze" />
-                    <set attributeName="visibility" attributeType="CSS" to="hidden" begin="2s" dur="5s" fill="freeze" />
-                </circle>
-    -->
-                <!--circle cx="170" cy="120" r="17" stroke="green" stroke-width="2" fill="yellow"-->
-
-                <!-- first level next 2 groups animation -->
-                <!--
-                <circle cx="240" cy="180" r="12" stroke="green" stroke-width="2" fill="yellow">
-                    <animate attributeName="cx" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="240" to="270" />
-                    <animate attributeName="cy" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="180" to="160" />
-                    <animate attributeName="r" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="12" to="16" />
-                    <animate attributeName="fill" attributeType="CSS" from="yellow" to="purple" begin="0s" dur="2s" fill="freeze" />
-                    <set attributeName="visibility" attributeType="CSS" to="hidden" begin="2s" dur="5s" fill="freeze" />
-                </circle>
-
-                <circle cx="300" cy="180" r="16" stroke="green" stroke-width="2" fill="yellow">
-                    <animate attributeName="cx" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="300" to="270" />
-                    <animate attributeName="cy" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="180" to="160" />
-                    <animate attributeName="r" attributeType="XML" begin="0s" dur="2s" fill="freeze" from="12" to="16" />
-                    <animate attributeName="fill" attributeType="CSS" from="yellow" to="purple" begin="0s" dur="2s" fill="freeze" />
-                    <set attributeName="visibility" attributeType="CSS" to="hidden" begin="2s" dur="5s" fill="freeze" />
-                </circle>
-                -->
 
                 <circle cx="210" cy="85" r="23" fill="red" stroke="blue" stroke-width="2"></circle>
             </svg>

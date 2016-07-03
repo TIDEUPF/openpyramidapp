@@ -607,9 +607,10 @@ function answer_submitted_wait($params) {
 
     $vars = array(
         'username' 					=> $sname,
-        'level' 				    => 'Level 1' . '/' . $levels,
+        'level' 				    => 'Level 1' . '/' . ($levels+1),
         'answer_text' 			=> 'Write a question',
         'answer_submit_button' 	=> 'Submit your question',
+        'next_step_date' 	    => \Flow\end_date_string(0),
         'hidden_input_array' 		=> array(
             'a_lvl' 			=> $activity_level,
             'a_peer_group_id'	=> $peer_group_id,

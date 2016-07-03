@@ -91,7 +91,7 @@
             </div>
 
             <div id="answer_submitted">
-                <?=TS('Your question was submitted successfully! Please login (using the same userID) from 9th 00:00h CET to see rating and discussion level.')?>
+                <?=TS('Your question was submitted successfully! Please login (using the same userID) from '. $next_step_date . 'h (CEST) to see rating and discussion level.')?>
             </div>
 
         </div>
