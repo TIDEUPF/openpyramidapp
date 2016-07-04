@@ -14,6 +14,8 @@ if(\Pyramid\get_current_flow() === -1) {
 global $activity_level, $levels;
 $answer_submitted = \Answer\is_submitted();
 
+\Pyramid\get_student_pyramid($fid, $sid);
+
 //$activity_level
 \Pyramid\get_current_activity_level();
 
@@ -23,7 +25,7 @@ $answer_submitted = \Answer\is_submitted();
 //rating has started(even if still is not submitted by anyone)
 $rating_started = \Pyramid\is_rating_started();
 
-$n_inactive_peers = count(\Pyramid\get_inactive_level_group_peers());
+$n_inactive_peers = count(\Pyramid\get_inactive_level_group_peers()) - 1;
 
 $flow_timestamps = \Flow\get_timestamps();
 

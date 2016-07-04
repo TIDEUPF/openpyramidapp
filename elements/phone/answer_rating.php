@@ -302,12 +302,18 @@
         <ul class="pages">
             <li class="chat page">
                 <a id="chat-popup-close" href="#" class="ui-icon-arrow-d"></a>
-                <div class="chatArea">
+                <div class="chatArea phone">
                     <ul class="messages">
                         <?php foreach($messages as $message): ?>
                             <li class="message" style="display: list-item;"><span class="username" style="color: rgb(56, 36, 170);"><?=htmlspecialchars($message['sid'], ENT_COMPAT | ENT_HTML401 | ENT_IGNORE)?></span><span class="messageBody"><?=htmlspecialchars($message['message'], ENT_COMPAT | ENT_HTML401 | ENT_IGNORE)?></span></li>
                         <?php endforeach; ?>
                     </ul>
+                    <div id="chat-script-buttons-block-phone">
+                        <button type="button" class="chat-script-switch" name="script-button-switch" value="<?=TS("script-button-switch");?>"><?=TS("Show hints");?></button>
+                        <?php foreach($scripted_buttons as $k => $button_item): ?>
+                            <button type="button" class="chat-script-button" name="script-button-<?=$k?>" value="<?=TS($button_item['value']);?>"><?=TS($button_item['label']);?></button>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
             </li>
         </ul>
@@ -504,6 +510,11 @@
         div.chatArea {
             padding-bottom: 0px;
         }
+
+        div.chatArea.phone {
+            width: 100% !important;
+        }
+
         ul.messages {
             box-sizing: border-box;
         }
@@ -512,6 +523,7 @@
     <div id="chat-padding"></div>
     <div id="mobile-bottom-chat-message">
     </div>
+
     <div id="mobile-bottom-chat-input">
         <input type="text" class="inputMessage" placeholder="<?=TS("Discuss with with your peers!")?>"/>
     </div>
@@ -552,6 +564,7 @@
                 e.stopPropagation();
                 e.preventDefault();
                 $('#rating-chat').toggle();
+                $('#chat-script-buttons-block-phone').toggle();
             });
 
             $('#chat-phone-write').click(function(e) {

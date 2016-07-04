@@ -181,10 +181,10 @@
 
     #chat-write {
         display: block;
-        position:relative;
+        position: absolute;
         outline: 0;
-        top: 37px;
-        left: 383px;
+        top: 20px;
+        right: 28px;
         width: 0px;
         height: 0px;
         z-index: 1001;
@@ -232,7 +232,7 @@
     }
 
     .ui-input-text {
-        width: 400px !important;
+        width: 100% !important;
         /*margin: auto !important;*/
     }
 
@@ -259,6 +259,24 @@
     #pyramid-icon img {
         height: 25px;
     }
+
+    #chat-input-field-block {
+        width: 65%;
+        position: relative;
+        margin-left: 5px;
+    }
+
+    #activity-status {
+        position:fixed;
+        left: 65%;
+        padding: 0 !important;
+        height: 32px;
+        line-height: 32px;
+    }
+
+    #activity-status a {
+        text-decoration: none;
+    }
 </style>
 
 <link rel="stylesheet" href="vendors/perfect-scrollbar/css/perfect-scrollbar.min.css">
@@ -276,6 +294,9 @@
 
         <div id="pyramid-icon">
             <img src="elements/resources/pyramid_icons/<?=($hidden_input_array['levels']+1)?>l_l<?=($hidden_input_array['level']+1)?>.png">
+        </div>
+        <div id="activity-status">
+            <a target="_blank" href="status.php">Activity Status</a>
         </div>
 
         <div id="topbar">
@@ -349,8 +370,10 @@
                         <?php endforeach; ?>
                     </ul>
                 </div>
-                <a id="chat-write" href="#" class="ui-icon-edit"></a>
-                <input type="text" class="inputMessage" placeholder="<?=TS("Discuss with with your peers!")?>"/>
+                <div id="chat-input-field-block">
+                    <a id="chat-write" href="#" class="ui-icon-edit"></a>
+                    <input type="text" class="inputMessage" placeholder="<?=TS("Discuss with with your peers!")?>"/>
+                </div>
                 <div id="chat-script-buttons-block">
                     <button type="button" class="chat-script-switch" name="script-button-switch" value="<?=TS("script-button-switch");?>"><?=TS("Show hints");?></button>
                     <?php foreach($scripted_buttons as $k => $button_item): ?>

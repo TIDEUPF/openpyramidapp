@@ -18,9 +18,9 @@ ul.pages {
 
 #chat-script-buttons-block {
     position: absolute;
-    bottom: 25px;
-    right: 7px;
-    width: 200px;
+    bottom: 8px;
+    right: 3px;
+    width: 30%;
 }
 
 #chat-script-buttons-block button {
@@ -29,7 +29,7 @@ ul.pages {
     display: none;
     background-color: #ebf9ff;
     padding: 4px;
-    width: 190px !important;
+    width: 100% !important;
     white-space: normal;
 }
 
@@ -41,6 +41,32 @@ ul.pages {
 #chat-script-buttons-block button:hover {
     background-color: #d0fbfd;
 }
+
+
+#chat-script-buttons-block-phone {
+    position: absolute;
+    bottom: 5px;
+    right: 0px;
+    width: 100%;
+    /*display: none;*/
+}
+
+#chat-script-buttons-block-phone button {
+    font-weight: normal;
+    margin-top: 5px !important;
+    display: none;
+    background-color: #ebf9ff;
+    padding: 4px;
+    width: 100% !important;
+    white-space: normal;
+    height: 40px;
+}
+
+#chat-script-buttons-block-phone button.chat-script-switch {
+    display: block;
+    height: 44.38px;
+}
+
 
 .login.page {
     display: none;

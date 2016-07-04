@@ -200,13 +200,13 @@ select[name="discussion"]~[role="application"] {
 .summary-field-title {
     font-weight: bold;
     font-size: 120%;
-    width: 500px;
+    width: 400px;
     float: left;
 }
 
 .summary-field-data {
     margin: 5px 0 0 10px;
-    width: 100px;
+    width: 200px;
     float: left;
 }
 
