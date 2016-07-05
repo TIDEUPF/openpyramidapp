@@ -803,7 +803,7 @@ function get_level_activity_rate($activity_level) {
 
     $i=0;
     while($remaining = array_pop($groups_sorted)) {
-        $next_level[$i][] = $remaining;
+        $next_level[$i++][] = $remaining;
     }
 
     mysqli_query($link, "begin transaction");

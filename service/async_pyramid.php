@@ -206,14 +206,14 @@ while(true) {
 
         $step = 2;
         try {
-            if ($created and !$email_sent[$step]) {
+            if (!$email_sent[$step]) {
                 $email_sent[$step] = true;
                 $recipients = \Util\get_users_email();
                 $html = \Util\get_html($step);
                 if (!empty($recipients))
                     \Util\notification_mail($recipients, $html);
 
-                $response = $an->send("Next level is ready! Start discussing. Rating is allowed till 28th, 12am CET.");
+                //$response = $an->send("Next level is ready! Start discussing. Rating is allowed till 28th, 12am CET.");
             }
         } catch(Exception $e) {}
 
@@ -247,7 +247,7 @@ while(true) {
 
         $step = 3;
         try {
-            if ($created and !$email_sent[$step]) {
+            if (!$email_sent[$step]) {
                 $email_sent[$step] = true;
                 $recipients = \Util\get_users_email();
                 $html = \Util\get_html($step);
@@ -291,7 +291,7 @@ while(true) {
 
         $step = 4;
         try {
-            if ($created and !$email_sent[$step]) {
+            if (!$email_sent[$step]) {
                 $email_sent[$step] = true;
                 $recipients = \Util\get_users_email();
                 $html = \Util\get_html($step);
