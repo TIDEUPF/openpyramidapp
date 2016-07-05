@@ -238,13 +238,15 @@ function request_rate($params) {
 
     $vars['messages'] = $messages;
 
+    $timestamp_level = $activity_level + 1;
+    $end_time_string = \Flow\end_date_string($timestamp_level);
     $next_level_messages = [
         'phone' => [
-            1 => T("Submitted rating can be discussed and modified till Monday 14th, 11:59pm CET. Login afterwards to see selected questions at the next level!"),
+            1 => T("Submitted rating can be discussed and modified till {$end_time_string}. Login afterwards to see selected questions at the next level!"),
             2 => T("Submitted rating can be discussed and modified."),
         ],
         'desktop' => [
-            1 => T("You submitted rating in this level successfully. You still can further discuss or modify your rating till Monday 14th, 11:59pm CET. Make sure you login afterwards to see which questions have been selected for the next pyramid level to continue!"),
+            1 => T("You submitted rating in this level successfully. You still can further discuss or modify your rating till {$end_time_string}. Make sure you login afterwards to see which questions have been selected for the next pyramid level to continue!"),
             2 => T("You submitted rating in this level successfully. You still can further discuss or modify your rating."),
         ]
     ];
@@ -253,6 +255,7 @@ function request_rate($params) {
             $vars['async_rated'] = $next_level_messages['phone'][((int)\Pyramid\get_current_level())];//"Submitted rating can be discussed and modified till today midnight. Login tomorrow to see selected questions at the next level!";
         } else {
             $vars['async_rated'] = $next_level_messages['desktop'][((int)\Pyramid\get_current_level())];//"You submitted rating in this level successfully. You still can further discuss or modify your rating till today midnight. Make sure you login tomorrow to see which questions have been selected for the next pyramid level to continue!";
+            $vars['async_rated'] = $next_level_messages['desktop'][1];//"You submitted rating in this level successfully. You still can further discuss or modify your rating till today midnight. Make sure you login tomorrow to see which questions have been selected for the next pyramid level to continue!";
         }
     }
 

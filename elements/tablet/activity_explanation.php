@@ -105,7 +105,7 @@
                 <!--In this activity, you will see links shared in previous weeks by other course participants. You can rate the links while discussing your proposition for rating about these creations. App will promote you to the next level when people finished rating. Gradually, you all together will select the most interesting highest voted creation.-->
                 <br>
                 <?php if(!empty($late_user)): ?>
-                    <br><?=TS("You joined the activity late! You may have missed initial steps, but still you will be added to a Pyramid. You can contribute by discussing and rating other peers options provided.")?>
+                    <br><?=TS("If you miss question submission, still you can rate. There will be new pyramids created frequently! Check step comments and try another day of the week!")?>
                 <?php endif; ?>
                 <br>
                 <!--<i>En aquesta activitat has de proposar una pregunta per al professor, després hauràs de puntuar les preguntes del teu grup. Quan tots hagueu puntuat les preguntes apareixerà el següent nivell.</i>

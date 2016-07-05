@@ -582,8 +582,8 @@ function update_pyramid($fid, $pid, $number = 0) {
 
     $nbase_groups = count($pyramid["0"]);
     $latecomers = available_students($number);
-    if(empty($latecomers))
-        return false;
+    //if(empty($latecomers))
+    //    return false;
     $nlatecomers = count($latecomers);
     //$split_size = ceil($nlatecomers/$nbase_groups);
 
@@ -772,4 +772,48 @@ function create_pyramid_structure($fid, $pid, $sarry, $fl, $fsg) {
     }
 
     return true;
+}
+
+function get_level_activity_rate($activity_level) {
+    global $link, $pyramid_size, $fid, $ps, $flow_data, $peer_array, $pid, $activity_level, $peer_group_id;
+
+    $activity_level = 0;
+    mysqli_query($link, "start transaction");
+    $result = mysqli_query($link, "select * from pyramid_groups where pg_fid='$fid' and pg_level='{$activity_level}'");
+
+    $groups = [];
+    while($pg_row = mysqli_fetch_assoc($result)) {
+        $pid = (int)$pg_row['pg_pid'];
+        $peer_group_id = (int)$pg_row['pg_group_id'];
+        \Util\sql_gen();
+        \Group\get_members_from_group_id();
+
+        $total_peers = count($peer_array);
+        $n_inactive_peers = count(\Pyramid\get_inactive_level_group_peers());
+        $groups_score[$peer_group_id] = ($total_peers - $n_inactive_peers) / $total_peers;
+    }
+
+    arsort($groups_score);
+    $groups_sorted = array_keys($groups_score);
+    for($i=0;$i<floor(count($groups_score)/2);$i++) {
+        $selected[0] = array_shift($groups_sorted);
+        $selected[1] = array_pop($groups_sorted);
+        $next_level[$i] = $selected;
+    }
+
+    $i=0;
+    while($remaining = array_pop($groups_sorted)) {
+        $next_level[$i][] = $remaining;
+    }
+
+    mysqli_query($link, "begin transaction");
+    foreach($next_level as $next_level_group_id => $next_level_combined_ids) {
+        $next_level_combined_ids_string = implode(',', $next_level_combined_ids);
+        $next_level_activity_level = $activity_level + 1;
+        mysqli_query($link, "update pyramid_groups set pg_combined_group_ids='{$next_level_combined_ids_string}' where pg_fid='{$fid}' and pg_pid='{$pid}' and pg_level='{$next_level_activity_level}' and pg_group_id='{$next_level_group_id}'");
+    }
+
+    \Pyramid\update_pyramid($fid, $pid);
+    mysqli_query($link, "commit");
+    \Util\log(['activity' => 'group_activity_reorder', 'timestamp' => time(), 'origin' => 'php_backend', 'entry' => ['scores' => $groups_score, 'fid' => $fid, 'pid' => $pid, 'level' => $activity_level, 'next_level' => $next_level]]);
 }

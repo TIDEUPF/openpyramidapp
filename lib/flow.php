@@ -61,10 +61,10 @@ function get_timestamps() {
     return $level_timestamps;
 }
 
-function end_date_string($level) {
+function end_date_string($timestamp_level) {
     $timestamps = \Flow\get_timestamps();
 
-    $start_timestamp = $timestamps[$level];
+    $start_timestamp = $timestamps[$timestamp_level];
 
     $date_string = date("l jS G:i", $start_timestamp);
 

@@ -17,7 +17,7 @@ global $link, $fid, $pid, $pyramid_minsize, $levels, $flow_data, $activity_level
 
 //email
 $email_sent = [
-    false,
+    true,
     false,
     false,
     false,
@@ -165,7 +165,7 @@ while(true) {
                 if ($created and !$email_sent[$step]) {
                     $email_sent[$step] = true;
                     $recipients = \Util\get_users_email();
-                    $html = \Util\get_html($step, $level_timestamps[1]);
+                    $html = \Util\get_html($step);
                     if (!empty($recipients))
                         \Util\notification_mail($recipients, $html);
 
@@ -199,6 +199,8 @@ while(true) {
             }
         }
 
+        \Pyramid\get_level_activity_rate();
+
         mysqli_query($link, "update pyramid_groups set pg_started = 1, pg_start_timestamp='{$time}' where pg_started = '0' and pg_fid='{$fid}' and pg_level='1'");
         mysqli_query($link, "commit");
 
@@ -207,7 +209,7 @@ while(true) {
             if ($created and !$email_sent[$step]) {
                 $email_sent[$step] = true;
                 $recipients = \Util\get_users_email();
-                $html = \Util\get_html($step, $level_timestamps[1]);
+                $html = \Util\get_html($step);
                 if (!empty($recipients))
                     \Util\notification_mail($recipients, $html);
 

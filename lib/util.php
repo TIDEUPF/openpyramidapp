@@ -192,7 +192,7 @@ HTML;
 <body>
 <p>Hi,</p>
 
-<p>You have successfully promoted to the next level in the PyramidApp. You can login to the app using the same email address or the username that you used previously. This is the link to the app: <a href="http://sos.gti.upf.edu/app/student_login.php">pyramid app</a>.</p>
+<p>You have successfully promoted to the next level in the PyramidApp. You can login to the app using the same email address or the username that you used previously. This is the link to the app: <a href="http://sos.gti.upf.edu/app/student.php">pyramid app</a>.</p>
 
 <p>In this new level you can see the submitted questions and you can use chat feature to discuss with other group members regarding their questions.</p>
 
