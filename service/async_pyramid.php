@@ -298,7 +298,7 @@ while(true) {
                 if (!empty($recipients))
                     \Util\notification_mail($recipients, $html);
 
-                $response = $an->send("We have the winning questions!");
+                // = $an->send("We have the winning questions!");
             }
         } catch(Exception $e) {}
 
