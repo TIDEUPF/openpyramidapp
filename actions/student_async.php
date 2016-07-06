@@ -23,6 +23,9 @@ if(!\Pyramid\get_current_flow()) {
 //avoid race condition
 $remaining_pyramids = \Pyramid\remaining_pyramids();
 
+//TODO:the new solution is determine if there are not full pyramids at this moment
+$existing_pyramids_full;
+
 //ask the question
 if(($pid = \Pyramid\get_student_pyramid($fid, $sid)) === false) {
     \Answer\submit();
@@ -35,14 +38,15 @@ if(($pid = \Pyramid\get_student_pyramid($fid, $sid)) === false) {
     else
         $rating = false;
 
-    if (!$rating and !\Answer\is_submitted()) {
+    if ($existing_pyramids_full and !\Answer\is_submitted()) {
         \Answer\request();
         exit;
-    } elseif(!$rating) {
+    } elseif($existing_pyramids_full) {
         //TODO: answer_form_filled
         \Answer\answer_submitted_wait();
         exit;
     } else {
+        //wait for the service to update the user
         \Pyramid\wait_pyramid();
         //wait for pyramid allocation
     }

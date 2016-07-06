@@ -48,6 +48,8 @@ while(true) {
 
     $time = time();
 
+
+    //TODO: check for not empty pyramids, the there are none just skip
     //add the latecomers if there are pyramids created
     $result = mysqli_query($link, "select pg_pid as pid from pyramid_groups where pg_fid='$fid' order by pg_pid desc limit 1");
     if(mysqli_num_rows($result)>0) {
@@ -83,6 +85,7 @@ while(true) {
         }
     }
 
+    //TODO: this must be done per pyramid? calculate level_timestamps per pyramid
     if($time <= $level_timestamps[0]) {
         //do nothing and wait for users to submit questions
         echo "question stage\n";
