@@ -238,7 +238,7 @@ HTML;
 <body>
 <p>Hi,</p>
 
-<p>We have two winning links selected from the PyramidApp. You can login to the app using the same email address or the username that you used previously to view final results. This is the link to the app: <a href="http://tiny.cc/pyramidapp">tiny.cc/pyramidapp</a>.</p>
+<p>We have two winning links selected from the PyramidApp. You can login to the app using the same email address or the username that you used previously to view final results. This is the link to the app: <a href="http://sos.gti.upf.edu/app/student.php">sos.gti.upf.edu/app/student.php</a>.</p>
 
 <p>Please make sure that you fill out the small feedback form also.</p>
 
