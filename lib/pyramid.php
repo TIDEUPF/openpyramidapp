@@ -741,6 +741,8 @@ function create_pyramid($fid, $fl, $fsg, $new_pyramid_size) {
 
     //create the new pyramid structure
     create_pyramid_structure($fid, $pid, $students, $fl , $fsg);
+
+    return $pid;
 }
 
 function create_pyramid_structure($fid, $pid, $sarry, $fl, $fsg) {
@@ -775,15 +777,15 @@ function create_pyramid_structure($fid, $pid, $sarry, $fl, $fsg) {
 }
 
 function get_level_activity_rate($activity_level) {
-    global $link, $pyramid_size, $fid, $ps, $flow_data, $peer_array, $pid, $activity_level, $peer_group_id;
+    global $link, $pyramid_size, $fid, $pid, $ps, $flow_data, $peer_array, $pid, $activity_level, $peer_group_id;
 
     $activity_level = 0;
     mysqli_query($link, "start transaction");
-    $result = mysqli_query($link, "select * from pyramid_groups where pg_fid='$fid' and pg_level='{$activity_level}'");
+    $result = mysqli_query($link, "select * from pyramid_groups where pg_fid='$fid' and pg_pid='$pid' and pg_level='{$activity_level}'");
 
     $groups = [];
     while($pg_row = mysqli_fetch_assoc($result)) {
-        $pid = (int)$pg_row['pg_pid'];
+        //$pid = (int)$pg_row['pg_pid'];
         $peer_group_id = (int)$pg_row['pg_group_id'];
         \Util\sql_gen();
         \Group\get_members_from_group_id();
@@ -816,4 +818,39 @@ function get_level_activity_rate($activity_level) {
     \Pyramid\update_pyramid($fid, $pid);
     mysqli_query($link, "commit");
     \Util\log(['activity' => 'group_activity_reorder', 'timestamp' => time(), 'origin' => 'php_backend', 'entry' => ['scores' => $groups_score, 'fid' => $fid, 'pid' => $pid, 'level' => $activity_level, 'next_level' => $next_level]]);
+}
+
+function get_pyramid_creation_timestamp() {
+    global $link, $sid, $fid, $ps, $pid, $ftimestamp, $answer_timeout, $answer_skip_timeout, $peer_array;
+
+    $r_start = mysqli_query($link, "select * from pyramid_students where timestamp > 0 and {$ps['e']} order by `timestamp` asc limit 1");
+
+    if(!(mysqli_num_rows($r_start) > 0))
+        return false;
+
+    $pyramid = mysqli_fetch_assoc($r_start);
+
+    return (int)$pyramid['timestamp'];
+}
+
+function get_timestamps() {
+    global $flow_data;
+
+    $init_day = get_pyramid_creation_timestamp();
+
+    if(!$init_day)
+        return false;
+
+    $submission_timer = (int)$flow_data['question_timeout'];
+    $rating_timer = (int)$flow_data['rating_timeout'];
+
+    $level_timestamps = [
+        $init_day + $submission_timer,
+        $init_day + $submission_timer + 1*$rating_timer,
+        $init_day + $submission_timer + 2*$rating_timer,
+        $init_day + $submission_timer + 3*$rating_timer,
+        $init_day + $submission_timer + 4*$rating_timer,
+    ];
+
+    return $level_timestamps;
 }

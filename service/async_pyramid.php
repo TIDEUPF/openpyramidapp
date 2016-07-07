@@ -33,21 +33,9 @@ while(true) {
     if (!\Pyramid\get_current_flow())
         continue;
 
-
-    $init_day = (int)$flow_data['start_timestamp'];
-    $submission_timer = (int)$flow_data['question_timeout'];
-    $rating_timer = (int)$flow_data['rating_timeout'];
-
-    $level_timestamps = [
-        $init_day + $submission_timer,
-        $init_day + $submission_timer + 1*$rating_timer,
-        $init_day + $submission_timer + 2*$rating_timer,
-        $init_day + $submission_timer + 3*$rating_timer,
-        $init_day + $submission_timer + 4*$rating_timer,
-    ];
-
     $time = time();
 
+    $level_timestamps = \Pyramid\get_timestamps();
 
     //TODO: check for not empty pyramids, the there are none just skip
     //add the latecomers if there are pyramids created
@@ -85,6 +73,13 @@ while(true) {
         }
     }
 
+    $pyramid_ids =\Flow\get_pyramid_ids();
+
+    foreach($pyramid_ids as $pyramid_id) {
+        $pid = $pyramid_id;
+        $level_timestamps = \Pyramid\get_timestamps();
+
+    }
     //TODO: this must be done per pyramid? calculate level_timestamps per pyramid
     if($time <= $level_timestamps[0]) {
         //do nothing and wait for users to submit questions
@@ -94,9 +89,9 @@ while(true) {
         //create the pyramids, must be executed once
         echo "group formation stage\n";
 
-        $result = mysqli_query($link, "select * from pyramid_groups where pg_fid='$fid' and pg_level = 0 and pg_started = 1");
-        if(mysqli_num_rows($result)>0)
-            continue;
+        //$result = mysqli_query($link, "select * from pyramid_groups where pg_fid='{$fid}' and pg_pid='{$pid}' and pg_level = 0 and pg_started = 1");
+        //if(mysqli_num_rows($result)>0)
+        //    continue;
 
         $created=false;
         //available users
@@ -104,18 +99,20 @@ while(true) {
         $nflow_students = mysqli_num_rows($result_avail);
 
         //users assigned to a pyramid
-        $result_assign = mysqli_query($link, "select sid from pyramid_students where fid = '$fid'");
-        $npy_students = mysqli_num_rows($result_assign);
+        //$result_assign = mysqli_query($link, "select sid from pyramid_students where fid = '$fid'");
+        //$npy_students = mysqli_num_rows($result_assign);
 
-        if (!($npy_students > 0)) {
+        if ($nflow_students > 0) {
             $nleft_to_assign = $nflow_students;
 
             $new_pyramid_size = $flow_data['pyramid_size'];
             mysqli_query($link, "start transaction");
             mysqli_query($link, "start transaction");
+
+            $new_pid_list = [];
             while ($nleft_to_assign >= $new_pyramid_size) {
                 try {
-                    \Pyramid\create_pyramid($fid, $flow_data['levels'], $flow_data['nostupergrp'], $new_pyramid_size);
+                    $new_pid_list[] = \Pyramid\create_pyramid($fid, $flow_data['levels'], $flow_data['nostupergrp'], $new_pyramid_size);
                     \Util\log(['activity' => 'new_pyramid']);
                     $created=true;
                     echo "created a new pyramid\n";
@@ -127,7 +124,20 @@ while(true) {
             mysqli_query($link, "update pyramid_groups set pg_started = 1, pg_start_timestamp='{$time}' where pg_started = '0' and pg_fid='{$fid}' and pg_level='0'");
             mysqli_query($link, "commit");
 
-            //remaining
+            //remaining users add added to the last pyramid
+            if($nleft_to_assign > 0) {
+                $n_users_to_add = min($nleft_to_assign, $new_pyramid_size - 1);
+                $pid_to_update = \Flow\get_last_pyramid_id();
+
+                mysqli_query($link, "begin transaction");
+                \Pyramid\update_pyramid($fid, $pid_to_update, $n_users_to_add);
+                \Util\log(['activity' => 'added_latecomers_to_pyramid', 'users' => $users]);
+                mysqli_query($link, "commit");
+            }
+
+            echo "users added and pyramid updated\n";
+
+            /*
             $result = mysqli_query($link, "select pg_pid as pid from pyramid_groups where pg_fid='$fid' order by pg_pid desc limit 1");
             if(mysqli_num_rows($result)>0) {
                 $result_avail = mysqli_query($link, "select distinct * from flow_available_students where fid='$fid' and sid not in (select sid from pyramid_students where fid = '$fid')");
@@ -160,14 +170,14 @@ while(true) {
                     echo "users added and pyramid updated\n";
                 }
             }
-
+*/
             mysqli_query($link, "commit");
 
             $step = 1;
             try {
                 if ($created and !$email_sent[$step]) {
                     $email_sent[$step] = true;
-                    $recipients = \Util\get_users_email();
+                    $recipients = \Util\get_users_email($fid, $pid);
                     $html = \Util\get_html($step);
                     if (!empty($recipients))
                         \Util\notification_mail($recipients, $html);
@@ -182,15 +192,15 @@ while(true) {
         //select the answers and enable the level
         echo "selection answers 1 stage\n";
 
-        $result = mysqli_query($link, "select * from pyramid_groups where pg_fid='$fid' and pg_level = 1 and pg_started = 1");
+        $result = mysqli_query($link, "select * from pyramid_groups where pg_fid='$fid' and pg_pid='$pid' and pg_level = 1 and pg_started = 1");
         if(mysqli_num_rows($result)>0)
             continue;
 
         $activity_level = 0;
         mysqli_query($link, "start transaction");
-        $result = mysqli_query($link, "select * from pyramid_groups where pg_fid='$fid' and pg_level='{$activity_level}'");
+        $result = mysqli_query($link, "select * from pyramid_groups where pg_fid='$fid' and pg_pid='$pid' and pg_level='{$activity_level}'");
         while($pg_row = mysqli_fetch_assoc($result)) {
-            $pid = (int)$pg_row['pg_pid'];
+            //$pid = (int)$pg_row['pg_pid'];
             $peer_group_id = (int)$pg_row['pg_group_id'];
             \Util\sql_gen();
             \Group\get_members_from_group_id();
@@ -204,14 +214,14 @@ while(true) {
 
         \Pyramid\get_level_activity_rate();
 
-        mysqli_query($link, "update pyramid_groups set pg_started = 1, pg_start_timestamp='{$time}' where pg_started = '0' and pg_fid='{$fid}' and pg_level='1'");
+        mysqli_query($link, "update pyramid_groups set pg_started = 1, pg_start_timestamp='{$time}' where pg_started = '0' and pg_fid='{$fid}'  and pg_pid='{$pid}' and pg_level='1'");
         mysqli_query($link, "commit");
 
         $step = 2;
         try {
             if (!$email_sent[$step]) {
                 $email_sent[$step] = true;
-                $recipients = \Util\get_users_email();
+                $recipients = \Util\get_users_email($fid, $pid);
                 $html = \Util\get_html($step);
                 if (!empty($recipients))
                     \Util\notification_mail($recipients, $html);
@@ -265,12 +275,12 @@ while(true) {
         echo "final stage\n";
         $activity_level = $levels - 1;
         $previous_level = $activity_level - 1;
-        $result = mysqli_query($link, "select * from selected_answers where sa_fid='$fid' and sa_level = {$activity_level}");
+        $result = mysqli_query($link, "select * from selected_answers where sa_fid='$fid' and sa_pid='$pid' and sa_level = {$activity_level}");
         if(mysqli_num_rows($result)>0)
             continue;
 
         //prevent race condition with the last flow or incorrect timestamp
-        $result = mysqli_query($link, "select * from selected_answers where sa_fid='$fid' and sa_level = {$previous_level}");
+        $result = mysqli_query($link, "select * from selected_answers where sa_fid='$fid' and sa_pid='$pid' and sa_level = {$previous_level}");
         if(!(mysqli_num_rows($result)>0))
             continue;
 
@@ -278,9 +288,9 @@ while(true) {
         $n_selected_answers = 1;
         $random_selection = false;
 
-        $result = mysqli_query($link, "select * from pyramid_groups where pg_fid='$fid' and pg_level='{$activity_level}'");
+        $result = mysqli_query($link, "select * from pyramid_groups where pg_fid='$fid' and pg_pid='$pid' and pg_level='{$activity_level}'");
         while($pg_row = mysqli_fetch_assoc($result)) {
-            $pid = (int)$pg_row['pg_pid'];
+            //$pid = (int)$pg_row['pg_pid'];
             $peer_group_id = (int)$pg_row['pg_group_id'];
             \Util\sql_gen();
             \Group\get_members_from_group_id();
@@ -296,7 +306,7 @@ while(true) {
         try {
             if (!$email_sent[$step]) {
                 $email_sent[$step] = true;
-                $recipients = \Util\get_users_email();
+                $recipients = \Util\get_users_email($fid, $pid);
                 $html = \Util\get_html($step);
                 if (!empty($recipients))
                     \Util\notification_mail($recipients, $html);

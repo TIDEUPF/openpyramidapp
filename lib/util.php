@@ -122,10 +122,15 @@ function filter_email($email_array) {
     return $filtered;
 }
 
-function get_users_email() {
+function get_users_email($fid, $pid) {
     global $link;
 
-    $students_result = mysqli_query($link, "select sid from students");
+    if(is_array($pid))
+        $pid_list = implode(',', $pid);
+    else
+        $pid_list = $pid;
+
+    $students_result = mysqli_query($link, "select sid from pyramid_students where fid = {$fid} and pid in ($pid_list)");
 
     $emails = [];
 
