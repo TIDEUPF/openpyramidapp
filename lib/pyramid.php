@@ -745,13 +745,62 @@ function create_pyramid($fid, $fl, $fsg, $new_pyramid_size) {
     return $pid;
 }
 
+function distribute_group_members($fsg, $question_students, $no_question_students) {
+    $n_groups = floor((count($question_students) + count($no_question_students))/$fsg);
+
+    $groups = [];
+
+    for($s=0;$s<$fsg;$s++) {
+        for ($i = 0; $i < $n_groups; $i++) {
+            if ($student = array_pop($question_students)) {
+                $groups[$i][] = $student;
+            } elseif ($student = array_pop($no_question_students)) {
+                $groups[$i][] = $student;
+            }
+        }
+    }
+
+    $students = [];
+    for ($i = 0; $i < $n_groups; $i++) {
+        $students = array_merge($students, $groups[$i]);
+    }
+
+
+    while(count($question_students) + count($no_question_students)) {
+        if ($student = array_pop($question_students)) {
+            $students[] = $student;
+        } elseif ($student = array_pop($no_question_students)) {
+            $students[] = $student;
+        }
+    }
+
+    return $students;
+}
+
 function create_pyramid_structure($fid, $pid, $sarry, $fl, $fsg) {
     global $link;
 
     if($fl < 1 || $fsg < 1)
         return false;
 
-    $pyramid_list = noSc_pyramid($fl, $sarry, $fsg);
+    //select students with a question
+    $students_sql = implode('\',\'',$sarry);
+    $result = mysqli_query($link, "select * from flow_available_students where fid='$fid' and sid in ('{$students_sql}') and sid in(select sid from flow_student where fid = '$fid')");
+
+    $question_students = [];
+    while($result_row = mysqli_fetch_assoc($result)) {
+        $question_students[] = $result_row['sid'];
+    }
+
+    $no_question_students = [];
+    foreach($sarry as $student) {
+        if(!in_array($student, $question_students))
+            $no_question_students[] = $student;
+    }
+
+    $student_array = distribute_group_members($fsg, $question_students, $no_question_students);
+
+    $pyramid_list = noSc_pyramid($fl, $student_array, $fsg);
 
     for($tl=0; $tl<$fl; $tl++) {
         if($tl == 0) {
@@ -833,6 +882,16 @@ function get_pyramid_creation_timestamp() {
     return (int)$pyramid['timestamp'];
 }
 
+function end_date_string($timestamp_level) {
+    $timestamps = get_timestamps();
+
+    $start_timestamp = $timestamps[$timestamp_level];
+
+    $date_string = date("l jS G:i", $start_timestamp);
+
+    return $date_string;
+}
+
 function get_timestamps() {
     global $flow_data;
 
@@ -845,12 +904,19 @@ function get_timestamps() {
     $rating_timer = (int)$flow_data['rating_timeout'];
 
     $level_timestamps = [
-        $init_day + $submission_timer,
-        $init_day + $submission_timer + 1*$rating_timer,
-        $init_day + $submission_timer + 2*$rating_timer,
-        $init_day + $submission_timer + 3*$rating_timer,
-        $init_day + $submission_timer + 4*$rating_timer,
+        $init_day,
+        $init_day + 1*$rating_timer,
+        $init_day + 2*$rating_timer,
+        $init_day + 3*$rating_timer,
+        $init_day + 4*$rating_timer,
     ];
 
     return $level_timestamps;
+}
+
+function set_pid($new_pid) {
+    global $pid;
+    
+    $pid = $new_pid;
+    \Util\sql_gen();
 }

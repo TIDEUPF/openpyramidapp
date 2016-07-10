@@ -239,7 +239,7 @@ function request_rate($params) {
     $vars['messages'] = $messages;
 
     $timestamp_level = $activity_level + 1;
-    $end_time_string = \Flow\end_date_string($timestamp_level);
+    $end_time_string = \Pyramid\end_date_string($timestamp_level);
     $next_level_messages = [
         'phone' => [
             1 => T("Submitted rating can be discussed and modified till {$end_time_string}. Login afterwards to see selected questions at the next level!"),

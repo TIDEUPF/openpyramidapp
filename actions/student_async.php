@@ -24,19 +24,14 @@ if(!\Pyramid\get_current_flow()) {
 $remaining_pyramids = \Pyramid\remaining_pyramids();
 
 //TODO:the new solution is determine if there are not full pyramids at this moment
-$existing_pyramids_full;
+//$existing_pyramids_full;
 
 //ask the question
 if(($pid = \Pyramid\get_student_pyramid($fid, $sid)) === false) {
     \Answer\submit();
     \Util\log_submit();
 
-    //rating has started(even if still is not submitted by anyone)
-    $result = mysqli_query($link, "select * from pyramid_groups where pg_fid = {$fid} and pg_level='0' and pg_started=1");
-    if(mysqli_num_rows($result) > 0)
-        $rating = true;
-    else
-        $rating = false;
+    $existing_pyramids_full = !(count(\Flow\get_not_full_pyramids()) > 0);
 
     if ($existing_pyramids_full and !\Answer\is_submitted()) {
         \Answer\request();

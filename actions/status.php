@@ -27,7 +27,7 @@ $rating_started = \Pyramid\is_rating_started();
 
 $n_inactive_peers = count(\Pyramid\get_inactive_level_group_peers()) - 1;
 
-$flow_timestamps = \Flow\get_timestamps();
+$flow_timestamps = \Pyramid\get_timestamps();
 
 $timestamp_level = $activity_level + 1 - 1*((int)(!$rating_started));
 $ui_level = $activity_level + 2 - 1*((int)(!$rating_started));

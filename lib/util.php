@@ -143,7 +143,7 @@ function get_users_email($fid, $pid) {
 }
 
 function get_html($step) {
-    $date_string = \Flow\end_date_string($step);
+    $date_string = \Pyramid\end_date_string($step);
 
     if($step == 1) {
 

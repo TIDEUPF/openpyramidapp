@@ -405,3 +405,10 @@ function sa_exists() {
 
     return false;
 }
+
+function set_group_id($new_group_id) {
+    global $peer_group_id;
+
+    $peer_group_id = $new_group_id;
+    \Group\get_members_from_group_id();
+}

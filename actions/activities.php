@@ -1,13 +1,13 @@
 <?php
 include('dbvar.php');
-global $node_path;
+global $node_path, $fid;
 $flow_data = [];
 //$fid_array = [10,11,12];
 
 //obtain the flows pertaining to the current teacher
 $flows = [];
 $teacher_id = $_SESSION['user'];
-$fid = (int)$_REQUEST['edit'];
+\Flow\set_fid($_REQUEST['edit']);
 $flow_query = mysqli_query($link, "select * from flow where fid = '{$fid}' and teacher_id = '$teacher_id'");
 if(mysqli_num_rows($flow_query) > 0) {
     $flow_query_row = mysqli_fetch_assoc($flow_query);
@@ -22,6 +22,16 @@ if($flow['multi_py'])
     $n_pyramids = floor($flow['expected_students']/$flow['pyramid_size']);
 else
     $n_pyramids = 1;
+
+    //multiple async pyramids info
+if($flow['multi_py'] and $flow['sync'] == 0) {
+    $unfilled_pyramids = \Flow\get_not_full_pyramids();
+    $last_expired_timestamp = \Flow\get_last_pyramid_expired_timestamp();
+
+    if(empty($unfilled_pyramids)) {
+        $available_students = \Flow\get_available_students();
+    }
+}
 
 //obtain the data for every flow
 foreach($flows as $flow) {
@@ -68,7 +78,7 @@ foreach($flows as $flow) {
             $pyramid_level_answers_row = mysqli_fetch_assoc($pyramid_level_answers);
             $activity_level = $pyramid_level_answers_row['levels'];
             $activity_level = $activity_level - 1;
-            $result_11 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_pid = '{$i}' and sa_level = '$activity_level'");
+            $result_11 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_pid = '{$i}' and sa_level = '$activity_level' and skip = 0");
 
             while ($data_t_11 = mysqli_fetch_assoc($result_11)) {
                 $qa_last_selected_id = $data_t_11['sa_selected_id'];
@@ -113,7 +123,7 @@ SQL;
             }
 
             //there is a winning answer
-            $pyramid_level_answers = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_pid = '{$i}' and sa_level='$level' and sa_group_id='$pg_group_id'");
+            $pyramid_level_answers = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_pid = '{$i}' and sa_level='$level' and sa_group_id='$pg_group_id' and skip = 0");
             if (mysqli_num_rows($pyramid_level_answers) > 0) { //the group has selected an answer
 
                 while($pyramid_level_answers_row = mysqli_fetch_assoc($pyramid_level_answers)) {
@@ -126,12 +136,12 @@ SQL;
                         $answer = $data4['fs_answer'];
                     }
                 }
-                $pyramid_data[$i]['levels'][$level]['groups'][] = [
-                    'members' => $group,
-                    'answer' => $answer,
-                    'ranking' => $ranking
-                ];
             }
+            $pyramid_data[$i]['levels'][$level]['groups'][] = [
+                'members' => $group,
+                'answer' => $answer,
+                'ranking' => $ranking
+            ];
         }
     }
 
@@ -200,6 +210,27 @@ header('Content-Type: text/html; charset=utf-8');
                     <?php endif;?>
                 <?php endforeach; ?>
             </div>
+            <?php endif;?>
+
+            <?php if(isset($unfilled_pyramids)):?>
+                <?php if(count($unfilled_pyramids)):?>
+                <div id="activity-pyramid-state-block">
+                    <div id="activity-pyramid-state-block-title"><?=TS("Pyramid state:")?></div>
+                    <ul class="activity-pyramid-state-block-pyramid-list">
+                        <li class="activity-pyramid-state-block-pyramid-list-item">Submission will start at <?=date("l jS G:i", $last_expired_timestamp)?></li>
+                        <?php foreach($unfilled_pyramids as $pkey => $unfilled_pyramid):?>
+                        <li class="activity-pyramid-state-block-pyramid-list-item">Pyramid <?=($unfilled_pyramid['pid'] + 1)?> remaining slots <?=($unfilled_pyramid['slots'])?></li>
+                    <?php endforeach; ?>
+                    </ul>
+                </div>
+                <?php else:?>
+                <div id="activity-pyramid-state-block">
+                    <ul class="activity-pyramid-state-block-pyramid-list">
+                    <li class="activity-pyramid-state-block-pyramid-list-item">Waiting for users since <?=date("l jS G:i", $last_expired_timestamp)?></li>
+                    <li class="activity-pyramid-state-block-pyramid-list-item">Available students <?=implode(', ', $available_students)?></li>
+                    </ul>
+                </div>
+                <?php endif;?>
             <?php endif;?>
 
             <?php foreach($flow as $pkey => $pyramid): ?>
