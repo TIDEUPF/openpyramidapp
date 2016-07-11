@@ -484,6 +484,9 @@ function view_final_answer($params) {
     if(mysqli_num_rows($feedback_result) > 0)
         $vars['no_feedback'] = true;
 
+    if($flow_data['sync'] == 1)
+        $vars['no_feedback'] = true;
+
     $body = \View\element("final_answer", $vars);
 
     \View\page(array(
