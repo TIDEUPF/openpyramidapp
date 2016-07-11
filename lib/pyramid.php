@@ -322,7 +322,7 @@ function show_final_answer() {
 }
 
 function get_current_flow() {
-    global $levels, $fname, $fdes,  $fid, $ps, $n_selected_answers, $random_selection, $link, $ftimestamp, $flow_data, $timeout, $answer_timeout, $pyramid_size, $pyramid_minsize;
+    global $levels, $fname, $fdes,  $fid, $ps, $n_selected_answers, $random_selection, $link, $ftimestamp, $flow_data, $timeout, $answer_timeout, $pyramid_size, $pyramid_minsize, $answer_required_percentage, $answer_submit_required_percentage;
     //get information the latest flow
     $res3 = mysqli_query($link, "select * from flow order by fid desc limit 1");
     if(mysqli_num_rows($res3) > 0){
@@ -339,8 +339,10 @@ function get_current_flow() {
         $answer_timeout = (int)$data3["question_timeout"];
         $n_selected_answers = (int)$data3["n_selected_answers"];
         $random_selection = (int)$data3["random_selection"];
+        $answer_required_percentage = (int)$data3["rating_required_percentage"];
+        $answer_submit_required_percentage = (int)$data3["answer_submit_required_percentage"];
 
-
+        
         if(isset($_SESSION['fid'])) {
             if($_SESSION['fid'] != $fid) {
                 $_SESSION['fid'] = $fid;

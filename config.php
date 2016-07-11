@@ -3,7 +3,7 @@
 require_once __DIR__ . '/vendors/mobiledetect/Mobile_Detect.php';
 
 function init_cfg() {
-    global $default_teacher_question, $force_email, $answer_required_percentage, $peer_toolbar_strlen, $answer_submit_required_percentage, $timeout, $answer_skip_timeout ,$answer_timeout, $pyramid_minsize, $device, $node_path;
+    global $default_teacher_question, $force_email, $peer_toolbar_strlen, $timeout, $answer_skip_timeout ,$answer_timeout, $pyramid_minsize, $device, $node_path;
     $detect = new Mobile_Detect;
 
     //$force_email = true;
@@ -36,8 +36,6 @@ function init_cfg() {
         $node_path = 'socket.io';
 
     load_translation("en");
-    $answer_required_percentage = 60;
-    $answer_submit_required_percentage = 60;
     $timeout = 120;
     $answer_skip_timeout = 15;
     $answer_timeout = 120;
