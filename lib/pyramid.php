@@ -718,6 +718,25 @@ function get_student_pyramid($fid, $sid) {
 function create_pyramid($fid, $fl, $fsg, $new_pyramid_size) {
     global $link,  $fid, $ps, $flow_data;
 
+    //required questions
+    $n_required_questions = floor($new_pyramid_size/$fsg) * 2;
+
+    $students = \Flow\get_available_students_with_question($n_required_questions);
+
+    if($new_pyramid_size > count($students)) {
+        $needed_students = $new_pyramid_size - count($students);
+        //try to get the remaining users
+        $no_question_students = \Flow\get_available_students_without_question($needed_students);
+        $students = array_merge($students, $no_question_students);
+    }
+
+    if($new_pyramid_size > count($students)) {
+        $needed_students = $new_pyramid_size - count($students);
+        //try to get the remaining users
+        $question_students = \Flow\get_available_students_with_question($needed_students, $students);
+        $students = array_merge($students, $question_students);
+    }
+
     //find the last pid
     $pid = null;
     $result = mysqli_query($link,"select * from pyramid_students where fid='$fid' order by pid desc limit 1");
@@ -729,16 +748,9 @@ function create_pyramid($fid, $fl, $fsg, $new_pyramid_size) {
         $pid = (int)$result_row['pid'] + 1;
     }
 
-    //select available flow students
-    $result = mysqli_query($link, "select * from flow_available_students where fid='$fid' and sid not in(select sid from pyramid_students where fid = '$fid') limit {$new_pyramid_size}");
-
-    if(!mysqli_num_rows($result))
-        $students = [];
-    else {
-        while($result_row = mysqli_fetch_assoc($result)) {
-            $students[] = $result_row['sid'];
-            add_student($fid, $pid, $result_row['sid']);
-        }
+    //add selected student to the pyramid
+    foreach($students as $student) {
+        add_student($fid, $pid, $student);
     }
 
     //create the new pyramid structure

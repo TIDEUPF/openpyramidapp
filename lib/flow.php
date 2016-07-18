@@ -248,3 +248,44 @@ function set_fid($new_fid) {
         return false;
     }
 }
+
+function get_available_students_with_question($new_pyramid_size, $excluded_students = array()) {
+    global $levels, $fname, $fdes, $fid, $ps, $n_selected_answers, $random_selection, $link, $ftimestamp, $flow_data, $timeout, $answer_timeout, $pyramid_size, $pyramid_minsize;
+
+    $excluded_sql = "";
+
+    if(count($excluded_students)) {
+        $excluded_string = implode('\',\'', $excluded_students);
+        $excluded_sql = " and sid not in ('{$excluded_string}') ";
+    }
+
+    //select available flow students
+    $result = mysqli_query($link, "select distinct * from flow_available_students where fid='$fid' and sid not in(select sid from pyramid_students where fid = '$fid') and sid in(select sid from flow_student where fid = '$fid') {$excluded_sql} limit {$new_pyramid_size}");
+
+    if(!mysqli_num_rows($result))
+        $students = [];
+    else {
+        while($result_row = mysqli_fetch_assoc($result)) {
+            $students[] = $result_row['sid'];
+        }
+    }
+
+    return $students;
+}
+
+function get_available_students_without_question($new_pyramid_size) {
+    global $levels, $fname, $fdes, $fid, $ps, $n_selected_answers, $random_selection, $link, $ftimestamp, $flow_data, $timeout, $answer_timeout, $pyramid_size, $pyramid_minsize;
+
+    //select available flow students
+    $result = mysqli_query($link, "select distinct * from flow_available_students where fid='$fid' and sid not in(select sid from pyramid_students where fid = '$fid') and sid not in(select sid from flow_student where fid = '$fid') limit {$new_pyramid_size}");
+
+    if(!mysqli_num_rows($result))
+        $students = [];
+    else {
+        while($result_row = mysqli_fetch_assoc($result)) {
+            $students[] = $result_row['sid'];
+        }
+    }
+
+    return $students;
+}

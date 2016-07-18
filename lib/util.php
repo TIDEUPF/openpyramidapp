@@ -143,6 +143,8 @@ function get_users_email($fid, $pid) {
 }
 
 function get_html($step) {
+    global $url;
+
     $date_string = \Pyramid\end_date_string($step);
 
     if($step == 1) {
@@ -152,7 +154,7 @@ function get_html($step) {
 <body>
 <p>Hi,</p>
 
-<p>You have successfully promoted to the next level in the PyramidApp. You can login to the app using the same email address or the username that you used previously. This is the link to the app: <a href="http://sos.gti.upf.edu/app/student.php">sos.gti.upf.edu/app/student.php</a>.</p>
+<p>You have successfully promoted to the next level in the PyramidApp. You can login to the app using the same email address or the username that you used previously. This is the link to the app: <a href="{$url}student.php">{$url}student.php</a>.</p>
 
 <p>In this new level you can see the submitted questions and you can use chat feature to discuss with other group members regarding their questions.</p>
 
@@ -197,7 +199,7 @@ HTML;
 <body>
 <p>Hi,</p>
 
-<p>You have successfully promoted to the next level in the PyramidApp. You can login to the app using the same email address or the username that you used previously. This is the link to the app: <a href="http://sos.gti.upf.edu/app/student.php">sos.gti.upf.edu/app/student.php</a>.</p>
+<p>You have successfully promoted to the next level in the PyramidApp. You can login to the app using the same email address or the username that you used previously. This is the link to the app: <a href="{$url}student.php">{$url}student.php</a>.</p>
 
 <p>In this new level you can see the submitted questions and you can use chat feature to discuss with other group members regarding their questions.</p>
 
@@ -220,7 +222,7 @@ HTML;
 <body>
 <p>Hi,</p>
 
-<p>It’s the final stage of the PyramidApp. You can login to the app using the same email address or the username that you used previously. This is the link to the app: <a href="http://sos.gti.upf.edu/app/student_login.php">pyramid app</a>.</p>
+<p>It’s the final stage of the PyramidApp. You can login to the app using the same email address or the username that you used previously. This is the link to the app: <a href="{$url}student.php">pyramid app</a>.</p>
 
 <p>In this level you will see final highly rated questions promoted from the previous level. You can discuss about these questions and rate the best.</p>
 
@@ -243,7 +245,7 @@ HTML;
 <body>
 <p>Hi,</p>
 
-<p>We have two winning links selected from the PyramidApp. You can login to the app using the same email address or the username that you used previously to view final results. This is the link to the app: <a href="http://sos.gti.upf.edu/app/student.php">sos.gti.upf.edu/app/student.php</a>.</p>
+<p>We have two winning links selected from the PyramidApp. You can login to the app using the same email address or the username that you used previously to view final results. This is the link to the app: <a href="{$url}student.php">{$url}student.php</a>.</p>
 
 <p>Please make sure that you fill out the small feedback form also.</p>
 
