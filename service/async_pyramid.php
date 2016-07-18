@@ -151,10 +151,12 @@ while(true) {
             try {
                 if ($created and !$email_sent[$step]) {
                     $email_sent[$step] = true;
-                    $recipients = \Util\get_users_email($fid, $pid);
-                    $html = \Util\get_html($step);
-                    if (!empty($recipients))
-                        \Util\notification_mail($recipients, $html);
+                    foreach($new_pid_list as $created_pid) {
+                        $recipients = \Util\get_users_email($fid, $created_pid);
+                        $html = \Util\get_html($step);
+                        if (!empty($recipients))
+                            \Util\notification_mail($recipients, $html);
+                    }
 
                     //$response = $an->send("Next level is ready! Start discussing. Rating is allowed till 27th, 6pm CET.");
                 }
