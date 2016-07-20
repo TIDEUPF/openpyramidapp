@@ -884,12 +884,13 @@ function get_level_activity_rate($activity_level) {
 }
 
 function get_pyramid_creation_timestamp() {
-    global $link, $sid, $fid, $ps, $pid, $ftimestamp, $answer_timeout, $answer_skip_timeout, $peer_array;
+    global $link, $sid, $fid, $flow_data, $ps, $pid, $ftimestamp, $answer_timeout, $answer_skip_timeout, $peer_array;
 
     $r_start = mysqli_query($link, "select * from pyramid_students where timestamp > 0 and {$ps['e']} order by `timestamp` asc limit 1");
 
-    if(!(mysqli_num_rows($r_start) > 0))
+    if(!(mysqli_num_rows($r_start) > 0)) {
         return false;
+    }
 
     $pyramid = mysqli_fetch_assoc($r_start);
 
