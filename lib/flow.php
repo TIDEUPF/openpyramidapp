@@ -289,3 +289,94 @@ function get_available_students_without_question($new_pyramid_size) {
 
     return $students;
 }
+
+function get_flow_default_fields() {
+    $flow_fields = [
+        'activity',
+        'task_description',
+        'learning_setting',
+        'discussion',
+        'expected_students',
+        'first_group_size',
+        'n_levels',
+        'multiple_pyramids',
+        'min_students_per_pyramid',
+        'satisfaction',
+        's_question',
+        'h_question',
+        's_rating',
+        'h_rating',
+        'sync',
+        'random_selection',
+        'n_selected_answers'
+    ];
+
+    return $flow_fields;
+}
+
+function get_default_field_values() {
+    $defaults = [
+        'async' => [
+            'discussion' => [
+                'sync' => 0,
+                's_question' => 24*3600,
+                'h_question' => 36*3600,
+                's_rating' => 24*3600,
+                'h_rating' => 36*3600,
+                'satisfaction' => 60,
+                'discussion' => 1,
+                'n_selected_answers' => 1,
+                'random_selection' => 1,
+                'n_levels' => 3,
+                'first_group_size' => 4,
+                'multiple_pyramids' => 1,
+            ],
+            'no_discussion' => [
+                'sync' => 0,
+                's_question' => 24*3600,
+                'h_question' => 36*3600,
+                's_rating' => 24*3600,
+                'h_rating' => 2*24*3600,
+                'satisfaction' => 60,
+                'discussion' => 0,
+                'n_selected_answers' => 1,
+                'random_selection' => 1,
+                'n_levels' => 3,
+                'first_group_size' => 4,
+                'multiple_pyramids' => 1,
+            ],
+        ],
+        'sync' => [
+            'discussion' => [
+                'sync' => 1,
+                's_question' => 120,
+                'h_question' => 240,
+                's_rating' => 180,
+                'h_rating' => 300,
+                'satisfaction' => 60,
+                'discussion' => 1,
+                'n_selected_answers' => 1,
+                'random_selection' => 1,
+                'n_levels' => 3,
+                'first_group_size' => 4,
+                'multiple_pyramids' => 1,
+            ],
+            'no_discussion' => [
+                'sync' => 1,
+                's_question' => 120,
+                'h_question' => 240,
+                's_rating' => 60,
+                'h_rating' => 180,
+                'satisfaction' => 60,
+                'discussion' => 0,
+                'n_selected_answers' => 1,
+                'random_selection' => 1,
+                'n_levels' => 3,
+                'first_group_size' => 4,
+                'multiple_pyramids' => 1,
+            ],
+        ],
+    ];
+
+    return $defaults;
+}
