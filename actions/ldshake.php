@@ -5,11 +5,18 @@ global $node_path;
 
 $flow_fields = \Flow\get_flow_default_fields();
 
-$sectoken = $_REQUEST['sectoken'];
-$id = $_REQUEST['id'];
-
+if(isset($_REQUEST['ldshake_save']))	{
+    $ldshake_sectoken = $_REQUEST['ldshake_sectoken'];
+    $ldshake_doc_id = $_REQUEST['ldshake_doc_id'];
+    $ldshake_flow_data = $_REQUEST['flow_data'];
+    \Util\ldshake_save_document($ldshake_doc_id, $ldshake_sectoken, $ldshake_flow_data);
+    exit;
+} else {
+    $ldshake_sectoken = $_REQUEST['sectoken'];
+    $ldshake_doc_id = $_REQUEST['id'];
+}
 $sql = <<<SQL
-select * from `ldshake_editor` where `doc_id` = '{$id}' AND `sectoken` = '{$sectoken}'
+select * from `ldshake_editor` where `doc_id` = '{$ldshake_doc_id}' AND `sectoken` = '{$ldshake_sectoken}'
 SQL;
 
 $flow_result = mysqli_query($link, $sql);

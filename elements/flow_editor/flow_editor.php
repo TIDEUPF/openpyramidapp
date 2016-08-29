@@ -729,6 +729,11 @@ header('Content-Type: text/html; charset=utf-8');
                         <?php if($edit):?>
                             <input type="hidden" name="fid" value="<?=$fid?>">
                         <?php endif;?>
+                        <?php if(isset($ldshake)):?>
+                            <input type="hidden" name="ldshake_doc_id" value="<?=$ldshake_doc_id?>">
+                            <input type="hidden" name="ldshake_sectoken" value="<?=$ldshake_sectoken?>">
+                            <input type="hidden" name="ldshake_save" value="true">
+                        <?php endif;?>
                     </div>
 
                     <div style="clear: both;"></div>
