@@ -210,6 +210,33 @@ SQL;
         }
 */
     }
+} elseif(isset($non_live_html)) {
+    $document_id = (int)$document_id;
+
+    $sql = <<<SQL
+select * from `ldshake_editor` 
+where 
+`doc_id` = {$document_id} 
+SQL;
+
+    $flow_result = mysqli_query($link, $sql);
+    if (!(mysqli_num_rows($flow_result) > 0)) {
+        throw new Exception("Document not found");
+    }
+
+    $row = mysqli_fetch_assoc($flow_result);
+
+    $flow_object = json_decode($row['json']);
+
+//check fields
+    foreach ($flow_fields as $field) {
+        if (!isset($flow_object->$field)) {
+            $error = true;
+            break;
+        }
+    }
+
+    $edit = true;
 } else {
     header("location: login.php");
     exit(0);
@@ -332,11 +359,13 @@ header('Content-Type: text/html; charset=utf-8');
     <script src="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
     <link rel="stylesheet" type="text/css" href="elements/resources/css/teacher/styles.css">
 
+    <?php if($non_live_html): ?>
     <script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
     <script src="lib/actions.js"></script>
     <script type="text/javascript">
         var socket = io({multiplex : false, 'reconnection': true,'reconnectionDelay': 3000,'maxReconnectionAttempts':Infinity, path: '/<?=$node_path?>/'});
     </script>
+    <?php endif;?>
 </head>
 
 <body>

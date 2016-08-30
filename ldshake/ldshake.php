@@ -34,3 +34,14 @@ function send_binary_data($data) {
     echo $data;
     exit;
 }
+
+function view__non_live_summary($document_id) {
+    $non_live_html = true;
+
+    ob_start();
+    include __DIR__ . '/../actions/summary.php';
+    $html = ob_get_contents();
+    ob_end_clean();
+
+    return $html;
+}

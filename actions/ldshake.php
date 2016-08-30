@@ -21,7 +21,7 @@ SQL;
 
 $flow_result = mysqli_query($link, $sql);
 if(!(mysqli_num_rows($flow_result) > 0)) {
-    $error = true;
+    throw new Exception("Document not found");
 }
 
 $row = mysqli_fetch_assoc($flow_result);
