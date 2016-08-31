@@ -1,9 +1,10 @@
 <?php
 error_reporting(0);
+include __DIR__ .'/../../actions/dbvar.php';
 //recogemos las variables
 
 $document_file = isset($_FILES['document']) ? $_FILES['document'] : null;
-$sectoken = $_POST['sectoken'];
+$sectoken = $_REQUEST['sectoken'];
 $document_id = mt_rand(1,5000000);
 
 //$ruta = __DIR__.'/../../temporalData/'.$document_id;
@@ -11,14 +12,13 @@ $document_id = mt_rand(1,5000000);
 
 
 // comprobamos que se hayan recogido correctamente
-if (empty ($sectoken));
-{
+if (empty ($sectoken)) {
     header($_SERVER['protocol'] . ' 500 Error en sectoken', true, 500);
 }
 
 if ($document_file['error'] != UPLOAD_ERR_OK or !isset($_FILES['document'])) {
     $new = true;
-    $json_string_sql = "";
+    $json_string_sql = json_encode((object)[]);
 } else {
     try {
         if (!($json_string = file_get_contents($document_file ["tmp_name"])))
@@ -32,13 +32,13 @@ if ($document_file['error'] != UPLOAD_ERR_OK or !isset($_FILES['document'])) {
         exit;
     }
 
-    global $link;
-    $json_string_sql = mysqli_real_escape_string($link, $json_string);
-    $sectoken_sql = mysqli_real_escape_string($link, $sectoken);
 }
 
+global $link;
+$json_string_sql = mysqli_real_escape_string($link, $json_string);
+$sectoken_sql = mysqli_real_escape_string($link, $sectoken);
 
-    $sql = <<<SQL
+$sql = <<<SQL
 insert into ldshake_editor values (
 null, 
 '{$document_id}', 
@@ -56,6 +56,6 @@ if (!$fid = mysqli_insert_id($link)) {
 
 global $url;
 header($_SERVER['protocol'] . ' 201 Created', true, 201);
-$response = $url.'krating/ldshake/ldsdoc/'.$document_id;
+$response = $url.'ldshake/ldsdoc/'.$document_id;
 echo $response;
 exit;

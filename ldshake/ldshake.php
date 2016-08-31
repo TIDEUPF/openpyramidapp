@@ -35,7 +35,7 @@ function send_binary_data($data) {
     exit;
 }
 
-function view__non_live_summary($document_id) {
+function view_non_live_summary($document_id) {
     $non_live_html = true;
 
     ob_start();
@@ -44,4 +44,15 @@ function view__non_live_summary($document_id) {
     ob_end_clean();
 
     return $html;
+}
+
+function create_zippped_summary($html) {
+    $zipped_summary_object = new \ZipArchive();
+    $zipped_summary_object->open('php://temp', \ZipArchive::CREATE);
+    $zipped_summary_object->addFromString('index.html', $html);
+    $zipped_summary_object->close();
+
+    $zip_file_contents = file_get_contents('php://temp');
+
+    return $zip_file_contents;
 }

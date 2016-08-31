@@ -1212,7 +1212,7 @@ header('Content-Type: text/html; charset=utf-8');
 
         top.postMessage({type: 'ldshake_restapi_presave_ready'}, data.params.ldshake_origin);
         ldshake_event_save_data = null;
-        console.log("exe: save_ready");
+        console.log("pyramid: save_ready");
     }
 
 </script>
