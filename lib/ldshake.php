@@ -56,3 +56,58 @@ function create_zippped_summary($html) {
 
     return $zip_file_contents;
 }
+
+function ldshake_save_document($document_id, $sectoken, $json_string)
+{
+    global $link;
+
+    $document_id_sql = mysqli_real_escape_string($link, $document_id);
+    $json_string_sql = mysqli_real_escape_string($link, $json_string);
+    $sectoken_sql = mysqli_real_escape_string($link, $sectoken);
+
+    $sql = <<<SQL
+insert into flow values (
+null, 
+'{$document_id_sql}', 
+'{$sectoken_sql}',
+'{$json_string_sql}'
+)
+SQL;
+
+    $insert_result = mysqli_query($link, $sql);
+
+    if (!$fid = mysqli_insert_id($link))
+        return null;
+
+    return $insert_result;
+}
+
+function ldshake_update_document($document_id, $sectoken, $json_string) {
+    global $link;
+
+    $document_id_sql = mysqli_real_escape_string($link, $document_id);
+    $json_string_sql = mysqli_real_escape_string($link, $json_string);
+    $sectoken_sql = mysqli_real_escape_string($link, $sectoken);
+
+    $sql = <<<SQL
+update `ldshake_editor` set
+`json` = '{$json_string_sql}'
+WHERE 
+`doc_id` = '{$document_id_sql}' AND 
+`sectoken` = '{$sectoken_sql}'
+SQL;
+
+    $result = mysqli_query($link, $sql);
+
+    $affected_rows = mysqli_affected_rows($link);
+    if (!($affected_rows > 0)) {
+        return null;
+    }
+
+    return true;
+}
+
+function return_success() {
+    http_response_code(200);
+    exit;
+}

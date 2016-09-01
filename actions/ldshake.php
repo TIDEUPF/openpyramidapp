@@ -1,6 +1,7 @@
 <?php
 session_start();
 include('dbvar.php');
+
 global $node_path;
 
 $flow_fields = \Flow\get_flow_default_fields();
@@ -20,7 +21,8 @@ if(isset($_REQUEST['ldshake_save']))	{
     $ldshake_sectoken = $_REQUEST['ldshake_sectoken'];
     $ldshake_doc_id = $_REQUEST['ldshake_doc_id'];
     $ldshake_flow_data = $_REQUEST['flow_data'];
-    \Util\ldshake_save_document($ldshake_doc_id, $ldshake_sectoken, $ldshake_flow_data);
+    \ldshake\ldshake_update_document($ldshake_doc_id, $ldshake_sectoken, $ldshake_flow_data);
+    \ldshake\return_success();
     exit;
 } else {
     $ldshake_sectoken = $_REQUEST['sectoken'];
@@ -36,8 +38,9 @@ if(!(mysqli_num_rows($flow_result) > 0)) {
 }
 
 $row = mysqli_fetch_assoc($flow_result);
+$flow_object = json_decode($row['json']);
 
-if($flow_object = json_decode($row['json'])) {
+if(count((array)$flow_object) > 0) {
     $edit = true;
 }
 

@@ -7,6 +7,7 @@ session_start();
 
 include_once(__DIR__ . '/config.php');
 include_once(__DIR__ . '/actions/dbvar.php');
+include_once(__DIR__ . '/lib/ldshake.php');
 include_once(__DIR__ . '/lib/util.php');
 include_once(__DIR__ . '/lib/view.php');
 include_once(__DIR__ . '/lib/action.php');

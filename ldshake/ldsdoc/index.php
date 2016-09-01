@@ -18,7 +18,7 @@ if (empty ($sectoken)) {
 
 if ($document_file['error'] != UPLOAD_ERR_OK or !isset($_FILES['document'])) {
     $new = true;
-    $json_string_sql = json_encode((object)[]);
+    $json_string = json_encode((object)[]);
 } else {
     try {
         if (!($json_string = file_get_contents($document_file ["tmp_name"])))
@@ -31,7 +31,6 @@ if ($document_file['error'] != UPLOAD_ERR_OK or !isset($_FILES['document'])) {
         header($_SERVER['protocol'] . ' 500 Invalid document', true, 500);
         exit;
     }
-
 }
 
 global $link;

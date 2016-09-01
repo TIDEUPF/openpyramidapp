@@ -805,6 +805,11 @@ header('Content-Type: text/html; charset=utf-8');
     var default_flow_fields = new_flow_fields;
     <?php endif;?>
 
+    <?php if(isset($ldshake_doc_id) and isset($ldshake_sectoken)): /*ldshake vars*/?>
+    var ldshake_sectoken = '<?=$ldshake_sectoken?>';
+    var ldshake_doc_id = <?=$ldshake_doc_id?>;
+    <?php endif;?>
+
     function time_field_to_seconds(field) {
         var unit_time = get_field_integer(field + '_unit_value');
         var unit = $('[name="' + field + '_unit' + '"]:checked').val();
@@ -995,6 +1000,8 @@ header('Content-Type: text/html; charset=utf-8');
         }
 
         $('[name="flow_data"]').val(JSON.stringify(flow_data));
+
+        return true;
     };
 
     //calculate the remaining variables before submitting
@@ -1193,13 +1200,34 @@ header('Content-Type: text/html; charset=utf-8');
         console.log("message received");
         console.log(event);
         if (event.data.type == 'ldshake_presave') {
-            var save_button_array = document.querySelector('[name="authoringIFrame1-frame"]').contentWindow.document.querySelectorAll('img[class="submit"][src="/images/stock-apply.png"]');
             ldshake_event_save_data = event.data;
 
             //ajax save
-            post_process_data();
-            var form_element = document.querySelector("form"));
-            var form_object = FormData(form_element);
+            if(!post_process_data()) {
+                var error_message = "Wrong field data.";
+                ldshakeSendSaveErrorMessage(ldshake_event_save_data, error_message);
+                return false;
+            }
+
+            try {
+                var flow_data_string = $('[name="flow_data"]').val();
+
+                if(!(flow_data_string.length > 0))
+                    throw "flow_data json not valid"
+
+                JSON.parse(flow_data_string);
+            } catch(error_message) {
+                ldshakeSendSaveErrorMessage(ldshake_event_save_data, error_message);
+                return false;
+            }
+
+            var form_element = document.querySelector("form");
+            var form_object = {
+                "flow_data" : $('[name="flow_data"]').val(),
+                "ldshake_doc_id" :  ldshake_doc_id,
+                "ldshake_sectoken" : ldshake_sectoken,
+                "ldshake_save" : true
+            };
 
             $.post('ldshake.php', form_object, function() {
                 ldshakeSendSaveReadyMessage(ldshake_event_save_data);
@@ -1213,6 +1241,14 @@ header('Content-Type: text/html; charset=utf-8');
         top.postMessage({type: 'ldshake_restapi_presave_ready'}, data.params.ldshake_origin);
         ldshake_event_save_data = null;
         console.log("pyramid: save_ready");
+    }
+
+    function ldshakeSendSaveErrorMessage(data, error_message) {
+        if(!ldshake_event_save_data) return;
+
+        top.postMessage({type: 'ldshake_restapi_presave_error', params: {error_message: error_message}}, data.params.ldshake_origin);
+        ldshake_event_save_data = null;
+        console.log("pyramid: save_error");
     }
 
 </script>
