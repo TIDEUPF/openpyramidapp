@@ -76,15 +76,15 @@ if(isset($_SESSION['user'])) {
     });
 
     /*
-    $(window).on('popstate', function (e) {
-        return false;
-        var state = e.originalEvent.state;
-        if (state !== null) {
-            //load content with ajax
-            return false;
-        }
-    });
-    */
+     $(window).on('popstate', function (e) {
+     return false;
+     var state = e.originalEvent.state;
+     if (state !== null) {
+     //load content with ajax
+     return false;
+     }
+     });
+     */
     history.pushState(null, null, document.title);
     window.addEventListener('popstate', function () {
         history.pushState(null, null, document.title);

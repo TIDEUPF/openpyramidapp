@@ -17,6 +17,15 @@ if(isset($_REQUEST['ldshake_summary'])) {
     exit;
 }
 
+if(isset($_REQUEST['ldshake_activity_tracking'])) {
+    $ldshake_fid = $_REQUEST['ldshake_fid'];
+    $teacher_id = $_REQUEST['ldshake_username'];
+    \Flow\set_fid($ldshake_fid);
+
+    include __DIR__ . '/../elements/activity_teacher_view.php';
+    exit;
+}
+
 if(isset($_REQUEST['ldshake_save']))	{
     $ldshake_sectoken = $_REQUEST['ldshake_sectoken'];
     $ldshake_doc_id = $_REQUEST['ldshake_doc_id'];
@@ -27,6 +36,7 @@ if(isset($_REQUEST['ldshake_save']))	{
 } else {
     $ldshake_sectoken = $_REQUEST['sectoken'];
     $ldshake_doc_id = $_REQUEST['document_id'];
+    $ldshake_iframe = true;
 }
 $sql = <<<SQL
 select * from `ldshake_editor` where `doc_id` = '{$ldshake_doc_id}' AND `sectoken` = '{$ldshake_sectoken}'

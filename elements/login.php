@@ -158,7 +158,11 @@
         <div id="activity-middle-frame">
             <div id="login-block-wrapper">
                 <div id="login-block">
+                    <?php if($force_email):?>
                     <label for="usr"><b><?=T("email")?></b></label>
+                    <?php else: ?>
+                    <label for="usr"><b><?=T("username")?></b></label>
+                    <?php endif;?>
                     <div id="usr-input"><input type="text" data-clear-btn="true" name="usr" value=""></div>
                     <button type="submit" class="ui-btn" name="loginBtn"><?=T("Log in")?></button>
                 </div>
@@ -171,9 +175,9 @@
             <?php endif;?>
 
             <ul id="login-instructions">
-                <li><?php echo T("It is recommended to provide an <span class=\"bold\">email address</span> here so that you will be automatically notified about the activity progression to make it much easier. This email address does not necessarily have to be the same as your FutureLearn course email.")?></li>
+                <!--<li><?php echo T("It is recommended to provide an <span class=\"bold\">email address</span> here so that you will be automatically notified about the activity progression to make it much easier. This email address does not necessarily have to be the same as your FutureLearn course email.")?></li>
                 <li><?php echo TS("If you do not like to provide an email, you can use a preferred username.")?></li>
-                <!--<li><?php echo TS("You can see activity notifications from the step comments also.")?></li>-->
+                --><!--<li><?php echo TS("You can see activity notifications from the step comments also.")?></li>-->
                 <!--<li><?php echo TS("Please do remember the e-mail or username you're using for this app! You will need to use it when accessing to participate in other levels of the pyramid. If you use another username you will be added with a different pyramid and affect your activity progress.")?></li>-->
                 <li><?php echo TS("For more information on how the app works, you can watch the following video.")?></li>
             </ul>

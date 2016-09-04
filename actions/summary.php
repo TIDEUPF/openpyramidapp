@@ -1,5 +1,8 @@
 <?php
-session_start();
+
+if(!isset($non_live_html))
+    session_start();
+
 include('dbvar.php');
 global $node_path;
 
@@ -359,12 +362,16 @@ header('Content-Type: text/html; charset=utf-8');
     <script src="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
     <link rel="stylesheet" type="text/css" href="elements/resources/css/teacher/styles.css">
 
-    <?php if($non_live_html): ?>
+    <?php if(!isset($non_live_html)): ?>
     <script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
     <script src="lib/actions.js"></script>
     <script type="text/javascript">
         var socket = io({multiplex : false, 'reconnection': true,'reconnectionDelay': 3000,'maxReconnectionAttempts':Infinity, path: '/<?=$node_path?>/'});
     </script>
+    <?php else:?>
+    <style>
+    <?php echo file_get_contents(__DIR__ . '/../elements/resources/css/teacher/styles.css');?>
+    </style>
     <?php endif;?>
 </head>
 

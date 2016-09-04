@@ -709,9 +709,11 @@ header('Content-Type: text/html; charset=utf-8');
                             </div>
                         </div><!--popup-->
                         <br>
+                        <?php if(!isset($ldshake_iframe)):?>
                         <div class="ui-input-btn ui-btn ui-btn-inline ui-shadow ui-corner-all ui-icon-check ui-btn-icon-left ui-btn-a">
                             <?=(($edit) ? TS('Update') : TS('Create'))?><input name="create_flow" type="submit" data-enhanced="true" value="<?=(($edit) ? 'update' : 'create')?>">
                         </div>
+                        <?php endif;?>
 
                         <!--<div id="popup-clearance"></div>-->
 

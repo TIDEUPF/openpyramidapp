@@ -13,7 +13,7 @@ $document_id = mt_rand(1,5000000);
 
 // comprobamos que se hayan recogido correctamente
 if (empty ($sectoken)) {
-    header($_SERVER['protocol'] . ' 500 Error en sectoken', true, 500);
+    header($_SERVER['protocol'] . ' 500 sectoken error', true, 500);
 }
 
 if ($document_file['error'] != UPLOAD_ERR_OK or !isset($_FILES['document'])) {

@@ -2,10 +2,14 @@ php_value short_open_tag 1
 
 RewriteEngine on
 
+RewriteRule ^ldshake\/ldsdoc\/([0-9]+)$ ldshake/ldsdoc/save.php?document_id=$1 [L,QSA]
+RewriteRule ^ldshake\/ldsdoc\/([0-9]+)\/summary$ ldshake/ldsdoc/summary.php?document_id=$1 [L,QSA]
+RewriteRule ^ldshake\/publish\/$ ldshake/ldsdoc/publish.php [L,QSA]
+RewriteRule ^ldshake\.php\/activity_tracking\/?(.*)$ index.php?action=ldshake&ldshake_activity_tracking=1&$1 [L,QSA]
+RewriteRule ^activity\/(.*)$ index.php?action=ldshake_activity&ldshake_guid=$1&ldshake_activity_tracking=1 [L,QSA]
+
 RewriteRule ^jslib/chatvars\.js$ index.php?action=chatjs [L,QSA]
 RewriteRule ^Activity$ index.php?action=activity [L,QSA]
 RewriteRule ^([A-Za-z_]+)\.php$ index.php?action=$1 [L,QSA]
 RewriteRule ^([A-Za-z_]+)\.php?\(.*\)$ index.php?action=$1&$2 [L,QSA]
 
-RewriteRule ^ldshake\/ldsdoc\/([0-9]+)$ ldshake/save.php?document_id=$1
-RewriteRule ^ldshake\/ldsdoc\/([0-9]+)\/summary$ ldshake/summary.php?document_id=$1

@@ -99,6 +99,7 @@ if(!isset($_SESSION['student'])) {
     $vars['hidden_input_array'] = [];
     $hidden_input_array['page'] = "student_login";
     $vars['hidden_input_array'] = array_merge($vars['hidden_input_array'], $hidden_input_array);
+    $vars['force_email'] = $force_email;
     $login_form = View\element("login", $vars);
 
     \View\page(array(

@@ -38,6 +38,7 @@ SQL;
 
         $sname = $teacher_id;
         \Util\log_submit();
+
         $action = $_POST['create_flow'];
         $flow_data_decoded = json_decode($_POST['flow_data']);
 

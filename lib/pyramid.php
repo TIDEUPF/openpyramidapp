@@ -323,8 +323,13 @@ function show_final_answer() {
 
 function get_current_flow() {
     global $levels, $fname, $fdes,  $fid, $ps, $n_selected_answers, $random_selection, $link, $ftimestamp, $flow_data, $timeout, $answer_timeout, $pyramid_size, $pyramid_minsize, $answer_required_percentage, $answer_submit_required_percentage;
-    //get information the latest flow
-    $res3 = mysqli_query($link, "select * from flow order by fid desc limit 1");
+
+    if(isset($_SESSION['ldshake_guid'])) {
+        $res3 = mysqli_query($link, "select * from flow where fid = '{$_SESSION['ldshake_guid']}' order by fid desc limit 1");
+    } else {
+        //get information the latest flow
+        $res3 = mysqli_query($link, "select * from flow order by fid desc limit 1");
+    }
     if(mysqli_num_rows($res3) > 0){
         $data3 = mysqli_fetch_assoc($res3);
         $flow_data = $data3;
@@ -359,6 +364,51 @@ function get_current_flow() {
         //show activity explanation
         return  -1;
     }
+}
+
+function get_flows() {
+    global $levels, $fname, $fdes,  $fid, $ps, $n_selected_answers, $random_selection, $link, $ftimestamp, $flow_data, $timeout, $answer_timeout, $pyramid_size, $pyramid_minsize, $answer_required_percentage, $answer_submit_required_percentage;
+
+    $result = mysqli_query($link, "select * from flow order by fid desc limit 1");
+
+    $flows_array = [];
+    while($row = mysqli_fetch_assoc($result)) {
+        $flows_array[] = $row;
+    }
+
+    return $flows_array;
+}
+
+function set_current_flow($flow) {
+    global $levels, $fname, $fdes,  $fid, $ps, $n_selected_answers, $random_selection, $link, $ftimestamp, $flow_data, $timeout, $answer_timeout, $pyramid_size, $pyramid_minsize, $answer_required_percentage, $answer_submit_required_percentage;
+
+    $flow_data = $flow;
+    $levels = $flow["levels"];
+    $fname = $flow["fname"];
+    $fdes = $flow["fdes"];
+    $fid = $flow["fid"];
+    $ftimestamp = (int)$flow["timestamp"];
+    $pyramid_size = (int)$flow["pyramid_size"];
+    $pyramid_minsize = (int)$flow["pyramid_minsize"];
+    $timeout = (int)$flow["rating_timeout"];
+    $answer_timeout = (int)$flow["question_timeout"];
+    $n_selected_answers = (int)$flow["n_selected_answers"];
+    $random_selection = (int)$flow["random_selection"];
+    $answer_required_percentage = (int)$flow["rating_required_percentage"];
+    $answer_submit_required_percentage = (int)$flow["answer_submit_required_percentage"];
+
+    if(isset($_SESSION)) {
+        if (isset($_SESSION['fid'])) {
+            if ($_SESSION['fid'] != $fid) {
+                $_SESSION['fid'] = $fid;
+                return false;
+            }
+        } else {
+            $_SESSION['fid'] = $fid;
+        }
+    }
+
+    return $fid;
 }
 
 function wait($params) {
