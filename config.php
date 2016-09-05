@@ -3,12 +3,15 @@
 require_once __DIR__ . '/vendors/mobiledetect/Mobile_Detect.php';
 
 function init_cfg() {
-    global $default_teacher_question, $force_email, $peer_toolbar_strlen, $timeout, $answer_skip_timeout ,$answer_timeout, $pyramid_minsize, $device, $node_path;
+    global $default_teacher_question, $ldshake_mode, $force_email, $peer_toolbar_strlen, $timeout, $answer_skip_timeout ,$answer_timeout, $pyramid_minsize, $device, $node_path;
     $detect = new Mobile_Detect;
 
     //$force_email = true;
     $force_email = false;
     $default_teacher_question = 'Please submit the question';
+
+    //ldshake mode or not
+    $ldshake_mode = true;
 
     $device = 'tablet';
     $ajax = false;

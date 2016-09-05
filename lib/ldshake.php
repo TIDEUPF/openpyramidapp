@@ -1,6 +1,12 @@
 <?php
 namespace ldshake;
 
+function check_student_session_flow() {
+    if(!isset($_SESSION['ldshake_guid'])) {
+        exit;
+    }
+}
+
 function get_document_data($document_id) {
     global $link;
 

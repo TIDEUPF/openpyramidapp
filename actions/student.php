@@ -1,10 +1,10 @@
 <?php
-global $ldshake_model;
+global $ldshake_mode;
 
 //TODO: mandatory ldshake token for students
 /*
 if($ldshake_mode) {
-\ldshake\fdf();
+    \ldshake\check_student_session_flow();
 }
 */
 Student\enforce_login();
