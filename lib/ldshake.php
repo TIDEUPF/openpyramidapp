@@ -48,6 +48,17 @@ function view_non_live_summary($document_id) {
     return $html;
 }
 
+function check_user_ldshake_flow() {
+    $non_live_html = true;
+
+    ob_start();
+    include __DIR__ . '/../actions/summary.php';
+    $html = ob_get_contents();
+    ob_end_clean();
+
+    return $html;
+}
+
 function create_zippped_summary($html) {
     $zip_filepath = tempnam(sys_get_temp_dir(), 'pyramid');
 

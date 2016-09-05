@@ -1,5 +1,12 @@
 <?php
+global $ldshake_model;
 
+//TODO: mandatory ldshake token for students
+/*
+if($ldshake_mode) {
+\ldshake\fdf();
+}
+*/
 Student\enforce_login();
 
 $sname = Student\get_username();

@@ -9,13 +9,14 @@ while(true) {
 
     echo "iteration started\n";
     //there is no flow
-    if (!\Pyramid\get_current_flow())
-        continue;
+    //if (!\Pyramid\get_current_flow())
+    //    continue;
 
     $flows = \Pyramid\get_flows();
 
     foreach ($flows as $current_flow) {
-        \Pyramid\set_flow($current_flow);
+        \Pyramid\set_current_flow($current_flow);
+        echo $fid . "\n";
 
         //available users
         $result_avail = mysqli_query($link, "select distinct * from flow_available_students where fid='$fid' and sid not in (select sid from pyramid_students where fid = '$fid')");

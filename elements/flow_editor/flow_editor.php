@@ -709,6 +709,9 @@ header('Content-Type: text/html; charset=utf-8');
                             </div>
                         </div><!--popup-->
                         <br>
+                        <?php if(isset($ldshake_iframe)):?>
+                        <a goto="1" class="create-flow-previous ui-btn ui-corner-all ui-shadow ui-btn-icon-left ui-icon-arrow-l" style="width:150px;">Previous</a>
+                        <?php endif;?>
                         <?php if(!isset($ldshake_iframe)):?>
                         <div class="ui-input-btn ui-btn ui-btn-inline ui-shadow ui-corner-all ui-icon-check ui-btn-icon-left ui-btn-a">
                             <?=(($edit) ? TS('Update') : TS('Create'))?><input name="create_flow" type="submit" data-enhanced="true" value="<?=(($edit) ? 'update' : 'create')?>">
@@ -811,6 +814,8 @@ header('Content-Type: text/html; charset=utf-8');
     var ldshake_sectoken = '<?=$ldshake_sectoken?>';
     var ldshake_doc_id = <?=$ldshake_doc_id?>;
     <?php endif;?>
+
+    var second_screen = false;
 
     function time_field_to_seconds(field) {
         var unit_time = get_field_integer(field + '_unit_value');
@@ -1051,11 +1056,23 @@ header('Content-Type: text/html; charset=utf-8');
         if(!edit) {
             var learning_setting = $('[name="learning_setting"]:checked').val();
             var discussion_setting = $('[name="discussion"]').val();
+            var update_defaults = true;
+            if(second_screen) {
+                if(sync != sync_table[learning_setting] ||
+                    discussion != discussion_table[discussion_setting]) {
+                    //update the defaults
+                } else {
+                    update_defaults = false;
+                }
+            }
             sync = sync_table[learning_setting];
             discussion = discussion_table[discussion_setting];
-            current_default = defaults[sync][discussion];
-            flow_load_fields();
-            restore_timers();
+
+            if(update_defaults) {
+                current_default = defaults[sync][discussion];
+                flow_load_fields();
+                restore_timers();
+            }
         } else {
             update_fields();
         }
@@ -1066,6 +1083,14 @@ header('Content-Type: text/html; charset=utf-8');
             var figure = $('#pyramid-levels-' + n_levels_setting).html();
             $('#pyramid-levels-' + n_levels_setting).html(figure);
             $('#pyramid-levels-' + n_levels_setting).show();
+            second_screen = true;
+            $('#page-' + goto).fadeIn();
+        });
+    });
+
+    $('.create-flow-previous').click(function(event) {
+        var goto = $(this).attr('goto');
+        $('#page-2').fadeOut(400,'swing', function() {
             $('#page-' + goto).fadeIn();
         });
     });

@@ -34,7 +34,7 @@ $flow_summary_fields = [
     'task_description' => T("Student task"),
     'n_final_outcomes' => T("Final outcomes"),
     'expected_students' => T("Total number of students"),
-    'first_group_size' => T("No. of students per group at rating level 1"),
+    'first_group_size' => T("No. of students per group at initial rating level"),
 ];
 
 $flow_summary_timer_fields = [
@@ -355,14 +355,15 @@ header('Content-Type: text/html; charset=utf-8');
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="utf-8"/>
     <title>CreateActivityPage</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
-    <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
-    <script src="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="elements/resources/css/teacher/styles.css">
+    <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
 
     <?php if(!isset($non_live_html)): ?>
+    <link rel="stylesheet" type="text/css" href="elements/resources/css/teacher/styles.css">
     <script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
     <script src="lib/actions.js"></script>
     <script type="text/javascript">

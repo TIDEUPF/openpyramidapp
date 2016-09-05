@@ -369,7 +369,7 @@ function get_current_flow() {
 function get_flows() {
     global $levels, $fname, $fdes,  $fid, $ps, $n_selected_answers, $random_selection, $link, $ftimestamp, $flow_data, $timeout, $answer_timeout, $pyramid_size, $pyramid_minsize, $answer_required_percentage, $answer_submit_required_percentage;
 
-    $result = mysqli_query($link, "select * from flow order by fid desc limit 1");
+    $result = mysqli_query($link, "select * from flow order by fid desc");
 
     $flows_array = [];
     while($row = mysqli_fetch_assoc($result)) {
