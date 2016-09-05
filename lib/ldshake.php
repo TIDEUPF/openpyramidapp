@@ -3,6 +3,12 @@ namespace ldshake;
 
 function check_student_session_flow() {
     if(!isset($_SESSION['ldshake_guid'])) {
+        $body = \View\element("no_ldshake_flow", []);
+
+        \View\page(array(
+            'title' => 'Question',
+            'body' => $body,
+        ));
         exit;
     }
 }

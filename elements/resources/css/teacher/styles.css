@@ -186,14 +186,14 @@ select[name="discussion"]~[role="application"] {
 }
 
 .summary-field-block {
-    padding: 10px;
-    margin: 10px auto 10px auto;
+    padding: 5px;
+    margin: 0 auto 0 auto;
     width: 700px;
 }
 
 .summary-timer-field-block {
-    padding: 10px;
-    margin: 10px auto 10px auto;
+    padding: 5px;
+    margin: 0 auto 0 auto;
     width: 500px;
 }
 
@@ -221,6 +221,10 @@ select[name="discussion"]~[role="application"] {
     margin: 5px 0 0 10px;
     width: 100px;
     float: left;
+}
+
+#summary-lower-block {
+    margin-top: 10px;
 }
 
 #pyramid-summary-levels-block {

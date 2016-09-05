@@ -705,12 +705,12 @@ header('Content-Type: text/html; charset=utf-8');
                                 </label>
                                 <input type="range" name="satisfaction" id="satisfaction" value="60" min="30" max="100" data-highlight="true">
 
-                                <a data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-check"><?=TS("Submit")?></a>
+                                <a id="advancedPopUpBack" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-check"><?=TS("Submit")?></a>
                             </div>
                         </div><!--popup-->
                         <br>
                         <?php if(isset($ldshake_iframe)):?>
-                        <a goto="1" class="create-flow-previous ui-btn ui-corner-all ui-shadow ui-btn-icon-left ui-icon-arrow-l" style="width:150px;">Previous</a>
+                        <a goto="1" class="create-flow-previous ui-btn ui-corner-all ui-shadow ui-btn-icon-left ui-icon-arrow-l" style="width:90px;">Previous</a>
                         <?php endif;?>
                         <?php if(!isset($ldshake_iframe)):?>
                         <div class="ui-input-btn ui-btn ui-btn-inline ui-shadow ui-corner-all ui-icon-check ui-btn-icon-left ui-btn-a">
@@ -1154,6 +1154,12 @@ header('Content-Type: text/html; charset=utf-8');
         $('[name="n_levels"]').on('slidestop', update_fields);
         $('[name="multiple_pyramids"]').on('change', update_fields);
         $('[name="min_students_per_pyramid"]').on('change', update_fields);
+
+        /*fix to allow closing the advanced screen on small screens*/
+        $('#advancedPopUpBack').on('mousedown', function(event) {
+            event.stopPropagation();
+            event.preventDefault();
+        });
     });
 
     //tooltip popups
@@ -1231,7 +1237,7 @@ header('Content-Type: text/html; charset=utf-8');
 
             //ajax save
             if(!post_process_data()) {
-                var error_message = "Wrong field data.";
+                var error_message = "The data you entered in some of the fields is not valid.";
                 ldshakeSendSaveErrorMessage(ldshake_event_save_data, error_message);
                 return false;
             }

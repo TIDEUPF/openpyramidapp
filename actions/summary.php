@@ -523,15 +523,16 @@ header('Content-Type: text/html; charset=utf-8');
     <div class="summary-field-block">
         <div class="summary-field-title"><?=$field?></div>
         <div id="<?=$kfield?>" class="summary-field-data"></div>
+        <div style="clear:both"></div>
     </div>
     <?php endforeach;?>
 
-    <br>
-    <div>
+    <div id="summary-lower-block">
     <?php foreach($flow_summary_timer_fields as $kfield => $field):?>
         <div class="summary-timer-field-block">
             <div class="summary-timer-field-title"><?=$field?></div>
             <div id="<?=$kfield?>" class="summary-timer-field-data"></div>
+            <div style="clear:both"></div>
         </div>
     <?php endforeach;?>
     </div>

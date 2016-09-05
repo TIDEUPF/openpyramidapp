@@ -2,11 +2,11 @@
 global $ldshake_mode;
 
 //TODO: mandatory ldshake token for students
-/*
+
 if($ldshake_mode) {
     \ldshake\check_student_session_flow();
 }
-*/
+
 Student\enforce_login();
 
 $sname = Student\get_username();
