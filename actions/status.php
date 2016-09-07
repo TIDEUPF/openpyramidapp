@@ -23,7 +23,7 @@ $answer_submitted = \Answer\is_submitted();
 \Group\get_members();
 
 //rating has started(even if still is not submitted by anyone)
-$rating_started = \Pyramid\is_rating_started();
+$rating_started = \Group\is_level_zero_rating_started();
 
 $n_inactive_peers = count(\Pyramid\get_inactive_level_group_peers()) - 1;
 
