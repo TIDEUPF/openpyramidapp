@@ -10,10 +10,6 @@ function is_submitted($params) {
     if(mysqli_num_rows($res4) > 0)
         return true;
 
-    //in case of timeout allow the user to rate the answers
- //   if(is_timeout())
- //       return true;
-
     return false;
 }
 

@@ -77,7 +77,8 @@ function get_needed_results_to_end_level($full_requirements = false, $level = nu
     global $link, $sid, $fid, $activity_level, $peer_array, $answer_submit_required_percentage, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp, $answer_required_percentage;
 
     $group_size = count($peer_array); //no of peers in the branch
-    if(!\Answer\is_submitted() or $level == 'answer') {
+    //FIXME: submission stage
+    if((!\Answer\is_submitted() and !is_level_zero_rating_started()) or $level == 'answer') {
         $needed_results = count($peer_array);
         $status_percentage = $answer_submit_required_percentage;
         $opt_count = 1;
@@ -106,13 +107,14 @@ function check_if_group_finished_level()
 {
     global $link, $sid, $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
-    if(!($activity_level == 0 and !\Answer\is_submitted())) {
-        $cgfl_result_1 = mysqli_query($link, "select * from flow_student_rating where {$ps['fsr']} and fsr_level = '$activity_level' and fsr_group_id = '$peer_group_id'");
-        $cgfl_result_1_count = mysqli_num_rows($cgfl_result_1);
-    } else {
+    //FIXME: submission stage
+    if(!\Answer\is_submitted() and !is_level_zero_rating_started()) {
         $peer_array_sql = implode("','", \Util\sanitize_array($peer_array));
 
         $cgfl_result_1 = mysqli_query($link, "select * from flow_student where fid = '$fid' and sid in ('{$peer_array_sql}')");
+        $cgfl_result_1_count = mysqli_num_rows($cgfl_result_1);
+    } else {
+        $cgfl_result_1 = mysqli_query($link, "select * from flow_student_rating where {$ps['fsr']} and fsr_level = '$activity_level' and fsr_group_id = '$peer_group_id'");
         $cgfl_result_1_count = mysqli_num_rows($cgfl_result_1);
     }
 
@@ -196,7 +198,7 @@ function get_previous_groups_rated_count() {
 }
 
 function is_level_zero_rating_started() {
-    global $link, $activity_level, $fid, $ps, $peer_group_id;
+    global $link, $ps, $peer_group_id;
 
     $gcal_result_1 = mysqli_query($link, "select * from pyramid_groups where pg_group_id = '{$peer_group_id}' and pg_level = 0 and pg_started = 1 and {$ps['pg']}");
     if (mysqli_num_rows($gcal_result_1) > 0)
@@ -205,12 +207,20 @@ function is_level_zero_rating_started() {
     return false;
 }
 
+function is_submission_level() {
+    global $link, $ps, $peer_group_id;
+
+    $gcal_result_1 = mysqli_query($link, "select * from pyramid_groups where pg_group_id = '{$peer_group_id}' and pg_level = 0 and pg_started = 1 and {$ps['pg']}");
+    if (mysqli_num_rows($gcal_result_1) > 0)
+        return false;
+
+    return true;
+}
+
 function is_level_timeout() {
     global $timeout, $activity_level, $fid, $peer_group_id, $flow_data;
 
-    //if($activity_level == 0 and !\Answer\is_submitted() and !is_level_zero_rating_started())
-    //    return \Answer\is_timeout();
-
+    //FIXME submission stage
     if($activity_level == 0 and !is_level_zero_rating_started())
         return \Answer\is_timeout();
 
