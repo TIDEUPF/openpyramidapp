@@ -536,42 +536,47 @@ function is_timeout() {
     $answertimestamp = 0;
 
     //if the user is not present on any group in the current level it has been eliminated
+    //obsolete?
     if(empty($peer_array))
         return true;
 
+    /*
     if($activity_level > 0)
         return true;
 
     if(\Student\level_is_rated())
         return true;
+    */
 
     //rating has started(even if still is not submitted by anyone)
+    if(\Group\is_level_zero_rating_started())
+        return true;
+
+    /*
     $result = mysqli_query($link, "select * from pyramid_groups where {$ps['pg']} and pg_level='0' and pg_group_id='{$peer_group_id}' and pg_started=1");
     if(mysqli_num_rows($result) > 0)
         return true;
+    */
 
     $peer_array_sql = implode("','", \Util\sanitize_array($peer_array));
     $r_submitted_answers = mysqli_query($link, "select * from flow_student where fid = '$fid' and sid in ('{$peer_array_sql}') order by `timestamp` asc");
     $n_submitted_answers = mysqli_num_rows($r_submitted_answers);
 
-    //all student submitted
+    //all students submitted the answer
     if($n_submitted_answers >= \Group\get_needed_results_to_end_level(true, 'answer'))
         return true;
 
-    $required_peers = \Group\get_needed_results_to_end_level(false, 'answer');
-
-    /*
-    if($n_submitted_answers < $required_peers)
-        return false;
-    */
-
     $timeout_data = get_answer_timeout();
 
+    //check the soft timer in case we have enough answers
+    $required_peers = \Group\get_needed_results_to_end_level(false, 'answer');
     if($n_submitted_answers >= $required_peers) {
+
+        //obtain the answer with the latest timestamp
         for($i=0;$i<$required_peers;$i++)
             $a_submitted_answers = mysqli_fetch_assoc($r_submitted_answers);
 
-        //the answer timestamp cannot be lower than pyramid creation creation
+        //if the pyramid was created after the last answer we use the pyramid creation time timestamp
         if($timeout_data['start_timestamp'] > $a_submitted_answers['timestamp'])
             $a_submitted_answers['timestamp'] = $timeout_data['start_timestamp'];
 
@@ -580,7 +585,6 @@ function is_timeout() {
     }
 
     //check hardtimer
-
     if(time() > $flow_data['hardtimer_question'] + $timeout_data['start_timestamp'])
         return true;
 

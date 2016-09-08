@@ -84,10 +84,6 @@ if(\Answer\is_new_data()) {
 }
 */
 
-//not needed, inclusive
-//delete inactive students from the current level
-//\Pyramid\set_previous_level_peer_active_group_ids();
-
 if(\Pyramid\is_complete()) {
     \Pyramid\show_final_answer();
     exit;

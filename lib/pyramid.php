@@ -52,7 +52,7 @@ function upgrade_level($forced = false) {
         return false;
 
     if(!$forced) {
-        //the answer phase has ended
+        //the answer phase is timed out
         if ($activity_level == 0 and \Answer\is_timeout() and !\Group\is_level_zero_rating_started()) {
             $time = time();
             mysqli_query($link, "update pyramid_groups set pg_started = 1, pg_start_timestamp='{$time}' where pg_started = '0' and {$ps['pg']} and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}'");
@@ -69,6 +69,7 @@ function upgrade_level($forced = false) {
             $upgrade = true;
         } else {
             //here decide the criteria to allow to proceed to the next level
+            //this function doesn't work properly for question submission stage
             $cgfl_temp = \Group\check_if_group_finished_level();
 
             if ($cgfl_temp and !($activity_level == 0 and !\Student\level_is_rated())) {
@@ -100,12 +101,11 @@ function upgrade_level($forced = false) {
         if($activity_level + 1 == $levels)
             return false;
 
-        //FIXME update sql vars
-        $activity_level++;
-        \Group\get_members();
-        $time = time();
+        \Group\upgrade_level();
+
         \Util\log(['activity' => 'group_upgrade']);
 
+        $time = time();
         //register only when all sibling groups are completed
         if(\Group\check_if_previous_groups_completed_task()) {
             set_selected_answers_for_previous_groups();
@@ -570,13 +570,17 @@ function activity_status($params) {
 }
 
 //remove users that didn't submit due the timeout in the previous level
+/*
 function set_previous_level_peer_active_group_ids() {
     global $link, $sid,  $fid, $ps, $sname, $levels, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
     if(\Group\is_level_timeout())//redundant
         return false;
 
-    if(!\Group\check_if_previous_groups_completed_task() or (!\Answer\is_submitted() and !\Group\is_level_zero_rating_started()))
+    if(!\Group\check_if_previous_groups_completed_task())
+        return false;
+
+    if(!\Group\is_level_zero_rating_started())
         return false;
 
     $previous_activity_level = $activity_level-1;
@@ -603,6 +607,7 @@ function set_previous_level_peer_active_group_ids() {
 
     return $active_ids;
 }
+*/
 
 function available_students($number = 0) {
     global $link, $sid, $fid, $ps, $sname, $levels, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;

@@ -103,11 +103,15 @@ function get_needed_results_to_end_level($full_requirements = false, $level = nu
     return $needed_results;
 }
 
-function check_if_group_finished_level()
-{
+/*
+ *  DO NOT USE THIS FUNCTION, THE FIRST STAGE SECTION IS WRONG
+ */
+function check_if_group_finished_level() {
     global $link, $sid, $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
-    //FIXME: submission stage
+    if(\Group\is_level_timeout())
+        return true;
+
     if(!\Answer\is_submitted() and !is_level_zero_rating_started()) {
         $peer_array_sql = implode("','", \Util\sanitize_array($peer_array));
 
@@ -117,9 +121,6 @@ function check_if_group_finished_level()
         $cgfl_result_1 = mysqli_query($link, "select * from flow_student_rating where {$ps['fsr']} and fsr_level = '$activity_level' and fsr_group_id = '$peer_group_id'");
         $cgfl_result_1_count = mysqli_num_rows($cgfl_result_1);
     }
-
-    if(\Group\is_level_timeout())
-        return true;
 
     //all members submitted
     if($cgfl_result_1_count >= get_needed_results_to_end_level(true))
@@ -134,7 +135,7 @@ function check_if_previous_groups_completed_task()
 
     $activity_level_previous = $activity_level-1;
 
-    //the first stage is always true
+    //if we are on the answer submission phase then return true because there is no previous group to be completed
     if($activity_level == 0 and !\Answer\is_submitted() and !is_level_zero_rating_started())
         return true;
 
@@ -200,8 +201,8 @@ function get_previous_groups_rated_count() {
 function is_level_zero_rating_started() {
     global $link, $ps, $peer_group_id;
 
-    $gcal_result_1 = mysqli_query($link, "select * from pyramid_groups where pg_group_id = '{$peer_group_id}' and pg_level = 0 and pg_started = 1 and {$ps['pg']}");
-    if (mysqli_num_rows($gcal_result_1) > 0)
+    $result = mysqli_query($link, "select * from pyramid_groups where pg_group_id = '{$peer_group_id}' and pg_level = 0 and pg_started = 1 and {$ps['pg']}");
+    if (mysqli_num_rows($result) > 0)
         return true;
 
     return false;
@@ -421,4 +422,20 @@ function set_group_id($new_group_id) {
 
     $peer_group_id = $new_group_id;
     \Group\get_members_from_group_id();
+}
+
+/*
+ * Upgrades the activity level. It doesn't modify the actual database.
+ */
+function upgrade_activity_level() {
+    global $activity_level, $levels;
+
+    if($activity_level + 1 >= $levels) {
+        $activity_level = $levels;
+    } else {
+        $activity_level++;
+    }
+
+    \Group\get_members();
+    \Util\sql_gen();
 }
