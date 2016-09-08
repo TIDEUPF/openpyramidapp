@@ -106,7 +106,7 @@ function upgrade_level($forced = false) {
         \Util\log(['activity' => 'group_upgrade']);
 
         $time = time();
-        //register only when all sibling groups are completed
+        //register only when all sibling groups are completed or timed out
         if(\Group\check_if_previous_groups_completed_task()) {
             set_selected_answers_for_previous_groups();
             mysqli_query($link, "update pyramid_groups set pg_started = 1, pg_start_timestamp='{$time}' where {$ps['pg']} and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}'");

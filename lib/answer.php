@@ -5,9 +5,9 @@ namespace Answer;
 function is_submitted($params) {
     global $link, $sid, $fid;
 
-    $res4 = mysqli_query($link, "select * from flow_student where sid = '$sid' and fid = '$fid'");
+    $result = mysqli_query($link, "select * from flow_student where sid = '$sid' and fid = '$fid'");
     //the user already submitted the answer
-    if(mysqli_num_rows($res4) > 0)
+    if(mysqli_num_rows($result) > 0)
         return true;
 
     return false;
