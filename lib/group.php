@@ -436,7 +436,5 @@ function upgrade_activity_level() {
     } else {
         $activity_level++;
     }
-
     \Group\get_members();
-    \Util\sql_gen();
 }

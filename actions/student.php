@@ -73,7 +73,7 @@ if(\Answer\is_new_data()) {
     } else {
         //reload values
         \Pyramid\upgrade_level();
-        \Group\get_members();
+        //\Group\get_members();
     }
 }
 

@@ -101,7 +101,7 @@ function upgrade_level($forced = false) {
         if($activity_level + 1 == $levels)
             return false;
 
-        \Group\upgrade_level();
+        \Group\upgrade_activity_level();
 
         \Util\log(['activity' => 'group_upgrade']);
 
