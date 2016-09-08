@@ -94,6 +94,7 @@ function get_needed_results_to_end_level($full_requirements = false, $level = nu
     }
 
     if(!$full_requirements) {
+        //must be rounded to a multiple of $opt_count
         $needed_results = floor(floor($needed_results * $status_percentage / 100.0)/$opt_count)*$opt_count;
     }
 
