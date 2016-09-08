@@ -78,7 +78,7 @@ function get_needed_results_to_end_level($full_requirements = false, $level = nu
 
     $group_size = count($peer_array); //no of peers in the branch
     //FIXME: submission stage
-    if((!\Answer\is_submitted() and !is_level_zero_rating_started()) or $level == 'answer') {
+    if(($activity_level == 0 and !\Answer\is_submitted() and !is_level_zero_rating_started()) or $level == 'answer') {
         $needed_results = count($peer_array);
         $status_percentage = $answer_submit_required_percentage;
         $opt_count = 1;

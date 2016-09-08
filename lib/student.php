@@ -35,8 +35,8 @@ function enforce_login() {
 function level_is_rated() {
     global $link, $sid,  $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids;
 
-    $sa_result_4 = mysqli_query($link, "select * from flow_student_rating where {$ps['fsr']} and fsr_sid= '$sid' and fsr_level = '$activity_level'");
-    if(mysqli_num_rows($sa_result_4) > 0) {
+    $result = mysqli_query($link, "select * from flow_student_rating where {$ps['fsr']} and fsr_sid= '$sid' and fsr_level = '$activity_level'");
+    if(mysqli_num_rows($result) > 0) {
         return true;
     }
 
