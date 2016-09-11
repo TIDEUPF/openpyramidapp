@@ -47,6 +47,12 @@ function add_latecomer($pid, $activity_level, $peer_group_id, $pid, $sid) {
 function upgrade_level($forced = false) {
     global $link, $sid, $fid, $pid, $ps, $activity_level, $levels, $peer_array, $peer_group_id, $peer_group_combined_ids, $flow_data;
 
+    $upgrade = false;
+
+    //a level that is not started cannot be upgraded
+    if($activity_level > 0 and !\Group\is_level_started())
+        return false;
+
     //we never upgrade the level on a syncronous situation
     if($flow_data['sync'] == 0)
         return false;
@@ -59,38 +65,47 @@ function upgrade_level($forced = false) {
             return true;
         }
 
-        if (!\Student\level_is_rated() and !\Group\sa_exists())
+        //the below rules don't apply to submission stage
+        if($activity_level == 0 and !\Group\is_level_zero_rating_started()) {
             return false;
+        }
 
-        $upgrade = false;
+        //if (!\Student\level_is_rated() and !\Group\sa_exists())
+        //    return false;
+
         //check if the highest rated level has a selected answer
-        $gcal_result_2 = mysqli_query($link, "select * from selected_answers where {$ps['sa']} and sa_level = '$activity_level' and sa_group_id = '$peer_group_id'");
-        if (mysqli_num_rows($gcal_result_2) > 0) {
+        //$gcal_result_2 = mysqli_query($link, "select * from selected_answers where {$ps['sa']} and sa_level = '$activity_level' and sa_group_id = '$peer_group_id'");
+        //if (mysqli_num_rows($gcal_result_2) > 0) {
+
+        //rating phase
+        if (\Group\sa_exists()) {
             $upgrade = true;
-        } else {
+        } elseif(\Group\check_if_group_finished_level()) {
             //here decide the criteria to allow to proceed to the next level
             //this function doesn't work properly for question submission stage
-            $cgfl_temp = \Group\check_if_group_finished_level();
+            //$cgfl_temp = \Group\check_if_group_finished_level();
 
-            if ($cgfl_temp and !($activity_level == 0 and !\Student\level_is_rated())) {
-                set_selected_answers();
-                $upgrade = true;
-            }
+            //if ($cgfl_temp and !($activity_level == 0 and !\Student\level_is_rated())) {
+            set_selected_answers();
+            $upgrade = true;
         }
     }
 
     if($forced) {
         //the answer phase has ended
-        if ($activity_level == 0 and \Answer\is_timeout() and !\Group\is_level_zero_rating_started()) {
+        if ($activity_level == 0 and !\Group\is_level_zero_rating_started()) {
             $time = time();
 
             mysqli_query($link, "update pyramid_groups set pg_started = 1, pg_start_timestamp='{$time}' where pg_started = '0' and pg_fid='{$fid}' and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}'");
             return true;
-        } else {
-            if(!set_selected_answers()) {
-                //the conditions to select an question are not meet
+        } elseif(!\Group\sa_exists()) {
+            //try to select a selected answer if the conditions are met
+            $selected_answers_exists = set_selected_answers();
+
+            if(!$selected_answers_exists) {
+                //the conditions to select an answer are not met
+                //TODO: select 2 answers if asynchronous
                 $time = time();
-                //TODO: select 2 answers if asychronous
                 mysqli_query($link, "insert into selected_answers values ('$fid', '$pid', '$activity_level', '$peer_group_id', '-1', '0', '1', FROM_UNIXTIME({$time}))");
                 \Util\log(['activity' => 'level_finished_with_no_rates']);
             }
@@ -101,15 +116,22 @@ function upgrade_level($forced = false) {
         if($activity_level + 1 == $levels)
             return false;
 
-        \Group\upgrade_activity_level();
+        $level_upgraded = \Group\upgrade_activity_level();
+
+        if(!$level_upgraded) {
+            return false;
+        }
 
         \Util\log(['activity' => 'group_upgrade']);
+
+        if(\Group\is_level_started())
+            return false;
 
         $time = time();
         //register only when all sibling groups are completed or timed out
         if(\Group\check_if_previous_groups_completed_task()) {
             set_selected_answers_for_previous_groups();
-            mysqli_query($link, "update pyramid_groups set pg_started = 1, pg_start_timestamp='{$time}' where {$ps['pg']} and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}'");
+            mysqli_query($link, "update pyramid_groups set pg_started = 1, pg_start_timestamp='{$time}' where pg_started = 0 and {$ps['pg']} and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}'");
             \Util\log(['activity' => 'siblings_finished_level_upgrade']);
         }
     }
@@ -120,12 +142,20 @@ function upgrade_level($forced = false) {
 function set_selected_answers() {
     global $link, $sid, $fid, $pid, $random_selection, $n_selected_answers, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids;
 
-    //to sum the ratings
-    $ssa_result_1= mysqli_query($link, "SELECT fsr_to_whom_rated_id, skip, SUM(fsr_rating) as sum FROM `flow_student_rating` where {$ps['fsr']} and fsr_level = '$activity_level' and fsr_group_id = '$peer_group_id' group by fsr_to_whom_rated_id order by SUM(fsr_rating) desc, flow_student_rating_id asc limit {$n_selected_answers}");
+    //if the answer is already select don't continue
+    if(\Group\sa_exists())
+        return false;
 
-    if(mysqli_num_rows($ssa_result_1)> 0) {
+    //to select an answer the level must be started
+    if(!\Group\is_level_started())
+        return false;
+
+    //to sum the ratings
+    $result = mysqli_query($link, "SELECT fsr_to_whom_rated_id, skip, SUM(fsr_rating) as sum FROM `flow_student_rating` where {$ps['fsr']} and fsr_level = '$activity_level' and fsr_group_id = '$peer_group_id' group by fsr_to_whom_rated_id order by SUM(fsr_rating) desc, flow_student_rating_id asc limit {$n_selected_answers}");
+
+    if(mysqli_num_rows($result)> 0) {
         //takes into account skipped answers
-        while($ssa_data_1 = mysqli_fetch_assoc($ssa_result_1)) {
+        while($ssa_data_1 = mysqli_fetch_assoc($result)) {
             $selected_id = $ssa_data_1['fsr_to_whom_rated_id'];
             $selected_id_rating_sum = $ssa_data_1['sum'];
             $skip = $ssa_data_1['skip'];

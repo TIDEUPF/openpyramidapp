@@ -73,40 +73,41 @@ if(\Answer\is_new_data()) {
     } else {
         //reload values
         \Pyramid\upgrade_level();
-        //\Group\get_members();
     }
 }
-
-//wrong answer
-/*if(\Answer\submit_error()) {
-
-    exit;
-}
-*/
 
 if(\Pyramid\is_complete()) {
     \Pyramid\show_final_answer();
     exit;
 }
 
-/*
-if(\Pyramid\is_final_level_complete()) {
+//here the current level never should be timed out
+if(\Group\is_level_timeout()) {
+    \Util\log(['activity' => 'error_flow_student_interaction_timed_out']);
+    //wait
     \Pyramid\wait();
     exit;
 }
-*/
 
-if(!\Answer\is_timeout() and !\Answer\is_submitted()) {
-    \Answer\request();
-    exit;
+if($activity_level == 0 and !\Group\is_level_zero_rating_started()) {
+    if(!\Answer\is_submitted()/* and !\Group\is_level_timeout()*/) {
+        \Answer\request();
+        exit;
+    } else {
+        //wait
+        \Pyramid\wait();
+        exit;
+    }
 }
 
 //we need the answers for other groups too
-if(\Group\check_if_previous_groups_completed_task() and !\Student\level_is_rated() and !\Group\is_level_timeout()) {
-    if(\Answer\is_available_answers())
+//if(!\Student\level_is_rated() and \Group\check_if_previous_groups_completed_task() and !\Group\is_level_timeout()) {
+if(!\Student\level_is_rated() and \Group\is_level_started()/* and !\Group\is_level_timeout()*/) {
+    if(\Answer\is_available_answers()) {
         \Answer\request_rate();
-    else
+    } else {
         \Answer\skip_rating();
+    }
 }
 
 //wait

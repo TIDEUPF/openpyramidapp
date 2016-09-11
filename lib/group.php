@@ -76,9 +76,14 @@ function get_next_level_groups($params) {
 function get_needed_results_to_end_level($full_requirements = false, $level = null) {
     global $link, $sid, $fid, $activity_level, $peer_array, $answer_submit_required_percentage, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp, $answer_required_percentage;
 
+   if($activity_level > 0 and !\Group\is_level_started()) {
+       \Util\log(['activity' => 'error_non_started_get_needed_results_to_end_level']);
+       return 99999;
+   }
+
     $group_size = count($peer_array); //no of peers in the branch
     //FIXME: submission stage
-    if(($activity_level == 0 and !\Answer\is_submitted() and !is_level_zero_rating_started()) or $level == 'answer') {
+    if(($activity_level == 0 and !is_level_zero_rating_started()) or $level == 'answer') {
         $needed_results = count($peer_array);
         $status_percentage = $answer_submit_required_percentage;
         $opt_count = 1;
@@ -91,6 +96,11 @@ function get_needed_results_to_end_level($full_requirements = false, $level = nu
         $opt_count = count(\Answer\get_selected_ids(true));
         $needed_results = $group_size * $opt_count; //because now every student is rating two answers, need to occupy all answers
         $status_percentage = $answer_required_percentage;
+    }
+
+    if(empty($opt_count)) {
+        \Util\log(['activity' => 'error_empty_opt_count_get_needed_results_to_end_level']);
+        return 1;
     }
 
     if(!$full_requirements) {
@@ -110,10 +120,14 @@ function get_needed_results_to_end_level($full_requirements = false, $level = nu
 function check_if_group_finished_level() {
     global $link, $sid, $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
+    //if the level is not started it cannot be complete
+    if(!\Group\is_level_started() and $activity_level > 0)
+        return false;
+
     if(\Group\is_level_timeout())
         return true;
 
-    if(!\Answer\is_submitted() and !is_level_zero_rating_started()) {
+    if($activity_level == 0 and !is_level_zero_rating_started()) {
         $peer_array_sql = implode("','", \Util\sanitize_array($peer_array));
 
         $cgfl_result_1 = mysqli_query($link, "select * from flow_student where fid = '$fid' and sid in ('{$peer_array_sql}')");
@@ -137,7 +151,7 @@ function check_if_previous_groups_completed_task()
     $activity_level_previous = $activity_level-1;
 
     //if we are on the answer submission phase then return true because there is no previous group to be completed
-    if($activity_level == 0 and !\Answer\is_submitted() and !is_level_zero_rating_started())
+    if($activity_level == 0 and !is_level_zero_rating_started())
         return true;
 
     //check if every group member has submitted the answer or the timeout is expired
@@ -209,11 +223,21 @@ function is_level_zero_rating_started() {
     return false;
 }
 
+function is_level_started() {
+    global $link, $ps, $peer_group_id, $activity_level;
+
+    $result = mysqli_query($link, "select * from pyramid_groups where pg_group_id = '{$peer_group_id}' and pg_level = '{$activity_level}' and pg_started = 1 and {$ps['pg']}");
+    if (mysqli_num_rows($result) > 0)
+        return true;
+
+    return false;
+}
+
 function is_submission_level() {
     global $link, $ps, $peer_group_id;
 
-    $gcal_result_1 = mysqli_query($link, "select * from pyramid_groups where pg_group_id = '{$peer_group_id}' and pg_level = 0 and pg_started = 1 and {$ps['pg']}");
-    if (mysqli_num_rows($gcal_result_1) > 0)
+    $result = mysqli_query($link, "select * from pyramid_groups where pg_group_id = '{$peer_group_id}' and pg_level = 0 and pg_started = 1 and {$ps['pg']}");
+    if (mysqli_num_rows($result) > 0)
         return false;
 
     return true;
@@ -225,6 +249,10 @@ function is_level_timeout() {
     //FIXME submission stage
     if($activity_level == 0 and !is_level_zero_rating_started())
         return \Answer\is_timeout();
+
+    //if the level is not started it cannot be timed out
+    if(!\Group\is_level_started() and $activity_level > 0)
+        return false;
 
     if(sa_exists())
         return true;
@@ -241,7 +269,7 @@ function is_level_timeout() {
             $timestamp = set_level_timeout_timestamp();
         }
 
-        if(time() > $timestamp + $timeout)
+        if($time > $timestamp + $flow_data['rating_timeout'])
             return true;
     }
 
@@ -250,6 +278,10 @@ function is_level_timeout() {
 
 function is_level_minimun_required_answers_to_set_timestamps_reached() {
     global $link, $sid, $fid, $ps, $sname, $levels, $activity_level, $peer_group_id;
+
+    //if the level is not started it doesn't reached the satisfaction level
+    if(!\Group\is_level_started())
+        return false;
 
     $submitted_group_answers_query = mysqli_query($link, "select * from flow_student_rating where {$ps['fsr']} and fsr_level='{$activity_level}' and fsr_group_id='{$peer_group_id}'");
     $submitted_group_answers_count = mysqli_num_rows($submitted_group_answers_query);
@@ -260,9 +292,14 @@ function is_level_minimun_required_answers_to_set_timestamps_reached() {
     return false;
 }
 
-function set_level_timeout_timestamp()
-{
+function set_level_timeout_timestamp() {
     global $link, $sid, $fid, $ps, $sname, $levels, $activity_level, $peer_group_id;
+
+    //if the level is not started it cannot be timed out
+    if(!\Group\is_level_started()) {
+        \Util\log(['activity' => 'error_level_not_started__set_level_timeout_timestamp']);
+        return false;
+    }
 
     $timestamp = time();
     mysqli_query($link, "update pyramid_groups set pg_timestamp='{$timestamp}' where {$ps['pg']} and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}'");
@@ -296,7 +333,7 @@ function get_time_left() {
 function get_level_timeout_timestamp($fid, $activity_level, $peer_group_id) {
     global $link, $peer_group_id, $activity_level, $fid, $ps;
 
-    if(!\Answer\is_timeout()) {
+    if($activity_level == 0 and !\Group\is_level_zero_rating_started()) {
         $answer_user_timeout = \Answer\get_answer_timeout();
         return $answer_user_timeout['time_left'];
     }
@@ -410,8 +447,8 @@ function get_sname_list($sid_array) {
 function sa_exists() {
     global $link, $sid, $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids;
 
-    $gcal_result_2 = mysqli_query($link, "select * from selected_answers where {$ps['sa']} and sa_level = '$activity_level' and sa_group_id = '$peer_group_id'");
-    if (mysqli_num_rows($gcal_result_2) > 0) {
+    $result = mysqli_query($link, "select * from selected_answers where {$ps['sa']} and sa_level = '$activity_level' and sa_group_id = '$peer_group_id'");
+    if (mysqli_num_rows($result) > 0) {
         return true;
     }
 
@@ -431,10 +468,15 @@ function set_group_id($new_group_id) {
 function upgrade_activity_level() {
     global $activity_level, $levels;
 
+    $upgraded = false;
+
     if($activity_level + 1 >= $levels) {
         $activity_level = $levels;
     } else {
         $activity_level++;
+        $upgraded = true;
     }
     \Group\get_members();
+
+    return $upgraded;
 }

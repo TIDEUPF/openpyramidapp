@@ -64,11 +64,6 @@ function submit($params) {
         } else {
             //insert new
             mysqli_query($link, "insert into flow_student values (null, '$fid', '$sql_pid', '$sid', '$ans_input', 0, $answertimestamp)");
-            /*if (mysqli_affected_rows($link) > 0) {
-                $success = 'Submitted.';
-            } else {
-                $error = 'Database error!';
-            }*/
         }
     } else {
         $error = 'Field cannot be empty!';
@@ -370,7 +365,7 @@ function is_available_answers() {
 function get_selected_ids($full=false, $current_level = false) {
     global $link, $sid, $fid, $ps, $levels, $sname, $flow_data, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
-    $result = [];
+    $selected_ids = [];
 
     //instead of selecting answers from the previous level, select answers from the current one.
     if($current_level) {
@@ -392,23 +387,23 @@ function get_selected_ids($full=false, $current_level = false) {
                 $nosubmit_id = "group_{$peer_group_id}_{$i}";
                 $no_submit_result = mysqli_query($link, "select * from flow_student where sid = '$nosubmit_id' and fid = '$fid'");// to get peer answer
                 if (mysqli_num_rows($no_submit_result) > 0) {//the peer already submitted the answer
-                    $result[] = $nosubmit_id;
+                    $selected_ids[] = $nosubmit_id;
                     $i++;
                 } else {
                     $remaining = false;
                 }
             }
 
-            return $result;
+            return $selected_ids;
         }
 
         foreach ($peer_array as $rate_peer_id) {
             $res5 = mysqli_query($link, "select * from flow_student where sid = '$rate_peer_id' and fid = '$fid' {$skip_answers}");// to get peer answer
             if (mysqli_num_rows($res5) > 0) {//the peer already submitted the answer
-                $result[] = $rate_peer_id;
+                $selected_ids[] = $rate_peer_id;
             }
         }
-        if(empty($result)) {//TODO: the peers did not submit the answer
+        if(empty($selected_ids)) {//TODO: the peers did not submit the answer
             return [];
             //throw new \Exception ("peer answer not submitted");
         }
@@ -421,17 +416,17 @@ function get_selected_ids($full=false, $current_level = false) {
             $sa_result_2 = mysqli_query($link, "select * from selected_answers where {$ps['sa']} and sa_level = '$activity_level_previous' and sa_group_id = '$pgcid_group_id_temp' {$skip_answers}");
             if (mysqli_num_rows($sa_result_2) > 0) {
                 while($sa_data_2 = mysqli_fetch_assoc($sa_result_2)) {
-                    $result[] = $sa_data_2['sa_selected_id'];
+                    $selected_ids[] = $sa_data_2['sa_selected_id'];
                 }
             }
         }
-        if(empty($result)) {//no answers from the other peer, user must wait
+        if(empty($selected_ids)) {//no answers from the other peer, user must wait
             return [];
             //throw new \Exception("group answer not rated");
         }
     }
 
-    return $result;
+    return $selected_ids;
 }
 
 function view_final_answer($params) {
