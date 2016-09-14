@@ -80,3 +80,37 @@ function timeout_view($params) {
     ));
     exit;
 }
+
+function get_student_level_activity($sid, $group_id, $level) {
+    global $link, $sid, $fid, $pid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+
+    //ratings
+    $ratings_sql = <<< SQL
+select sid as username, fsr_rating, fsr_to_whom_rated_id, fsr_datetime
+from flow_student_rating
+where {$ps['fsr']} 
+and fsr_level = {$level}
+and sid = '{$sid}'
+and fsr_to_whom_rated_id <> '-1'
+SQL;
+
+    $ratings = \Util\exec_sql($ratings_sql);
+
+    //chat
+    $room = \Util\get_room_string($fid, $pid, $level, $group_id);
+    $chat_sql = <<< SQL
+select sid as `username`, `message`, `date`
+from chat
+where {$ps['e']} 
+and room = {$room}
+and sid = '{$sid}'
+and fsr_to_whom_rated_id <> '-1'
+SQL;
+
+    $chat_messages = \Util\exec_sql($chat_sql);
+
+    return [
+        'ratings' => $ratings,
+        'chat_messages' => $chat_messages,
+    ];
+}

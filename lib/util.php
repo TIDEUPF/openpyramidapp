@@ -22,6 +22,22 @@ function rand_str($length = 32, $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijkl
     return $string;
 }
 
+function exec_sql($sql) {
+    global $link, $sid, $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+
+    $result = mysqli_query($link, $sql);
+    $result_rows = [];
+    if(mysqli_num_rows($result) > 0){ //get current level pyramid group info
+        while($row = mysqli_fetch_assoc($result))
+        {
+            $result_rows[] = $row;
+        }
+        return $result_rows;
+    } else {
+        return [];
+    }
+}
+
 function get_sql_pyramid($params= null) {
     global $fid, $pid;
 
@@ -51,6 +67,17 @@ function sql_gen() {
     foreach($prefixes as $p) {
         $ps[$p] = get_sql_pyramid(['prefix'=>$p]);
     }
+}
+
+function get_room_string($fid, $pid, $activity_level, $peer_group_id) {
+    $location_id = get_localtion_id();
+    $room = 'room_' . $fid . '_' . $peer_group_id . '_' . $activity_level . '_' . $pid . '_' . $location_id;
+
+    return $room;
+}
+
+function get_localtion_id() {
+    return hash('crc32b', $_SERVER['SCRIPT_NAME']);
 }
 
 function sanitize_array($data_array) {

@@ -19,6 +19,8 @@ if(($pid = \Pyramid\get_student_pyramid($fid, $sid)) === false) {
 \Group\get_members();
 global $peer_group_id, $activity_level;
 
+/* the location_id allows to use the same nodejs service for several instances of the application
+ * */
 $location_id = hash('crc32b', $_SERVER['SCRIPT_NAME']);
 
 header('Content-Type: application/javascript; charset=utf-8');

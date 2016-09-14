@@ -7,6 +7,42 @@ function get_group_name() {
 
 }
 
+function get_users_and_groups() {
+    global $link, $sid, $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+
+    $sql = <<< SQL
+select pg_group as `members`, pg_group_id 
+from pyramid_groups 
+where {$ps['pg']} 
+and pg_level = 0
+SQL;
+
+    $groups = \Util\exec_sql($sql);
+    $students = [];
+
+    foreach($groups as $group) {
+        $group_students_username = implode(',', $group['members']);
+        foreach($group_students_username as $group_students_username_item) {
+            $students[] = ['username' => $group_students_username_item, 'group_id' => $group['pg_group_id']];
+        }
+    }
+
+    return $students;
+}
+
+function get_group_details() {
+
+    //is started?
+
+    //is finished
+
+    //is completed
+
+    //timeout
+
+    //users who did not rate
+}
+
 function get_members($params) {
     global $link, $sid, $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
@@ -50,27 +86,6 @@ function get_members_from_group_id() {
         $peer_group_combined_ids = null;
         $peer_group_combined_ids_temp = [];
     }
-
-}
-
-function get_next_level_groups($params) {
-    global $link, $sid, $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
-
-    $next_activity_level = $activity_level + 1;
-    $sa_result_1 = mysqli_query($link, "select * from pyramid_groups where {$ps['pg']} and pg_level = '$next_activity_level'");
-    if(mysqli_num_rows($sa_result_1) > 0){ //get current level pyramid group info
-        while($sa_data_1 = mysqli_fetch_assoc($sa_result_1))
-        {
-            $peer_array_temp = explode(",",$sa_data_1['pg_group']);
-            if(in_array($sid,$peer_array_temp)){
-                $result['peer_array']                   = $peer_array_temp;
-                $result['peer_group_id']                = $sa_data_1['pg_group_id'];
-                $result['peer_group_combined_ids']      = $sa_data_1['pg_combined_group_ids'];
-                $result['peer_group_combined_ids_temp'] = explode(",",$result['peer_group_combined_ids']);
-            }
-        }
-    }
-    return $result;
 }
 
 function get_needed_results_to_end_level($full_requirements = false, $level = null) {
