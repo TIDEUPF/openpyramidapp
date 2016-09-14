@@ -20,7 +20,7 @@ foreach ($auto as $item) {
 
 while($j<5000) {
     $fv = [0, 1, 2];
-    $answertimestamp = time();
+    $answertimestamp = \Util\pyramid_time();
 
     for ($i = 0; $i < 3; $i++) {
         $result = mysqli_query($link, "insert into flow_student values (null, '$fid', '$sid', '', 1, $answertimestamp)");

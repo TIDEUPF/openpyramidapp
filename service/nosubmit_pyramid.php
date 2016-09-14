@@ -71,7 +71,7 @@ while(true) {
     if (!\Pyramid\get_current_flow())
         continue;
 
-    $time = time();
+    $time = \Util\pyramid_time();
 
     //add the latecomers
     $result = mysqli_query($link, "select pg_pid as pid from pyramid_groups where pg_fid='$fid' order by pg_pid desc limit 1");

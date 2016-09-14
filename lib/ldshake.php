@@ -208,7 +208,7 @@ function write_flow($params) {
     $flow_data['n_levels']--;
     $flow_data['min_students_per_pyramid'] = $min_students_per_pyramid;
 
-    $datestamp = time();
+    $datestamp = \Util\pyramid_time();
 
     $sql = <<<SQL
 insert into flow values (

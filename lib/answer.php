@@ -38,7 +38,7 @@ function submit($params) {
     if($pid === false)
         $sql_pid = -1;
 
-    $answertimestamp = time();
+    $answertimestamp = \Util\pyramid_time();
 
     if(isset($_POST['skip'])) {
         mysqli_query($link, "insert into flow_student values ('', '$fid', '$sql_pid', '$sid', '', 1, $answertimestamp)");
@@ -329,7 +329,7 @@ function skip_rating() {
     //TODO: in asynchronous mode we select the first two questions
 
     $n_real_answers = count(get_selected_ids(false));
-    $time = time();
+    $time = \Util\pyramid_time();
 
     //if there are no real answers just set a dummy selected answer
     if(!$n_real_answers) {
@@ -575,12 +575,12 @@ function is_timeout() {
         if($timeout_data['start_timestamp'] > $a_submitted_answers['timestamp'])
             $a_submitted_answers['timestamp'] = $timeout_data['start_timestamp'];
 
-        if(time() > $a_submitted_answers['timestamp'] + $answer_timeout)
+        if(\Util\pyramid_time() > $a_submitted_answers['timestamp'] + $answer_timeout)
             return true;
     }
 
     //check hardtimer
-    if(time() > $flow_data['hardtimer_question'] + $timeout_data['start_timestamp'])
+    if(\Util\pyramid_time() > $flow_data['hardtimer_question'] + $timeout_data['start_timestamp'])
         return true;
 
     return false;

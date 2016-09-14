@@ -180,7 +180,7 @@ function check_if_previous_groups_completed_task()
         return true;
 
     //if all the groups are timed out the level is complete
-    $time = time();
+    $time = \Util\pyramid_time();
     $max_start_time = $time - $flow_data['hardtimer_rating'];
     $complete_query = mysqli_query($link, "select * from pyramid_groups where pg_start_timestamp <= '{$max_start_time}' and pg_group_id in ({$peer_group_combined_ids}) and pg_level = '{$activity_level_previous}' and pg_started = 1 and {$ps['pg']}");
     $all_query = mysqli_query($link, "select * from pyramid_groups where pg_group_id in ({$peer_group_combined_ids}) and pg_level = '{$activity_level_previous}' and {$ps['pg']}");
@@ -194,7 +194,7 @@ function check_if_sibling_groups_hardtimer_expired() {
     global $link, $sid, $fid, $ps, $flow_data, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
     //if all the groups are timed out the level is complete
-    $time = time();
+    $time = \Util\pyramid_time();
     $max_start_time = $time - $flow_data['hardtimer_rating'];
     $complete_query = mysqli_query($link, "select * from pyramid_groups where pg_start_timestamp <= '{$max_start_time}' and pg_level = '{$activity_level}' and pg_started = 1 and {$ps['pg']}");
     $all_query = mysqli_query($link, "select * from pyramid_groups where pg_level = '{$activity_level}' and {$ps['pg']}");
@@ -273,7 +273,7 @@ function is_level_timeout() {
         return true;
 
     //hardtimer
-    $time = time();
+    $time = \Util\pyramid_time();
     $level_start_time = get_level_start_timestamp();
     if($level_start_time > 0 and $time > $level_start_time + $flow_data['hardtimer_rating'])
         return true;
@@ -316,7 +316,7 @@ function set_level_timeout_timestamp() {
         return false;
     }
 
-    $timestamp = time();
+    $timestamp = \Util\pyramid_time();
     mysqli_query($link, "update pyramid_groups set pg_timestamp='{$timestamp}' where {$ps['pg']} and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}'");
 
     return $timestamp;
@@ -325,19 +325,23 @@ function set_level_timeout_timestamp() {
 function get_time_left() {
     global $link, $sid, $fid, $ftimestamp, $answer_timeout, $answer_skip_timeout, $peer_array, $timeout, $flow_data;
 
+    //the satisfaction submit has been reached
     $timestamp = get_level_timeout_timestamp();
+
     $start_timestamp = get_level_start_timestamp();
 
     if(!\Answer\is_timeout()) {
-        $hardtime_left = $flow_data['hardtimer_question'] + $start_timestamp - time();
+        $hardtime_left = $flow_data['hardtimer_question'] + $start_timestamp - \Util\pyramid_time();
+
+        //if the satisfaction level has been reached or the hard timer has less time left than the soft rating
         if($hardtime_left < $answer_timeout or ($timestamp and is_numeric($timestamp))) {
-            $satisfaction_left = ($timestamp + $answer_timeout) - time();
+            $satisfaction_left = ($timestamp + $answer_timeout) - \Util\pyramid_time();
             return ($hardtime_left > $satisfaction_left and $timestamp) ? $satisfaction_left : $hardtime_left;
         }
     } else {
-        $hardtime_left = $flow_data['hardtimer_rating'] + $start_timestamp - time();
+        $hardtime_left = $flow_data['hardtimer_rating'] + $start_timestamp - \Util\pyramid_time();
         if($hardtime_left < $timeout or ($timestamp and is_numeric($timestamp))) {
-            $satisfaction_left = ($timestamp + $timeout) - time();
+            $satisfaction_left = ($timestamp + $timeout) - \Util\pyramid_time();
             return ($hardtime_left > $satisfaction_left and $timestamp) ? $satisfaction_left : $hardtime_left;
         }
     }

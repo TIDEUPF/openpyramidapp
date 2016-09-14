@@ -33,7 +33,7 @@ while(true) {
     if (!\Pyramid\get_current_flow())
         continue;
 
-    $time = time();
+    $time = \Util\pyramid_time();
 
     //TODO: check for not empty pyramids, the there are none just skip
     $unfilled_pyramids = \Flow\get_not_full_pyramids();
@@ -102,7 +102,7 @@ while(true) {
     $question_submit_expiry_timestamp = $flow_timestamps[0];
     $new_pyramid_size = $flow_data['pyramid_size'];
 
-    if(time() > $question_submit_expiry_timestamp and count($available_students) >= $new_pyramid_size) {
+    if(\Util\pyramid_time() > $question_submit_expiry_timestamp and count($available_students) >= $new_pyramid_size) {
         //create the pyramids, must be executed once
         echo "group formation stage\n";
 
@@ -173,7 +173,7 @@ while(true) {
         $level_timestamps = \Pyramid\get_timestamps();
 
         //discard expired pyramids
-        if (time() > $level_timestamps[($levels + 1)])
+        if (\Util\pyramid_time() > $level_timestamps[($levels + 1)])
             continue;
 
         //TODO: this must be done per pyramid? calculate level_timestamps per pyramid

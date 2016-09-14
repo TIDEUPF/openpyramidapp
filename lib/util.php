@@ -1,6 +1,15 @@
 <?php
 namespace Util;
 
+function pyramid_time() {
+    global $debug_time;
+
+    if(!empty($debug_time))
+        return $debug_time;
+
+    return time();
+}
+
 // Generate a random character string
 function rand_str($length = 32, $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890') {
     // Length of character list
@@ -123,7 +132,7 @@ function log($data) {
     if(isset($data['timestamp']))
         $date = $data['timestamp'];
     else
-        $date = time();
+        $date = \Util\pyramid_time();
 
     if(isset($data['entry']))
         $data_json = mysqli_real_escape_string($link, json_encode($data['entry']));

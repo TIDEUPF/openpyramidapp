@@ -60,7 +60,7 @@ function upgrade_level($forced = false) {
     if(!$forced) {
         //the answer phase is timed out
         if ($activity_level == 0 and \Answer\is_timeout() and !\Group\is_level_zero_rating_started()) {
-            $time = time();
+            $time = \Util\pyramid_time();
             mysqli_query($link, "update pyramid_groups set pg_started = 1, pg_start_timestamp='{$time}' where pg_started = '0' and {$ps['pg']} and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}'");
             return true;
         }
@@ -94,7 +94,7 @@ function upgrade_level($forced = false) {
     if($forced) {
         //the answer phase has ended
         if ($activity_level == 0 and !\Group\is_level_zero_rating_started()) {
-            $time = time();
+            $time = \Util\pyramid_time();
 
             mysqli_query($link, "update pyramid_groups set pg_started = 1, pg_start_timestamp='{$time}' where pg_started = '0' and pg_fid='{$fid}' and pg_level='{$activity_level}' and pg_group_id='{$peer_group_id}'");
             return true;
@@ -105,7 +105,7 @@ function upgrade_level($forced = false) {
             if(!$selected_answers_exists) {
                 //the conditions to select an answer are not met
                 //TODO: select 2 answers if asynchronous
-                $time = time();
+                $time = \Util\pyramid_time();
                 mysqli_query($link, "insert into selected_answers values ('$fid', '$pid', '$activity_level', '$peer_group_id', '-1', '0', '1', FROM_UNIXTIME({$time}))");
                 \Util\log(['activity' => 'level_finished_with_no_rates']);
             }
@@ -127,7 +127,7 @@ function upgrade_level($forced = false) {
         if(\Group\is_level_started())
             return false;
 
-        $time = time();
+        $time = \Util\pyramid_time();
         //register only when all sibling groups are completed or timed out
         if(\Group\check_if_previous_groups_completed_task()) {
             set_selected_answers_for_previous_groups();
@@ -159,7 +159,7 @@ function set_selected_answers() {
             $selected_id = $ssa_data_1['fsr_to_whom_rated_id'];
             $selected_id_rating_sum = $ssa_data_1['sum'];
             $skip = $ssa_data_1['skip'];
-            $time = time();
+            $time = \Util\pyramid_time();
             mysqli_query($link, "insert into selected_answers values ('$fid', '$pid', '$activity_level', '$peer_group_id', '$selected_id', '$selected_id_rating_sum', '$skip', FROM_UNIXTIME({$time}))");
             \Util\log(['activity' => 'selected_answer', 'answer' => $selected_id, 'rating' => $selected_id_rating_sum]);
         }
@@ -177,7 +177,7 @@ function set_selected_answers() {
 
             $selected_id_rating_sum = 0;
             $skip = 0;
-            $time = time();
+            $time = \Util\pyramid_time();
             mysqli_query($link, "insert into selected_answers values ('$fid', '$pid', '$activity_level', '$peer_group_id', '$selected_id', '$selected_id_rating_sum', '$skip', FROM_UNIXTIME({$time}))");
             \Util\log(['activity' => 'selected_answer_random', 'answer' => $selected_id, 'rating' => $selected_id_rating_sum]);
             $n_selected++;
@@ -195,7 +195,7 @@ function set_selected_answers_for_previous_groups() {
 
     $previous_groups_ids = explode(',', $peer_group_combined_ids);
     $previous_level = $activity_level - 1;
-    $time = time();
+    $time = \Util\pyramid_time();
 
     foreach($previous_groups_ids as $fpgi) {
 
@@ -253,7 +253,7 @@ function compute_level_rating() {
     while($data_t_2 = mysqli_fetch_assoc($result_3)) {
         $selected_id = $data_t_2['fsr_to_whom_rated_id'];
         $selected_id_rating_sum = $data_t_2['sum'];
-        $time = time();
+        $time = \Util\pyramid_time();
         mysqli_query($link, "insert into selected_answers values ('$fid', '$pid', '$activity_level', '$peer_group_id', '$selected_id', '$selected_id_rating_sum', FROM_UNIXTIME({$time}))");
     }
 }
@@ -756,7 +756,7 @@ function remaining_pyramids() {
 function add_student($fid, $pid, $sid) {
     global $link;
 
-    $time = time();
+    $time = \Util\pyramid_time();
     $result = mysqli_query($link,"insert into pyramid_students values (null, '$fid', '$pid', '$sid', '$time')");
 
     return !!mysqli_affected_rows($result);
@@ -965,7 +965,7 @@ function get_level_activity_rate($activity_level) {
 
     \Pyramid\update_pyramid($fid, $pid);
     mysqli_query($link, "commit");
-    \Util\log(['activity' => 'group_activity_reorder', 'timestamp' => time(), 'origin' => 'php_backend', 'entry' => ['scores' => $groups_score, 'fid' => $fid, 'pid' => $pid, 'level' => $activity_level, 'next_level' => $next_level]]);
+    \Util\log(['activity' => 'group_activity_reorder', 'timestamp' => \Util\pyramid_time(), 'origin' => 'php_backend', 'entry' => ['scores' => $groups_score, 'fid' => $fid, 'pid' => $pid, 'level' => $activity_level, 'next_level' => $next_level]]);
 }
 
 function get_pyramid_creation_timestamp() {

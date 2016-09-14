@@ -80,7 +80,7 @@ function get_not_full_pyramids() {
     $rating_timer = (int)$flow_data['rating_timeout'];
 
     $max_users = (int)$flow_data['pyramid_minsize'] * 2 - 1;
-    $min_timestamp = time() - $rating_timer*$levels;
+    $min_timestamp = \Util\pyramid_time() - $rating_timer*$levels;
 
     $sql = <<<SQL
 select * from

@@ -121,7 +121,7 @@ SQL;
         $flow_object_json = json_encode($flow_object);
         $flow_object_json_sql = mysqli_real_escape_string($link, $flow_object_json);
 
-        $datestamp = time();
+        $datestamp = \Util\pyramid_time();
 
         if($action == "create") {
             $sql = <<<SQL
@@ -275,7 +275,7 @@ $tq = $default_teacher_question;
 if(!isset($_REQUEST['save']))	{
     //default values
 } else {
-    $datestamp = time();
+    $datestamp = \Util\pyramid_time();
     $data_sql = mysqli_real_escape_string($link, json_encode($data));
     mysqli_query($link,"insert into activity values (null, '$teacher_id', '$data_sql')");
     $activity_id = mysqli_insert_id($link);

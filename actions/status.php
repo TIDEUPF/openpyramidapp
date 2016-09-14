@@ -32,7 +32,7 @@ $flow_timestamps = \Pyramid\get_timestamps();
 $timestamp_level = $activity_level + 1 - 1*((int)(!$rating_started));
 $ui_level = $activity_level + 2 - 1*((int)(!$rating_started));
 
-$time_remaining = $flow_timestamps[$timestamp_level] - time();
+$time_remaining = $flow_timestamps[$timestamp_level] - \Util\pyramid_time();
 
 $question_submitted = \Answer\is_submitted();
 
