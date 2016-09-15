@@ -47,6 +47,17 @@ function exec_sql($sql) {
     }
 }
 
+function exec_sql_bool($sql) {
+    global $link, $sid, $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+
+    $result = mysqli_query($link, $sql);
+    if(mysqli_num_rows($result) > 0){ //get current level pyramid group info
+        return true;
+    } else {
+        return false;
+    }
+}
+
 function get_sql_pyramid($params= null) {
     global $fid, $pid;
 

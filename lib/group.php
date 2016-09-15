@@ -11,7 +11,7 @@ function get_users_and_groups() {
     global $link, $sid, $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
     $sql = <<< SQL
-select pg_group as `members`, pg_group_id 
+select pg_group as `members`, pg_group_id
 from pyramid_groups 
 where {$ps['pg']} 
 and pg_level = 0
@@ -30,17 +30,59 @@ SQL;
     return $students;
 }
 
-function get_group_details() {
+function get_group_details($group_level, $group_id) {
+    global $ps;
+
+    set_activity_level($group_level, $group_id);
 
     //is started?
+    $group_level_started = is_level_started();
 
     //is finished
+    $group_is_finished = is_level_started() and is_level_timeout();
 
     //is completed
+
+
+    $group_is_finished = is_level_timeout();
 
     //timeout
 
     //users who did not rate
+
+
+}
+
+function get_groups_ratings() {
+    global $link, $sid, $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+
+    $sql = <<< SQL
+select 
+fsr_sid as `username`, 
+fsr_level as `level`,
+fsr_group_is as `group_id`,
+fsr_rating as `rating`,
+fsr_to_whom_rated_id as `question_id`,
+UNIX_TIMESTAMP(fsr_datetime) as `timestamp`,
+from flow_student_rating 
+where {$ps['fsr']} and
+fsr_group_id = {$peer_group_id} and
+fsr_level = {$activity_level} and
+fsr_to_whom_rated_id <> -1
+SQL;
+
+    $ratings = \Util\exec_sql($sql);
+    $students = [];
+
+    foreach($ratings as $rating_item) {
+        $students[$rating_item['username']]['ratings'][] = [
+            'question_id' => $rating_item['question_id'],
+            'rating' => $rating_item['rating'],
+            'timestamp' => (int)$rating_item['timestamp']
+        ];
+    }
+
+    return $students;
 }
 
 function get_members($params) {
@@ -479,6 +521,25 @@ function set_group_id($new_group_id) {
 
     $peer_group_id = $new_group_id;
     \Group\get_members_from_group_id();
+}
+
+/*
+ * in non interactive sessions $new_group_id must be set
+ */
+function set_activity_level($new_activity_level, $new_group_id = false) {
+    global $activity_level, $peer_group_id, $sid;
+
+    if($new_group_id === false) {
+        if(empty($sid))
+            throw new Exception("The sid must be set in non interactive sessions");
+
+        $activity_level = $new_activity_level;
+        get_members();
+    } else {
+        $activity_level = $new_activity_level;
+        $peer_group_id = $new_group_id;
+        \Group\get_members_from_group_id();
+    }
 }
 
 /*
