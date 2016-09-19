@@ -3,6 +3,8 @@ Student\enforce_login();
 
 $sname = Student\get_username();
 $sid = $_SESSION['student'];
+$client_level = (int)$_REQUEST['level'];
+
 global $fid, $link, $ps, $flow_data;
 
 // $levels, $fname, $fdes, $fid, $fid_timestamp
@@ -50,7 +52,7 @@ if((int)$flow_data['sync'] == 0) {
     exit;
 }
 
-global $activity_level;
+global $activity_level, $levels;
 \Pyramid\get_current_activity_level();
 
 //$peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp
@@ -59,8 +61,17 @@ global $activity_level;
 //check if the group has completed the level and upgrade the level
 \Pyramid\upgrade_level();
 
-if(\Group\is_level_timeout())
-    $expired = true;
+if($client_level == -1) {
+    if(\Group\is_level_zero_rating_started()) {
+        $expired = true;
+    }
+} else {
+   if ($activity_level > $client_level)
+        $expired = true;
+
+   if ($activity_level + 1 == $levels and \Pyramid\is_complete())
+        $expired = true;
+}
 
 $time_left = \Group\get_time_left();
 

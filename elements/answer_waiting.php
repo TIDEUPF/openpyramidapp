@@ -86,7 +86,7 @@
         <div id="answer-header-frame">
 
             <div id="pyramid-icon">
-                <img src="elements/resources/pyramid_icons/<?=($hidden_input_array['levels']+1)?>l_l<?=($hidden_input_array['level']+1)?>.png">
+                <img src="elements/resources/pyramid_icons/<?=($hidden_input_array['levels']+1)?>l_l<?=($hidden_input_array['level']+2)?>.png">
             </div>
 
             <div id="topbar">

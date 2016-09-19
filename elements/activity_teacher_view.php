@@ -162,6 +162,17 @@ $flow_data[] = $pyramid;
 }
 
 $flow = $flow_data;
+
+//\Pyramid\set_current_flow($fid);
+\Pyramid\set_pid(0);
+\Util\sql_gen();
+
+$users_and_groups = \Group\get_users_and_groups();
+
+    foreach($users_and_groups as $users_and_groups_item) {
+        \Student\get_student_details();
+    }
+
 header('Content-Type: text/html; charset=utf-8');
 ?><!DOCTYPE html>
 <html lang="en">
@@ -181,6 +192,7 @@ header('Content-Type: text/html; charset=utf-8');
 
 </head>
 <body>
+
 <input name="page" type="hidden" value="activity_tracking"/>
 <input name="username" type="hidden" value="<?=htmlspecialchars($teacher_id)?>"/>
 <div data-role="page">
@@ -188,6 +200,11 @@ header('Content-Type: text/html; charset=utf-8');
         <h1>View Pyramid details</h1>
     </div>
     <div data-role="main" class="ui-content">
+<pre>
+        <?php
+        echo var_export($users_and_groups);
+        ?>
+</pre>
         <div id="activity-info-main">
 
             <?php if(isset($final_answers)):?>

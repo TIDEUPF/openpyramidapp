@@ -130,11 +130,15 @@
     <div id="answer-header-frame">
 
         <div id="pyramid-icon">
-            <img src="elements/resources/pyramid_icons/<?=($hidden_input_array['levels']+1)?>l_l<?=($hidden_input_array['level'])?>.png">
+            <img src="elements/resources/pyramid_icons/<?=($hidden_input_array['levels']+1)?>l_l<?=($hidden_input_array['level'] + 2)?>.png">
         </div>
-        <div id="activity-status">
-            <a target="_blank" href="status.php">Activity Status</a>
-        </div>
+
+        <?php if($flow_data['sync'] == 0):?>
+            <div id="activity-status">
+                <a target="_blank" href="status.php">Activity Status</a>
+            </div>
+        <?php endif;?>
+
         <div>
             <div id="answer-header-user" class="topbar_item"><?=$username?></div>
             <div id="answer-header-level" class="topbar_item"><?=$level?></div>

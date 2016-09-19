@@ -128,7 +128,7 @@ function request($params) {
     $hidden_input_array['group_id'] = $peer_group_id;
     $hidden_input_array['page'] = "answer_form";
     $hidden_input_array['levels'] = $levels;
-    $hidden_input_array['level'] = \Pyramid\get_current_level();
+    $hidden_input_array['level'] = -1;
 
     $vars['hidden_input_array'] = array_merge($vars['hidden_input_array'], $hidden_input_array);
 
@@ -181,7 +181,7 @@ function request_rate($params) {
     $hidden_input_array['fid'] = $fid;
     $hidden_input_array['pid'] = $pid;
     $hidden_input_array['group_id'] = $peer_group_id;
-    $hidden_input_array['level'] = \Pyramid\get_current_level();
+    $hidden_input_array['level'] = $activity_level;
     $hidden_input_array['page'] = "answer_rating";
     $hidden_input_array['levels'] = $levels;
 

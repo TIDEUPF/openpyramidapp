@@ -10,10 +10,6 @@ if(!isset($_SESSION['user'])){
         else{
             $uname = mysqli_real_escape_string($link, stripslashes(trim(strip_tags($_POST['usr']))));
 
-            /*$_SESSION['user'] = $uname;
-            header("location: activity.php");
-            exit(0);
-            */
             $pass =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['pwd']))));
 
             $count_login = mysqli_num_rows(mysqli_query($link, "select uname from teacher where uname = '$uname' and pass = '$pass' limit 1 "));

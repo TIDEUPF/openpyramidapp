@@ -21,7 +21,7 @@ SQL;
     $students = [];
 
     foreach($groups as $group) {
-        $group_students_username = implode(',', $group['members']);
+        $group_students_username = explode(',', $group['members']);
         foreach($group_students_username as $group_students_username_item) {
             $students[] = ['username' => $group_students_username_item, 'group_id' => $group['pg_group_id']];
         }
@@ -30,8 +30,31 @@ SQL;
     return $students;
 }
 
+function get_student_group($student, $activity_level) {
+    global $link, $sid, $fid, $ps, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+
+    $sql = <<< SQL
+select pg_group as `members`, pg_group_id
+from pyramid_groups 
+where {$ps['pg']} 
+and pg_level = {$activity_level}
+SQL;
+
+    $groups = \Util\exec_sql($sql);
+
+    foreach($groups as $group) {
+        $group_students_username = explode(',', $group['members']);
+        foreach($group_students_username as $group_students_username_item) {
+            if($student == $group_students_username_item)
+                return (int)$group['pg_group_id'];
+        }
+    }
+
+    return null;
+}
+
 function get_group_details($group_level, $group_id) {
-    global $ps;
+    global $ps, $peer_array;
 
     set_activity_level($group_level, $group_id);
 
@@ -41,29 +64,33 @@ function get_group_details($group_level, $group_id) {
     //is finished
     $group_is_finished = is_level_started() and is_level_timeout();
 
-    //is completed
-
-
+    //is finished
     $group_is_finished = is_level_timeout();
 
-    //timeout
+    //ratings
+    $group_ratings = get_group_ratings();
 
-    //users who did not rate
+    //rating table
+    $rating_table = get_group_rating_table();
 
+    //group_users
+    $group_users = $peer_array;
 
+    //chat messages
+    $chat_messages = get_group_chat();
 }
 
-function get_groups_ratings() {
+function get_group_ratings() {
     global $link, $sid, $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
     $sql = <<< SQL
 select 
-fsr_sid as `username`, 
+fsr_sid as `sid`, 
 fsr_level as `level`,
 fsr_group_is as `group_id`,
 fsr_rating as `rating`,
 fsr_to_whom_rated_id as `question_id`,
-UNIX_TIMESTAMP(fsr_datetime) as `timestamp`,
+UNIX_TIMESTAMP(fsr_datetime) as `timestamp`
 from flow_student_rating 
 where {$ps['fsr']} and
 fsr_group_id = {$peer_group_id} and
@@ -83,6 +110,47 @@ SQL;
     }
 
     return $students;
+}
+
+function get_group_rating_table() {
+    global $link, $sid, $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+
+    $sql = <<< SQL
+select * from (
+    select (select fs_answer from flow_student
+    where fid = fsr_fid and pid = fsr_pid and sid = fsr_to_whom_rated_id)
+    as answer, sum(fsr_rating) as rating
+    from flow_student_rating
+    where {$ps['fsr']} and fsr_level = {$activity_level} and fsr_group_id = {$peer_group_id} and fsr_to_whom_rated_id <> '-1' and skip = 0
+group by fsr_to_whom_rated_id
+) as rated_answers
+order by rating desc
+SQL;
+
+    $rating_table = \Util\exec_sql($sql);
+
+    return $rating_table;
+}
+
+function get_group_chat() {
+    global $link, $sid, $fid, $pid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+
+    $room = \Util\get_room_string($fid, $pid, $activity_level, $peer_group_id);
+
+    $sql = <<< SQL
+select 
+`sid` as `username`, 
+`message`,
+UNIX_TIMESTAMP(`date`) as `timestamp`
+from flow_student_rating 
+where {$ps['e']} and
+`room` LIKE '{$room}'
+order BY `date` asc
+SQL;
+
+    $messages = \Util\exec_sql($sql);
+
+    return $messages;
 }
 
 function get_members($params) {

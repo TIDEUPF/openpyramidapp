@@ -293,11 +293,14 @@
     <div id="answer-header-frame">
 
         <div id="pyramid-icon">
-            <img src="elements/resources/pyramid_icons/<?=($hidden_input_array['levels']+1)?>l_l<?=($hidden_input_array['level']+1)?>.png">
+            <img src="elements/resources/pyramid_icons/<?=($hidden_input_array['levels']+1)?>l_l<?=($hidden_input_array['level']+2)?>.png">
         </div>
+
+        <?php if($flow_data['sync'] == 0):?>
         <div id="activity-status">
             <a target="_blank" href="status.php">Activity Status</a>
         </div>
+        <?php endif;?>
 
         <div id="topbar">
             <div id="answer-header-user" class="topbar_item"><?=$username?></div>
@@ -397,8 +400,12 @@
 
         <div>
             <div id="answer-waiting-group"><?=$answer_waiting_message?></div>
-            <!--<div style="font-size: 1.35em; margin-top:20px;">Please note that when you submit rating, you will no longer be able to edit rating values. Also you will be removed from the discussion thread for this level.</div>-->
-            <div style="font-size: 1.35em; margin-top:20px;"><?=TS("Submit rating here! But you still can continue discussion and modify rating accordingly.")?></div>
+
+            <?php if($flow_data['sync'] == 0):?>
+                <div style="font-size: 1.35em; margin-top:20px;"><?=TS("Submit rating here! But you still can continue discussion and modify rating accordingly.")?></div>
+            <?php else:?>
+                <div style="font-size: 1.35em; margin-top:20px;"><?=TS("Please note that when you submit rating, you will no longer be able to edit rating values. Also you will be removed from the discussion thread for this level.")?></div>
+            <?php endif;?>
 
             <div id="answer-next-button"><button id="answer-next-button-ui" class="ui-btn"><?=$answer_rate_submit?></button></div>
         </div>

@@ -318,6 +318,10 @@ function is_final_level_complete() {
     return $is_final_level_completed;
 }
 
+/*
+ * This function returns the current level according to the new criteria assigning level 1 to individual level
+ * and level 2 to the first rating level
+ */
 function get_current_level() {
     global $levels, $activity_level;
 
@@ -480,7 +484,7 @@ function wait($params) {
 
     $hidden_input_array['username'] = $sname;
     $hidden_input_array['fid'] = $fid;
-    $hidden_input_array['level'] = \Pyramid\get_current_level();
+    $hidden_input_array['level'] = $activity_level;
     $hidden_input_array['levels'] = $levels;
     $hidden_input_array['page'] = "waiting";
     $hidden_input_array['group_id'] = $peer_group_id;
