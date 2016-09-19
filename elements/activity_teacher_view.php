@@ -1,5 +1,5 @@
 <?php
-global $node_path, $fid;
+global $node_path, $fid, $pid, $flow_data;
 //obtain the flows pertaining to the current teacher
 
 $flow_data = [];
@@ -164,13 +164,17 @@ $flow_data[] = $pyramid;
 $flow = $flow_data;
 
 //\Pyramid\set_current_flow($fid);
+\Flow\set_fid($fid);
 \Pyramid\set_pid(0);
 \Util\sql_gen();
 
 $users_and_groups = \Group\get_users_and_groups();
-
+$students_activity = [];
     foreach($users_and_groups as $users_and_groups_item) {
-        \Student\get_student_details();
+        for($i=0; $i<$flow_data['levels']; $i++) {
+            $student_sid = $users_and_groups_item['student_sid'];
+            $students_activity[$student_sid][$i] = \Student\get_student_details($student_sid, $i);
+        }
     }
 
 header('Content-Type: text/html; charset=utf-8');

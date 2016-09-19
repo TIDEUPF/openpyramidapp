@@ -2,19 +2,22 @@
 namespace Student;
 
 function get_student_details($student, $group_level) {
-    global $ps, $peer_array;
+    global $peer_array;
 
-    $group_id = \Group\get_student_group($student);
-    set_activity_level($group_level, $group_id);
+    $group_id = \Group\get_student_group($student, $group_level);
+    \Group\set_activity_level($group_level, $group_id);
 
     //is started?
-    $group_level_started = is_level_started();
+    $group_level_started = \Group\is_level_started();
+
+    //$group_started_timestamp =
+    //$group_finished_timestamp =
 
     //is finished
-    $group_is_finished = is_level_started() and is_level_timeout();
+    $group_is_finished = \Group\is_level_started() and \Group\is_level_timeout();
 
     //ratings
-    $group_ratings = get_group_ratings();
+    $student_group_ratings = get_student_group_ratings($student, $group_level);
 
     //group_users
     $group_users = $peer_array;
@@ -26,11 +29,10 @@ function get_student_details($student, $group_level) {
     $answer_timeout_data = \Answer\get_answer_timeout();
     $pyramid_creation_timestamp = (int)$answer_timeout_data['start_timestamp'];
 
-
     $student_activity = [
         'group_level_started' => $group_level_started,
         'group_is_finished' => $group_is_finished,
-        'group_ratings' => $group_ratings,
+        'student_group_ratings' => $student_group_ratings,
         'group_users' => $group_users,
         'chat_messages' => $chat_messages,
         'pyramid_creation_timestamp' => $pyramid_creation_timestamp,
@@ -64,7 +66,7 @@ function get_student_ratings($sid) {
 select 
 fsr_sid as `sid`, 
 fsr_level as `level`,
-fsr_group_is as `group_id`,
+fsr_group_id as `group_id`,
 fsr_rating as `rating`,
 fsr_to_whom_rated_id as `question_id`,
 UNIX_TIMESTAMP(fsr_datetime) as `timestamp`
@@ -83,7 +85,7 @@ SQL;
 function get_student_chat() {
     global $link, $sid, $fid, $pid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
-    $room = \Util\get_room_string($fid, $pid, $activity_level, $peer_group_id);
+    $room = \Util\get_room_string($fid, $pid, $activity_level, $peer_group_id, false);
 
     $sql = <<< SQL
 select 
@@ -93,7 +95,7 @@ select
 UNIX_TIMESTAMP(`date`) as `timestamp`
 from chat
 where {$ps['e']} and
-`room` LIKE '{$room}'
+`room` LIKE '%{$room}%'
 order BY `date` asc
 SQL;
 
@@ -221,4 +223,30 @@ SQL;
         'ratings' => $ratings,
         'chat_messages' => $chat_messages,
     ];
+}
+
+function get_student_group_ratings($student, $group_level) {
+    global $ps;
+
+    $group_id = \Group\get_student_group($student);
+
+    //ratings
+    $ratings_sql = <<< SQL
+select
+fsr_sid as `sid`, 
+fsr_level as `level`,
+fsr_group_id as `group_id`,
+fsr_rating as `rating`,
+fsr_to_whom_rated_id as `answer_id`,
+UNIX_TIMESTAMP(fsr_datetime) as `timestamp`
+from flow_student_rating
+where {$ps['fsr']} 
+and fsr_level = {$group_level}
+and fsr_sid = '{$student}'
+and fsr_to_whom_rated_id <> '-1'
+SQL;
+
+    $ratings = \Util\exec_sql($ratings_sql);
+
+    return $ratings;
 }

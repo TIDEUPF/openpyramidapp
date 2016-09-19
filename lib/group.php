@@ -23,21 +23,21 @@ SQL;
     foreach($groups as $group) {
         $group_students_username = explode(',', $group['members']);
         foreach($group_students_username as $group_students_username_item) {
-            $students[] = ['username' => $group_students_username_item, 'group_id' => $group['pg_group_id']];
+            $students[] = ['student_sid' => $group_students_username_item, 'group_id' => $group['pg_group_id']];
         }
     }
 
     return $students;
 }
 
-function get_student_group($student, $activity_level) {
+function get_student_group($student, $group_level) {
     global $link, $sid, $fid, $ps, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
     $sql = <<< SQL
 select pg_group as `members`, pg_group_id
 from pyramid_groups 
-where {$ps['pg']} 
-and pg_level = {$activity_level}
+where {$ps['pg']}
+and pg_level = {$group_level}
 SQL;
 
     $groups = \Util\exec_sql($sql);
@@ -87,9 +87,9 @@ function get_group_ratings() {
 select 
 fsr_sid as `sid`, 
 fsr_level as `level`,
-fsr_group_is as `group_id`,
+fsr_group_id as `group_id`,
 fsr_rating as `rating`,
-fsr_to_whom_rated_id as `question_id`,
+fsr_to_whom_rated_id as `answer_id`,
 UNIX_TIMESTAMP(fsr_datetime) as `timestamp`
 from flow_student_rating 
 where {$ps['fsr']} and
