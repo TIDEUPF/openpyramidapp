@@ -1,6 +1,86 @@
 <?php
 namespace Student;
 
+function get_answer_activity($student) {
+    global $ps, $peer_array;
+
+    $sql = <<<SQL
+select
+`fs_answer` as `answer`,
+`skip`,
+`timestamp`
+from `flow_student`
+WHERE 
+{$ps['e']}
+and `sid` = '{$student}'
+SQL;
+
+    $sql = <<<SQL
+select
+`timestamp`
+from `pyramid_students`
+WHERE 
+{$ps['e']}
+and `sid` = '{$student}'
+SQL;
+
+    $sql = <<<SQL
+select
+`timestamp`
+from `flow_available_students`
+WHERE 
+{$ps['e']}
+and `sid` = '{$student}'
+SQL;
+
+
+
+    //submitted question
+
+    //skipped?
+
+    //time to submit the question
+
+
+
+    $group_id = \Group\get_student_group($student, $group_level);
+    \Group\set_activity_level($group_level, $group_id);
+
+    //is started?
+    $group_level_started = \Group\is_level_started();
+
+    //$group_started_timestamp =
+    //$group_finished_timestamp =
+
+    //is finished
+    $group_is_finished = \Group\is_level_started() and \Group\is_level_timeout();
+
+    //ratings
+    $student_group_ratings = get_student_group_ratings($student, $group_level);
+
+    //group_users
+    $group_users = $peer_array;
+
+    //chat messages
+    $chat_messages = get_student_chat();
+
+    //pyramid creation timestamp
+    $answer_timeout_data = \Answer\get_answer_timeout();
+    $pyramid_creation_timestamp = (int)$answer_timeout_data['start_timestamp'];
+
+    $student_activity = [
+        'group_id' => $group_id,
+        'group_level_started' => $group_level_started,
+        'group_is_finished' => $group_is_finished,
+        'student_group_ratings' => $student_group_ratings,
+        'group_users' => $group_users,
+        'chat_messages' => $chat_messages,
+        'pyramid_creation_timestamp' => $pyramid_creation_timestamp,
+    ];
+
+    return $student_activity;
+}
+
 function get_student_details($student, $group_level) {
     global $peer_array;
 

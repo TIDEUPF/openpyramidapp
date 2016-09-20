@@ -168,12 +168,25 @@ $flow = $flow_data;
 \Pyramid\set_pid(0);
 \Util\sql_gen();
 
-$users_and_groups = \Group\get_users_and_groups();
-$students_activity = [];
+    $pyramid_groups = \Pyramid\get_groups();
+    $users_with_groups = \Group\get_users_with_groups();
+    $groups_activity = [];
+
+    //obtain activity per group
+    foreach($pyramid_groups as $pyramid_groups_item) {
+        $group_level = $pyramid_groups_item['group_level'];
+        $group_id = $pyramid_groups_item['group_id'];
+        $group_activity = \Group\get_group_details($group_level, $group_id);
+
+        $groups_activity['level'][$group_level]['group'][$group_id] = $group_activity;
+    }
+
+    $students_activity = [];
     foreach($users_and_groups as $users_and_groups_item) {
         for($i=0; $i<$flow_data['levels']; $i++) {
             $student_sid = $users_and_groups_item['student_sid'];
-            $students_activity[$student_sid][$i] = \Student\get_student_details($student_sid, $i);
+            $answer_activity = \Student\answer_activity($student_sid);
+            $students_activity['sid'][$student_sid]['group'][$i] = \Student\get_student_details($student_sid, $i);
         }
     }
 

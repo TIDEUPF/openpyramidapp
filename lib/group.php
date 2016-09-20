@@ -7,11 +7,11 @@ function get_group_name() {
 
 }
 
-function get_users_and_groups() {
+function get_users_with_groups() {
     global $link, $sid, $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
     $sql = <<< SQL
-select pg_group as `members`, pg_group_id
+select pg_group as `members`, pg_group_id, pg_level
 from pyramid_groups 
 where {$ps['pg']} 
 and pg_level = 0
@@ -22,9 +22,13 @@ SQL;
 
     foreach($groups as $group) {
         $group_students_username = explode(',', $group['members']);
+
         foreach($group_students_username as $group_students_username_item) {
-            $students[] = ['student_sid' => $group_students_username_item, 'group_id' => $group['pg_group_id']];
+            $students[$group_students_username_item]['levels'][(int)$group['pg_level']] = [
+                'group_id' => $group['pg_group_id']
+            ];
         }
+
     }
 
     return $students;
@@ -53,7 +57,7 @@ SQL;
     return null;
 }
 
-function get_group_details($group_level, $group_id) {
+function c($group_level, $group_id) {
     global $ps, $peer_array;
 
     set_activity_level($group_level, $group_id);
@@ -102,10 +106,10 @@ function get_group_ratings() {
     $sql = <<< SQL
 select 
 fsr_sid as `sid`, 
-fsr_level as `level`,
+fsr_level as `group_level`,
 fsr_group_id as `group_id`,
-fsr_rating as `rating`,
 fsr_to_whom_rated_id as `answer_id`,
+fsr_rating as `rating`,
 UNIX_TIMESTAMP(fsr_datetime) as `timestamp`
 from flow_student_rating 
 where {$ps['fsr']} and
@@ -115,17 +119,8 @@ fsr_to_whom_rated_id <> -1
 SQL;
 
     $ratings = \Util\exec_sql($sql);
-    $students = [];
 
-    foreach($ratings as $rating_item) {
-        $students[$rating_item['sid']]['ratings'][] = [
-            'question_id' => $rating_item['question_id'],
-            'rating' => $rating_item['rating'],
-            'timestamp' => (int)$rating_item['timestamp']
-        ];
-    }
-
-    return $students;
+    return $ratings;
 }
 
 function get_group_rating_table() {

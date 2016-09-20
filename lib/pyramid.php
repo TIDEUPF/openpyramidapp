@@ -779,7 +779,8 @@ function add_student($fid, $pid, $sid) {
 function flow_add_student($fid, $sid) {
     global $link;
 
-    $result = mysqli_query($link,"insert into flow_available_students values (null, '$fid', '$sid')");
+    $time = \Util\pyramid_time();
+    $result = mysqli_query($link,"insert into flow_available_students values (null, '$fid', '$sid', '$time')");
 
     return !!mysqli_affected_rows($result);
 }
