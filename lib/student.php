@@ -30,6 +30,7 @@ function get_student_details($student, $group_level) {
     $pyramid_creation_timestamp = (int)$answer_timeout_data['start_timestamp'];
 
     $student_activity = [
+        'group_id' => $group_id,
         'group_level_started' => $group_level_started,
         'group_is_finished' => $group_is_finished,
         'student_group_ratings' => $student_group_ratings,

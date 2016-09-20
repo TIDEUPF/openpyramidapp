@@ -221,8 +221,18 @@ function set_selected_answers_for_previous_groups() {
     }
 }
 
-function get_groups($params) {
+function get_groups() {
+    global $ps;
+    $sql = <<<SQL
+select pg_group_id as `group_id`,
+ pg_level as `group_level`
+from pyramid_groups 
+where {$ps['pg']}
+SQL;
 
+    $groups = \Util\exec_sql($sql);
+
+    return $groups;
 }
 
 function is_level_computed($params) {

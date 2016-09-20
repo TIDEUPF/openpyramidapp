@@ -57,27 +57,43 @@ function get_group_details($group_level, $group_id) {
     global $ps, $peer_array;
 
     set_activity_level($group_level, $group_id);
+    \Group\set_activity_level($group_level, $group_id);
 
     //is started?
-    $group_level_started = is_level_started();
+    $group_level_started = \Group\is_level_started();
+
+    //$group_started_timestamp =
+    //$group_finished_timestamp =
 
     //is finished
-    $group_is_finished = is_level_started() and is_level_timeout();
-
-    //is finished
-    $group_is_finished = is_level_timeout();
+    $group_is_finished = \Group\is_level_started() and \Group\is_level_timeout();
 
     //ratings
     $group_ratings = get_group_ratings();
-
-    //rating table
-    $rating_table = get_group_rating_table();
 
     //group_users
     $group_users = $peer_array;
 
     //chat messages
     $chat_messages = get_group_chat();
+
+    //pyramid creation timestamp
+    $answer_timeout_data = \Answer\get_answer_timeout();
+    $pyramid_creation_timestamp = (int)$answer_timeout_data['start_timestamp'];
+
+    //rating table
+    $group_rating_table = get_group_rating_table();
+
+    $group_activity = [
+        'group_level_started' => $group_level_started,
+        'group_is_finished' => $group_is_finished,
+        'group_ratings' => $group_ratings,
+        'group_users' => $group_users,
+        'group_rating_table' => $group_rating_table,
+        'chat_messages' => $chat_messages,
+    ];
+
+    return $group_activity;
 }
 
 function get_group_ratings() {
@@ -102,7 +118,7 @@ SQL;
     $students = [];
 
     foreach($ratings as $rating_item) {
-        $students[$rating_item['username']]['ratings'][] = [
+        $students[$rating_item['sid']]['ratings'][] = [
             'question_id' => $rating_item['question_id'],
             'rating' => $rating_item['rating'],
             'timestamp' => (int)$rating_item['timestamp']
