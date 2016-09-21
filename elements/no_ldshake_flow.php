@@ -126,7 +126,7 @@
     });
 
     timeoutPeriod = 10000;
-    setTimeout("refreshp();",timeoutPeriod);
+    //setTimeout("refreshp();",timeoutPeriod);
     function refreshp(){
         window.location.href = window.location.href;
     }
