@@ -55,14 +55,18 @@ if(($pid = \Pyramid\get_student_pyramid($fid, $sid)) === false) {
 \Pyramid\upgrade_level();
 
 //forced upgrade if hard timeout is reached
-if(\Group\is_level_timeout()) {
+if(\Pyramid\is_complete()) {
+    \Pyramid\show_final_answer();
+    exit;
+} elseif(\Group\is_level_timeout()) {
+    //only force upgrade if the pyramid has not reached completion
     \Util\log(['activity' => 'level_timeout']);
     \Pyramid\upgrade_level(true);
+} else {
+    //enter submitted information only if the level is not timed out
+    \Answer\submit();
+    \Answer\submit_rate();
 }
-
-//enter submitted information
-\Answer\submit();
-\Answer\submit_rate();
 
 //new data entered
 if(\Answer\is_new_data()) {
@@ -76,10 +80,6 @@ if(\Answer\is_new_data()) {
     }
 }
 
-if(\Pyramid\is_complete()) {
-    \Pyramid\show_final_answer();
-    exit;
-}
 
 //here the current level never should be timed out
 if(\Group\is_level_timeout()) {

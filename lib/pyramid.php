@@ -164,7 +164,7 @@ function set_selected_answers() {
             \Util\log(['activity' => 'selected_answer', 'answer' => $selected_id, 'rating' => $selected_id_rating_sum]);
         }
         return true;
-    } elseif($random_selection){
+    } elseif($random_selection) {
         //TODO: force random selection
         //doesn't take into account skipped answers
         $answers = \Answer\get_selected_ids(false, true);
