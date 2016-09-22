@@ -14,18 +14,30 @@
         <link rel="stylesheet" href="vendors/jquery-bar-rating/themes/font-awesome.min.css">
         <link rel="stylesheet" href="vendors/jquery-bar-rating/themes/fontawesome-stars.css">
         <script src="vendors/jquery-bar-rating/jquery.barrating.min.js"></script>
-        <script src="/<?=$node_path?>/socket.io.js"></script>
 
+        <?php if(!isset($nosocket)):?>
         <script src="lib/actions.js"></script>
+        <?php endif;?>
+
         <script>
             <?php if(!isset($nosocket)):?>
-            var socket = io({
-                'reconnection': true,
-                'reconnectionDelay': 3000,
-                'maxReconnectionAttempts':Infinity,
-                'path': '/<?=$node_path?>/',
-                'transports': [ 'polling', 'websocket']
-            });
+            var init_socket_io_interval_ms = 500;
+            var init_socket_io_interval = setInterval(init_socket_io, init_socket_io_interval_ms);
+
+            function init_socket_io() {
+                if(typeof io === "undefined")
+                    return false;
+
+                clearInterval(init_socket_io_interval);
+
+                socket = io({
+                    'reconnection': true,
+                    'reconnectionDelay': 3000,
+                    'maxReconnectionAttempts': Infinity,
+                    'path': '/<?=$node_path?>/',
+                    'transports': ['polling', 'websocket']
+                });
+            }
             <?php endif;?>
             var timeoutPeriod = 10000;
             function del_vali(){ if(confirm('Submit Answer?')) { return true; }else{ return false; } }
@@ -38,6 +50,11 @@
 <body>
 <?= $body ?>
 <input type="hidden" name="user_id" value="<?=$_SESSION['user_id']?>" />
+
+<?php if(!isset($nosocket)):?>
+<script src="/<?=$node_path?>/socket.io.js" async></script>
+<?php endif;?>
+
 <?php if(strlen(strstr($_SERVER['HTTP_HOST'], 'sos.gti.upf.edu')) > 0):?>
 <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

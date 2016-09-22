@@ -1,4 +1,17 @@
-$(function() {
+pyramid_init_chat_interval_ms = 500;
+
+var pyramid_init_chat_interval = setInterval(pyramid_init_chat, pyramid_init_chat_interval_ms);
+
+function pyramid_init_chat() {
+    if(typeof socket === "undefined")
+        return false;
+
+    clearInterval(pyramid_init_chat_interval);
+
+    pyramid_chat_init();
+}
+
+function pyramid_chat_init() {
     var FADE_TIME = 150; // ms
     var TYPING_TIMER_LENGTH = 400; // ms
     var COLORS = [
@@ -333,4 +346,4 @@ $(function() {
     socket.on('stop typing', function (data) {
         removeChatTyping(data);
     });
-});
+}
