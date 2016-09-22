@@ -13,18 +13,17 @@ function get_users_with_groups() {
     $sql = <<< SQL
 select pg_group as `members`, pg_group_id, pg_level
 from pyramid_groups 
-where {$ps['pg']} 
-and pg_level = 0
+where {$ps['pg']}
 SQL;
 
     $groups = \Util\exec_sql($sql);
     $students = [];
 
     foreach($groups as $group) {
-        $group_students_username = explode(',', $group['members']);
+        $group_students_sid = explode(',', $group['members']);
 
-        foreach($group_students_username as $group_students_username_item) {
-            $students[$group_students_username_item]['levels'][(int)$group['pg_level']] = [
+        foreach($group_students_sid as $group_students_sid_item) {
+            $students[$group_students_sid_item]['levels'][(int)$group['pg_level']] = [
                 'group_id' => $group['pg_group_id']
             ];
         }
@@ -57,7 +56,7 @@ SQL;
     return null;
 }
 
-function c($group_level, $group_id) {
+function get_group_activity($group_level, $group_id) {
     global $ps, $peer_array;
 
     set_activity_level($group_level, $group_id);
@@ -66,11 +65,28 @@ function c($group_level, $group_id) {
     //is started?
     $group_level_started = \Group\is_level_started();
 
-    //$group_started_timestamp =
-    //$group_finished_timestamp =
+    $sql = <<<SQL
+select *
+from pyramid_groups
+where {$ps['pg']} and
+pg_level = {$group_level} AND 
+pg_group_id = {$group_id}
+SQL;
+
+    $group = \Util\exec_sql($sql);
+
+    $group_started_timestamp = (int)$group['pg_start_timestamp'];
+    $group_satisfaction_timestamp = (int)$group['pg_timestamp'];
 
     //is finished
     $group_is_finished = \Group\is_level_started() and \Group\is_level_timeout();
+
+    $selected_answers = get_sa();
+    if(count($selected_answers) > 0 ) {
+        $group_finish_timestamp = $selected_answers[0]['timestamp'];
+    } else {
+        $group_finish_timestamp = 0;
+    }
 
     //ratings
     $group_ratings = get_group_ratings();
@@ -81,16 +97,15 @@ function c($group_level, $group_id) {
     //chat messages
     $chat_messages = get_group_chat();
 
-    //pyramid creation timestamp
-    $answer_timeout_data = \Answer\get_answer_timeout();
-    $pyramid_creation_timestamp = (int)$answer_timeout_data['start_timestamp'];
-
     //rating table
     $group_rating_table = get_group_rating_table();
 
     $group_activity = [
         'group_level_started' => $group_level_started,
+        'group_started_timestamp' => $group_started_timestamp,
+        'group_satisfaction_timestamp' => $group_satisfaction_timestamp,
         'group_is_finished' => $group_is_finished,
+        'group_finish_timestamp' => $group_finish_timestamp,
         'group_ratings' => $group_ratings,
         'group_users' => $group_users,
         'group_rating_table' => $group_rating_table,
@@ -593,6 +608,32 @@ function sa_exists() {
     }
 
     return false;
+}
+
+function get_sa() {
+    global $link, $sid, $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids;
+
+    $sql = <<<SQL
+select 
+sa_selected_id as `selected_id`,
+sa_rating_sum as `rating_sum`,
+skip,
+UNIX_TIMESTAMP(`datetime`) as `timestamp`
+from selected_answers 
+where {$ps['sa']} and 
+sa_level = '$activity_level' 
+and sa_group_id = '$peer_group_id'
+SQL;
+
+    $selected_answers = \Util\exec_sql($sql);
+
+    foreach($selected_answers as &$selected_answers_item) {
+        $selected_answers_item['rating_sum'] = (int)$selected_answers_item['rating_sum'];
+        $selected_answers_item['skip'] = (int)$selected_answers_item['skip'];
+        $selected_answers_item['timestamp'] = (int)$selected_answers_item['timestamp'];
+    }
+
+    return $selected_answers;
 }
 
 function set_group_id($new_group_id) {
