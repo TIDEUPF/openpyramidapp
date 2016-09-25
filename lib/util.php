@@ -89,13 +89,14 @@ function sql_gen() {
     }
 }
 
-function get_room_string($fid, $pid, $activity_level, $peer_group_id, $location = false) {
-    $location_id = get_localtion_id();
+function get_room_string($fid, $pid, $activity_level, $peer_group_id) {
+    //$location_id = get_localtion_id();
 
-    if(!$location)
+    //if(!$location)
         $location_id = "";
 
-    $room = 'room_' . $fid . '_' . $peer_group_id . '_' . $activity_level . '_' . $pid . '_' . $location_id;
+    //$room = 'room_' . $fid . '_' . $peer_group_id . '_' . $activity_level . '_' . $pid . '_' . $location_id;
+    $room = 'room_' . $fid . '_' . $peer_group_id . '_' . $activity_level . '_' . $pid . '_';
 
     return $room;
 }

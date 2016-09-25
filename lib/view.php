@@ -3,7 +3,7 @@
 Namespace View;
 
 function element($path, $vars, $filter = true) {
-    global $device, $flow_data, $node_path;
+    global $device, $flow_data, $node_path, $pyramid_jscache_break;
 
     $current_path = __DIR__;
 

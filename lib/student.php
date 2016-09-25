@@ -18,9 +18,15 @@ SQL;
 
     $answer_row = \Util\exec_sql($sql);
 
-    $answer = $answer_row['answer'];
-    $answer_skip = $answer_row['skip'];
-    $answer_timestamp = (int)$answer_row['timestamp'];
+    if(count($answer_row) > 0) {
+        $answer = $answer_row[0]['answer'];
+        $answer_skip = $answer_row[0]['skip'];
+        $answer_timestamp = (int)$answer_row[0]['timestamp'];
+    } else {
+        $answer = null;
+        $answer_skip = null;
+        $answer_timestamp = 0;
+    }
 
     //Flow access time
     $sql = <<<SQL
@@ -34,7 +40,7 @@ SQL;
 
     $flow_access_row = \Util\exec_sql($sql);
 
-    $flow_access_timestamp = $flow_access_row['timestamp'];
+    $flow_access_timestamp = $flow_access_row[0]['timestamp'];
 
     $sql = <<<SQL
 select

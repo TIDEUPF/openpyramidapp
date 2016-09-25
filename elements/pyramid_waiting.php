@@ -93,7 +93,7 @@
             </div>
 
             <div>
-                <div id="answer-header-text">Waiting a pyramid to continue...</div>
+                <div id="answer-header-text">Waiting for a group...</div>
             </div>
 
         </div>

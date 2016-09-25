@@ -16,7 +16,7 @@
         <script src="vendors/jquery-bar-rating/jquery.barrating.min.js"></script>
 
         <?php if(!isset($nosocket)):?>
-        <script src="lib/actions.js"></script>
+        <script src="lib/actions.js?z=<?=$pyramid_jscache_break?>"></script>
         <?php endif;?>
 
         <script>
@@ -32,7 +32,7 @@
 
                 socket = io({
                     'reconnection': true,
-                    'reconnectionDelay': 3000,
+                    'reconnectionDelay': 15000,
                     'maxReconnectionAttempts': Infinity,
                     'path': '/<?=$node_path?>/',
                     'transports': ['polling', 'websocket']

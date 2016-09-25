@@ -296,7 +296,7 @@
     </div>
 
     <?php if($flow_data['ch'] == 1):?>
-    <link rel="stylesheet" href="chat/client/embedded.css"/>
+    <link rel="stylesheet" href="chat/client/embedded.css?z=<?=$pyramid_jscache_break?>"/>
     <div id="rating-chat" class="ui-corner-all ui-shadow-inset">
         <div id="rating-chat-instructions" style="margin: .5em 0 0 .3em;"><?=TS("Please use this space to discuss with peers about their options before rating.")?></div>
         <ul class="pages">
@@ -370,12 +370,20 @@
                 display: none;
             }
         </style>
+
+        <script>
+            <?php
+            foreach($chat_vars as $jskey => $jsvalue) {
+                echo 'var ' . $jskey . ' = ' . json_encode($jsvalue) . ';' . PHP_EOL;
+            }
+            ?>
+        </script>
+        <script src="chat/client/chat.js?z=<?=$pyramid_jscache_break?>" async></script>
+
     <?php endif;?>
 
     <div style="clear:both"></div>
 
-    <script src="jslib/chatvars.js"></script>
-    <script src="chat/client/chat.js"></script>
 
     <?php foreach($hidden_input_array as $hidden_input_name => $hidden_input_value):?>
     <input type="hidden" name="<?=$hidden_input_name?>" value="<?=$hidden_input_value?>">

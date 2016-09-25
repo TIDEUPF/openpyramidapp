@@ -13,7 +13,9 @@ global $force_email;
 
 
 if(empty($_SESSION['user_id'])) {
+    session_start(/*['read_and_close' => true]*/);
     $_SESSION['user_id'] = sha1(mt_rand(0,9999999999));
+    session_write_close();
 }
 
 if(!isset($_SESSION['student'])) {
@@ -44,15 +46,19 @@ if(!isset($_SESSION['student'])) {
             } else {
                 mysqli_query($link, "insert into students values ('$uname', '$sname', NOW() )");
                 if (mysqli_affected_rows($link) > 0) {
+                    session_start(/*['read_and_close' => true]*/);
                     $_SESSION['student'] = $uname;
                     $_SESSION['sname'] = $sname;
+                    session_write_close();
                 } else {
                     $res2 = mysqli_query($link, "select * from students where sid = '$uname'");
                     if (mysqli_num_rows($res2) <= 0) {
                         $error = 'Database error!';
                     } else {
+                        session_start(/*['read_and_close' => true]*/);
                         $_SESSION['student'] = $uname;
                         $_SESSION['sname'] = $sname;
+                        session_write_close();
                     }
                 }
             }
@@ -61,8 +67,10 @@ if(!isset($_SESSION['student'])) {
 }
 
 if(!\Student\get_username()) {
+    session_start(/*['read_and_close' => true]*/);
     unset($_SESSION['student']);
     unset($_SESSION['sname']);
+    session_write_close();
 }
 
 if(!isset($_SESSION['student'])) {

@@ -5,6 +5,7 @@ if(!empty($_SESSION['student'])){
     unset($_SESSION['fid']);
     unset($_SESSION['student']);
     unset($_SESSION['user']);
+    session_write_close();
     header("location:student_login.php");
     exit(0);
 }
@@ -13,6 +14,7 @@ if(!empty($_SESSION['user'])){
     unset($_SESSION['user']);
     unset($_SESSION['student']);
     unset($_SESSION['fid']);
+    session_write_close();
     header("location:login.php");
     exit(0);
 }
@@ -20,6 +22,7 @@ elseif(!empty($_SESSION['student'])){
     unset($_SESSION['student']);
     unset($_SESSION['student']);
     unset($_SESSION['fid']);
+    session_write_close();
     header("location:student_login.php");
     exit(0);
 }

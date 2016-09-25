@@ -11,7 +11,7 @@ Student\enforce_login();
 
 $sname = Student\get_username();
 $sid = $_SESSION['student'];
-global $fid, $flow_data;
+global $fid, $flow_data, $activity_level, $levels;
 
 // $levels, $fname, $fdes, $fid, $fid_timestamp
 if(\Pyramid\get_current_flow() === -1) {
@@ -78,6 +78,13 @@ if(\Answer\is_new_data()) {
         //reload values
         \Pyramid\upgrade_level();
     }
+}
+
+//we are finished and one or more top level groups are not complete
+if(\Group\is_level_timeout() and $activity_level + 1 == $levels) {
+    //wait
+    \Pyramid\wait();
+    exit;
 }
 
 

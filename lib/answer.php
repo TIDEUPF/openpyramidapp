@@ -220,14 +220,25 @@ function request_rate($params) {
         'hidden_input_array'    => $hidden_input_array,
     );
 
-    $location_id = hash('crc32b', $_SERVER['SCRIPT_NAME']);
-    $room = 'room_' . $fid . '_' . $peer_group_id . '_' . $activity_level . '_' . $pid . '_' . $location_id;
-    $messages_result = mysqli_query($link, "select * from chat where fid = '$fid' and room = '{$room}'");// to get peer answer
-    $messages = [];
-    while($message_row = mysqli_fetch_assoc($messages_result))
-        $messages[] = $message_row;
+    if($flow_data['ch'] == 1) {
+        $room = \Util\get_room_string($fid, $pid, $activity_level, $peer_group_id);
 
-    $vars['messages'] = $messages;
+        $messages_result = mysqli_query($link, "select * from chat where fid = '$fid' and room = '{$room}'");// to get peer answer
+        $messages = [];
+        while ($message_row = mysqli_fetch_assoc($messages_result))
+            $messages[] = $message_row;
+
+        $vars['messages'] = $messages;
+
+        $chat_vars = [
+            'username' => $sname,
+            'room' => $room,
+            'fid' => $fid,
+            'pid' => $pid,
+        ];
+
+        $vars['chat_vars'] = $chat_vars;
+    }
 
     $timestamp_level = $activity_level + 1;
     $end_time_string = \Pyramid\end_date_string($timestamp_level);
