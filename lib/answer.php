@@ -111,8 +111,8 @@ function request($params) {
         'username' 				    => $sname . ' + ' . $peers,
         'level' 				    => $level_text,
         'answer_text' 			    => $petition,
-        'answer_submit_button' 	    => T('Submit your question'),
-        'answer_submit_skip_button' => T('Skip the question'),
+        'answer_submit_button' 	    => T('Submit'),
+        'answer_submit_skip_button' => T('Skip'),
         'answer_timeout'            => $timeout['time_left'],
         'answer_skip_timeout'       => $timeout['time_left_skip'],
         'hidden_input_array' 	    => array(
