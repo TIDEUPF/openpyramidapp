@@ -215,6 +215,24 @@ SQL;
     return $rating_table;
 }
 
+function get_room_table_ratings($room) {
+    $sql = <<<SQL
+select * 
+from rating_table
+where `room` = '{$room}'
+SQL;
+
+    $ratings_row = \Util\exec_sql($sql);
+
+    if(count($ratings_row) > 0) {
+        $ratings = json_decode($ratings_row['ratings']);
+    } else {
+        $ratings = [];
+    }
+
+    return $ratings;
+}
+
 function get_group_chat() {
     global $link, $sid, $fid, $pid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 

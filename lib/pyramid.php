@@ -457,7 +457,7 @@ function set_current_flow($flow) {
 }
 
 function wait($params) {
-    global $link, $sid,  $fid, $ps, $sname, $levels, $activity_level, $peer_group_id, $peer_array, $peer_group_combined_ids;
+    global $link, $sid,  $fid, $ps, $sname, $levels, $activity_level, $peer_group_id, $peer_array, $peer_group_combined_ids, $last_rating_table;
 
     $initial_level = $activity_level;
     upgrade_level();
@@ -493,6 +493,9 @@ function wait($params) {
         $rated_count = \Group\get_previous_groups_rated_count();
         $vars['inactive_groups_count'] = max($array_size - $rated_count, 1);
     }
+
+    if(isset($last_rating_table))
+        $vars['last_rating_table'] = $last_rating_table;
 
     if(isset($params['error']))
         $vars['error'] = $params['error'];
