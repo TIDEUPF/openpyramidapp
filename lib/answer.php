@@ -331,7 +331,31 @@ function submit_rate() {
 
     $input_result['updated'] = true;
 
+    //post_rating_submit();
+
     return true;
+}
+
+function post_rating_submit() {
+    global $link, $sid, $fid, $pid, $ps, $levels, $sname, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+
+    $room = \Util\get_room_string($fid, $pid, $activity_level, $peer_group_id);
+
+    $rating_table = \Group\get_group_rating_table();
+    $rating_table_json = json_encode($rating_table);
+    $count = 0;
+    $rating_table_json_sql = mysqli_real_escape_string($link, $rating_table_json);
+    $sql = <<<SQL
+insert VALUES 
+(
+null,
+{'$rating_table_json_sql'},
+{'$room'},
+{$count}
+) into rating_table
+SQL;
+
+    \Util\exec_sql($sql);
 }
 
 function skip_rating() {

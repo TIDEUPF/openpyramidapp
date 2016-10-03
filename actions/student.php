@@ -11,7 +11,7 @@ Student\enforce_login();
 
 $sname = Student\get_username();
 $sid = $_SESSION['student'];
-global $fid, $flow_data, $activity_level, $levels;
+global $fid, $flow_data, $activity_level, $levels, $peer_group_id;
 
 // $levels, $fname, $fdes, $fid, $fid_timestamp
 if(\Pyramid\get_current_flow() === -1) {
@@ -50,6 +50,11 @@ if(($pid = \Pyramid\get_student_pyramid($fid, $sid)) === false) {
 \Group\get_members();
 
 \Util\log_submit();
+
+global $preupgrade_room, $last_rating_table;
+
+//$preupgrade_room = \Util\get_room_string($fid, $pid, $activity_level, $peer_group_id);
+$last_rating_table = \Group\get_group_rating_table();
 
 //check if the group has completed the level and upgrade the level
 \Pyramid\upgrade_level();

@@ -48,6 +48,9 @@ function pyramid_chat_init() {
 
     //join the user to a room
     joinRoom(room);
+    socket.on('reconnect', function() {
+        joinRoom(room);
+    })
 
     //color existing messages
     $('li.message').each(function() {
