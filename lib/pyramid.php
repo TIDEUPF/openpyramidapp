@@ -478,6 +478,11 @@ function wait($params) {
         ),
     );
 
+    if(\Group\is_level_zero_rating_started()) {
+        $vars['sibling_answers_text'] = "Meanwhile, for your curiosity, these are the options being discussed in the other groups:";
+        $vars['sibling_answers'] = \Group\get_sibling_groups_questions();
+    }
+
     //if we wait another group all peers are inactive
     $n_inactive_peers = count(get_inactive_level_group_peers());
     if(count($peer_array) != $n_inactive_peers and $n_inactive_peers > 0) {
