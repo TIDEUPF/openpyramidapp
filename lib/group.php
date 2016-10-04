@@ -8,14 +8,37 @@ function get_group_name() {
 }
 
 function get_sibling_groups_questions() {
-    global $fid, $sid, $activity_level, $peer_group_id, $ps;
+    global $fid, $sid, $activity_level, $peer_group_id, $ps, $levels;
     $level_upgrade_substract = is_level_started() ? 0 : 1;
     $siblings_level = $activity_level - $level_upgrade_substract;
+    $target_level = $activity_level - $level_upgrade_substract + 1;
 
-    $pyramid_users_with_groups = get_users_with_groups();
+    $groups = get_groups();
+    $last_answer_ids = [];
+    if(count($groups[$levels-1]) == 1 or $target_level < $levels) {
 
-    $current_user_group_id = $pyramid_users_with_groups[$sid]['levels'][($siblings_level)+1]['group_id'];
-    $combined_ids = $pyramid_users_with_groups[$sid]['levels'][($siblings_level)+1]['combined_ids'];
+        if ($target_level >= $levels) {
+            $target_level = $levels - 1;
+            $siblings_level = $levels - 2;
+
+            $last_answer_ids = \Answer\get_selected_ids();
+        }
+
+        $pyramid_users_with_groups = get_users_with_groups();
+
+        $current_user_group_id = $pyramid_users_with_groups[$sid]['levels'][$target_level - 1]['group_id'];
+        $combined_ids = $pyramid_users_with_groups[$sid]['levels'][$target_level]['combined_group_ids'];
+    } else {
+        if (count($groups[$levels - 1]) > 1) {
+            $current_user_group_id = $peer_group_id;
+            foreach ($groups[$levels - 1] as $groups_item) {
+                if ($groups_item['group_id'] != $current_user_group_id) {
+                    $combined_ids = explode(',', $groups_item['combined_group_ids']);
+                }
+            }
+
+        }
+    }
 
     $siblings_group_ids = [];
 
@@ -30,7 +53,8 @@ function get_sibling_groups_questions() {
 select pg_group as `members`, pg_group_id, pg_level
 from pyramid_groups 
 where {$ps['pg']} and 
-pg_group_id IN ('{$siblings_group_ids_string}')
+pg_group_id IN ('{$siblings_group_ids_string}') AND 
+pg_level = '{$siblings_level}'
 SQL;
 
     $groups = \Util\exec_sql($sql);
@@ -43,7 +67,7 @@ SQL;
         $sibling_groups_students_sid = array_merge($sibling_groups_students_sid, $group_students_sid);
     }
 
-    $sibling_groups_students_sid_string = implode(',', $sibling_groups_students_sid);
+    $sibling_groups_students_sid_string = implode('\',\'', $sibling_groups_students_sid);
 
     $sql = <<< SQL
 select *
@@ -57,7 +81,9 @@ SQL;
 
     $answers = [];
     foreach($answers_rows as $answers_rows_item) {
-        $answers[] = $answers_rows_item['fs_answer'];
+        if(!in_array($answers_rows_item['sid'], $last_answer_ids)) {
+            $answers[] = $answers_rows_item['fs_answer'];
+        }
     }
 
     return $answers;
@@ -67,7 +93,7 @@ function get_users_with_groups() {
     global $link, $sid, $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
     $sql = <<< SQL
-select pg_group as `members`, pg_group_id, pg_level, combined_ids
+select pg_group as `members`, pg_group_id, pg_level, pg_combined_group_ids as combined_group_ids
 from pyramid_groups 
 where {$ps['pg']}
 SQL;
@@ -81,13 +107,32 @@ SQL;
         foreach($group_students_sid as $group_students_sid_item) {
             $students[$group_students_sid_item]['levels'][(int)$group['pg_level']] = [
                 'group_id' => $group['pg_group_id'],
-                'combined_ids' => explode(',', $group['combined_ids'])
+                'combined_group_ids' => explode(',', $group['combined_group_ids'])
             ];
         }
 
     }
 
     return $students;
+}
+
+function get_groups() {
+    global $link, $sid, $fid, $ps, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+
+    $sql = <<< SQL
+select pg_group as `members`, pg_group_id as group_id, pg_level as `level`, pg_combined_group_ids as combined_group_ids
+from pyramid_groups 
+where {$ps['pg']}
+SQL;
+
+    $groups = \Util\exec_sql($sql);
+    $levels = [];
+
+    foreach($groups as $group) {
+        $levels[$group['level']][$group['group_id']] = $group;
+    }
+
+    return $levels;
 }
 
 function get_student_group($student, $group_level) {
@@ -440,8 +485,12 @@ function get_previous_groups_rated_count() {
 }
 
 function is_level_zero_rating_started() {
-    global $link, $ps, $peer_group_id;
+    global $link, $ps, $peer_group_id, $activity_level;
 
+    if($activity_level > 0)
+        return true;
+
+    //only valid for activity_level = 0
     $result = mysqli_query($link, "select * from pyramid_groups where pg_group_id = '{$peer_group_id}' and pg_level = 0 and pg_started = 1 and {$ps['pg']}");
     if (mysqli_num_rows($result) > 0)
         return true;

@@ -54,7 +54,7 @@ if(($pid = \Pyramid\get_student_pyramid($fid, $sid)) === false) {
 global $preupgrade_room, $last_rating_table;
 
 //$preupgrade_room = \Util\get_room_string($fid, $pid, $activity_level, $peer_group_id);
-$last_rating_table = \Group\get_group_rating_table();
+//$last_rating_table = \Group\get_group_rating_table();
 
 //check if the group has completed the level and upgrade the level
 \Pyramid\upgrade_level();

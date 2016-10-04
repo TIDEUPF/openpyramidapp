@@ -478,9 +478,14 @@ function wait($params) {
         ),
     );
 
-    if(\Group\is_level_zero_rating_started()) {
-        $vars['sibling_answers_text'] = "Meanwhile, for your curiosity, these are the options being discussed in the other groups:";
-        $vars['sibling_answers'] = \Group\get_sibling_groups_questions();
+    try {
+        if (\Group\is_level_zero_rating_started()) {
+            $vars['sibling_answers_text'] = "Meanwhile, for your curiosity, these are the options being discussed in the other groups:";
+            $vars['sibling_answers'] = \Group\get_sibling_groups_questions();
+        }
+    } catch(Exception $e) {
+        unset($vars['sibling_answers_text']);
+        unset($vars['sibling_answers']);
     }
 
     //if we wait another group all peers are inactive
@@ -493,9 +498,6 @@ function wait($params) {
         $rated_count = \Group\get_previous_groups_rated_count();
         $vars['inactive_groups_count'] = max($array_size - $rated_count, 1);
     }
-
-    if(isset($last_rating_table))
-        $vars['last_rating_table'] = $last_rating_table;
 
     if(isset($params['error']))
         $vars['error'] = $params['error'];

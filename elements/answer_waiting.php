@@ -80,6 +80,16 @@
     #pyramid-icon img {
         height: 25px;
     }
+
+    #other-waiting-submitted-answers {
+        margin-top: 3em;
+    }
+
+    #other-waiting-submitted-answers li {
+        font-size: 150%;
+        max-width: 700px;
+        margin: 0 auto 0 auto;
+    }
 </style>
 <div id="answer-frame">
     <form method="post">
@@ -106,6 +116,19 @@
                 <?php endif;?>
             </div>
 
+            <?php if(!empty($sibling_answers)):?>
+            <div id="other-waiting-submitted-answers">
+                <div>
+                    <div id="answer-header-text"><?=$sibling_answers_text?></div>
+                </div>
+
+                <ul>
+                    <?php foreach($sibling_answers as $i=>$sibling_answers_item):?>
+                    <li><?=htmlspecialchars($sibling_answers_item, ENT_COMPAT | ENT_HTML401 | ENT_IGNORE)?></li>
+                    <?php endforeach;?>
+                </ul>
+            </div>
+            <?php endif;?>
         </div>
         <div id="answer-middle-frame">
 
