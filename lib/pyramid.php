@@ -777,6 +777,35 @@ function remaining_pyramids() {
     return false;
 }
 
+function pyramid_creation_wait_expired() {
+    global $link, $pyramid_size, $fid, $ps, $flow_data;
+
+    $sql = <<<SQL
+select sid, `timestamp` 
+from pyramid_students 
+where fid = '$fid' and 
+`pid` > 0 
+order by `pid` desc, `timestamp` asc 
+limit 1
+SQL;
+
+    $last_pyramid = \Util\exec_sql_bool($sql);
+
+    $nflow_students = mysqli_num_rows($result);
+
+    if((int)$flow_data['multi_py'] == 0) {
+        if($nflow_students > 0)
+            return false;
+
+        return true;
+    }
+
+    if($flow_data['expected_students'] - $nflow_students >= $pyramid_size)
+        return true;
+
+    return false;
+}
+
 function add_student($fid, $pid, $sid) {
     global $link;
 
