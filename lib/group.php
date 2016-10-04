@@ -31,9 +31,9 @@ function get_sibling_groups_questions() {
     } else {
         if (count($groups[$levels - 1]) > 1) {
             $current_user_group_id = $peer_group_id;
-            foreach ($groups[$levels - 1] as $groups_item) {
+            foreach ($groups[$siblings_level] as $groups_item) {
                 if ($groups_item['group_id'] != $current_user_group_id) {
-                    $combined_ids = explode(',', $groups_item['combined_group_ids']);
+                    $combined_ids[] = $groups_item['group_id'];
                 }
             }
 
@@ -47,7 +47,7 @@ function get_sibling_groups_questions() {
             $siblings_group_ids[] = $combined_ids_item;
     }
 
-    $siblings_group_ids_string = implode(',', $siblings_group_ids);
+    $siblings_group_ids_string = implode('\',\'', $siblings_group_ids);
 
     $sql = <<< SQL
 select pg_group as `members`, pg_group_id, pg_level
@@ -75,6 +75,7 @@ from flow_student
 where fid = {$fid} and 
 sid IN ('{$sibling_groups_students_sid_string}') AND 
 `skip` <> 1
+limit 4
 SQL;
 
     $answers_rows = \Util\exec_sql($sql);
