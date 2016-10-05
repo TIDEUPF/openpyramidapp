@@ -22,6 +22,9 @@ while(true) {
         $result_avail = mysqli_query($link, "select distinct * from flow_available_students where fid='$fid' and sid not in (select sid from pyramid_students where fid = '$fid')");
         $nflow_students = mysqli_num_rows($result_avail);
 
+        if($nflow_students == 0)
+            continue;
+
         //users assigned to a pyramid
         $result_assign = mysqli_query($link, "select sid from pyramid_students where fid = '$fid'");
         $npy_students = mysqli_num_rows($result_assign);

@@ -775,6 +775,9 @@ function remaining_pyramids() {
         return true;
     }
 
+    if(pyramid_creation_wait_expired())
+        return false;
+
     if($flow_data['expected_students'] - $nflow_students >= $pyramid_size)
         return true;
 
@@ -784,27 +787,30 @@ function remaining_pyramids() {
 function pyramid_creation_wait_expired() {
     global $link, $pyramid_size, $fid, $ps, $flow_data;
 
+    if((int)$flow_data['multi_py'] == 0) {
+        return false;
+    }
+
+    $timeout = 4*60;
+    $min_time = \Util\pyramid_time() - $timeout;
+
+    //here we never should have a pyramid over 4 minutes
     $sql = <<<SQL
 select sid, `timestamp` 
 from pyramid_students 
-where fid = '$fid' and 
-`pid` > 0 
-order by `pid` desc, `timestamp` asc 
+where fid = '$fid'
+order by `pid` desc
 limit 1
 SQL;
 
-    $last_pyramid = \Util\exec_sql_bool($sql);
+    $expired_pyramid_timeout = \Util\exec_sql($sql);
 
-    $nflow_students = mysqli_num_rows($result);
+    if(count($expired_pyramid_timeout) == 0)
+        return false;
 
-    if((int)$flow_data['multi_py'] == 0) {
-        if($nflow_students > 0)
-            return false;
+    $last_pyramid_timestamp = (int)$expired_pyramid_timeout[0]['timestamp'];
 
-        return true;
-    }
-
-    if($flow_data['expected_students'] - $nflow_students >= $pyramid_size)
+    if($last_pyramid_timestamp < $min_time)
         return true;
 
     return false;
@@ -891,13 +897,13 @@ function create_pyramid($fid, $fl, $fsg, $new_pyramid_size) {
         $pid = (int)$result_row['pid'] + 1;
     }
 
+    //create the new pyramid structure
+    create_pyramid_structure($fid, $pid, $students, $fl , $fsg);
+
     //add selected student to the pyramid
     foreach($students as $student) {
         add_student($fid, $pid, $student);
     }
-
-    //create the new pyramid structure
-    create_pyramid_structure($fid, $pid, $students, $fl , $fsg);
 
     return $pid;
 }
@@ -982,6 +988,7 @@ function create_pyramid_structure($fid, $pid, $sarry, $fl, $fsg) {
     return true;
 }
 
+//TODO: fix this mess
 function get_level_activity_rate($activity_level) {
     global $link, $pyramid_size, $fid, $pid, $ps, $flow_data, $peer_array, $pid, $activity_level, $peer_group_id;
 
