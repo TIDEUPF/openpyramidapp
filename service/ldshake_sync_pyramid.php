@@ -5,7 +5,7 @@ include_once('../init.php');
 global $link, $fid, $pyramid_minsize, $pyramid_size, $flow_data, $ps;
 echo 'init passed';
 while(true) {
-    sleep(1);
+    sleep(2);
 
     echo "iteration started\n";
     //there is no flow

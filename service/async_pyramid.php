@@ -10,8 +10,8 @@ $apiKey = "AIzaSyCvCBiO1YpIani9UnKRXN6ZrVCDs_yTaN8";
 //$apiKey = "";
 $devices = "/topics/global";
 //$message = "Next level is ready! Start discussing.";
-$an = new GCMPushMessage($apiKey);
-$an->setDevices($devices);
+//$an = new GCMPushMessage($apiKey);
+//$an->setDevices($devices);
 
 global $link, $fid, $pid, $pyramid_minsize, $levels, $flow_data, $activity_level, $peer_group_id, $n_selected_answers, $random_selection;
 
@@ -149,11 +149,11 @@ while(true) {
 
             $step = 1;
             try {
-                if ($created and !$email_sent[$step]) {
-                    $email_sent[$step] = true;
-                    foreach($new_pid_list as $created_pid) {
-                        \Pyramid\set_pid($created_pid);
-                        $recipients = \Util\get_users_email($fid, $created_pid);
+                foreach($new_pid_list as $created_pid) {
+                    \Pyramid\set_pid($created_pid);
+                    if ($created and empty($email_sent[$fid][$pid][$step])) {
+                    $email_sent[$fid][$pid][$step] = true;
+                        $recipients = \Util\get_users_email($fid, $pid);
                         $html = \Util\get_html($step);
                         if (!empty($recipients))
                             \Util\notification_mail($recipients, $html);
@@ -186,16 +186,18 @@ while(true) {
             echo "group formation stage\n";
             continue;
 
-        } elseif ($time <= $level_timestamps[2]) {
+        } elseif ($time <= $level_timestamps[2] and $levels > 2) {
             //select the answers and enable the level
             echo "selection answers 1 stage\n";
 
+            $activity_level = 0;
+            $next_level = $activity_level + 1;
+
             //rating started
-            $result = mysqli_query($link, "select * from pyramid_groups where pg_fid='$fid' and pg_pid='$pid' and pg_level = 1 and pg_started = 1");
+            $result = mysqli_query($link, "select * from pyramid_groups where pg_fid='$fid' and pg_pid='$pid' and pg_level = {$next_level} and pg_started = 1");
             if (mysqli_num_rows($result) > 0)
                 continue;
 
-            $activity_level = 0;
             mysqli_query($link, "start transaction");
             $result = mysqli_query($link, "select * from pyramid_groups where pg_fid='$fid' and pg_pid='$pid' and pg_level='{$activity_level}'");
             while ($pg_row = mysqli_fetch_assoc($result)) {
@@ -208,15 +210,15 @@ while(true) {
                 }
             }
 
-            \Pyramid\get_level_activity_rate();
+            \Pyramid\get_level_activity_rate($activity_level);
 
-            mysqli_query($link, "update pyramid_groups set pg_started = 1, pg_start_timestamp='{$time}' where pg_started = '0' and pg_fid='{$fid}'  and pg_pid='{$pid}' and pg_level='1'");
+            mysqli_query($link, "update pyramid_groups set pg_started = 1, pg_start_timestamp='{$time}' where pg_started = '0' and pg_fid='{$fid}'  and pg_pid='{$pid}' and pg_level={$next_level}");
             mysqli_query($link, "commit");
 
-            $step = 2;
+            $step = $next_level + 1;
             try {
-                if (!$email_sent[$step]) {
-                    $email_sent[$step] = true;
+                if (empty($email_sent[$fid][$pid][$step])) {
+                    $email_sent[$fid][$pid][$step] = true;
                     $recipients = \Util\get_users_email($fid, $pid);
                     $html = \Util\get_html($step);
                     if (!empty($recipients))
@@ -228,7 +230,97 @@ while(true) {
             }
 
             continue;
-        } /*elseif($time <= $level_timestamps[3]) {
+        } elseif ($time <= $level_timestamps[3] and $levels > 3) {
+        //select the answers and enable the level
+            echo "selection answers 1 stage\n";
+
+            $activity_level = 1;
+            $next_level = $activity_level + 1;
+
+            //rating started
+            $result = mysqli_query($link, "select * from pyramid_groups where pg_fid='$fid' and pg_pid='$pid' and pg_level = {$next_level} and pg_started = 1");
+            if (mysqli_num_rows($result) > 0)
+                continue;
+
+            mysqli_query($link, "start transaction");
+            $result = mysqli_query($link, "select * from pyramid_groups where pg_fid='$fid' and pg_pid='$pid' and pg_level='{$activity_level}'");
+            while ($pg_row = mysqli_fetch_assoc($result)) {
+                \Group\set_group_id((int)$pg_row['pg_group_id']);
+
+                if (!\Pyramid\set_selected_answers()) {
+                    //the conditions to select a question are not met
+                    mysqli_query($link, "insert into selected_answers values ('$fid', '$pid', '$activity_level', '$peer_group_id', '-1', '0', '1', FROM_UNIXTIME({$time}))");
+                    \Util\log(['activity' => 'level_finished_with_no_rates']);
+                }
+            }
+
+            \Pyramid\get_level_activity_rate($activity_level);
+
+            mysqli_query($link, "update pyramid_groups set pg_started = 1, pg_start_timestamp='{$time}' where pg_started = '0' and pg_fid='{$fid}'  and pg_pid='{$pid}' and pg_level={$next_level}");
+            mysqli_query($link, "commit");
+
+            $step = $next_level + 1;
+            try {
+                if (empty($email_sent[$fid][$pid][$step])) {
+                    $email_sent[$fid][$pid][$step] = true;
+                    $recipients = \Util\get_users_email($fid, $pid);
+                    $html = \Util\get_html($step);
+                    if (!empty($recipients))
+                        \Util\notification_mail($recipients, $html);
+
+                    //$response = $an->send("Next level is ready! Start discussing. Rating is allowed till 28th, 12am CET.");
+                }
+            } catch (Exception $e) {
+            }
+
+            continue;
+        } elseif ($time <= $level_timestamps[4] and $levels > 4) {
+            //select the answers and enable the level
+            echo "selection answers 1 stage\n";
+
+            $activity_level = 2;
+            $next_level = $activity_level + 1;
+
+            //rating started
+            $result = mysqli_query($link, "select * from pyramid_groups where pg_fid='$fid' and pg_pid='$pid' and pg_level = {$next_level} and pg_started = 1");
+            if (mysqli_num_rows($result) > 0)
+                continue;
+
+            mysqli_query($link, "start transaction");
+            $result = mysqli_query($link, "select * from pyramid_groups where pg_fid='$fid' and pg_pid='$pid' and pg_level='{$activity_level}'");
+            while ($pg_row = mysqli_fetch_assoc($result)) {
+                \Group\set_group_id((int)$pg_row['pg_group_id']);
+
+                if (!\Pyramid\set_selected_answers()) {
+                    //the conditions to select a question are not met
+                    mysqli_query($link, "insert into selected_answers values ('$fid', '$pid', '$activity_level', '$peer_group_id', '-1', '0', '1', FROM_UNIXTIME({$time}))");
+                    \Util\log(['activity' => 'level_finished_with_no_rates']);
+                }
+            }
+
+            \Pyramid\get_level_activity_rate($activity_level);
+
+            mysqli_query($link, "update pyramid_groups set pg_started = 1, pg_start_timestamp='{$time}' where pg_started = '0' and pg_fid='{$fid}'  and pg_pid='{$pid}' and pg_level={$next_level}");
+            mysqli_query($link, "commit");
+
+            $step = $next_level + 1;
+            try {
+                if (empty($email_sent[$fid][$pid][$step])) {
+                    $email_sent[$fid][$pid][$step] = true;
+                    $recipients = \Util\get_users_email($fid, $pid);
+                    $html = \Util\get_html($step);
+                    if (!empty($recipients))
+                        \Util\notification_mail($recipients, $html);
+
+                    //$response = $an->send("Next level is ready! Start discussing. Rating is allowed till 28th, 12am CET.");
+                }
+            } catch (Exception $e) {
+            }
+
+            continue;
+        }
+
+        /*elseif($time <= $level_timestamps[3]) {
         //select the answers and enable the level
         echo "selection answers 2 stage\n";
         $activity_level = 1;
@@ -301,8 +393,8 @@ while(true) {
 
             $step = 4;
             try {
-                if (!$email_sent[$step]) {
-                    $email_sent[$step] = true;
+                if (empty($email_sent[$fid][$pid][$step])) {
+                    $email_sent[$fid][$pid][$step] = true;
                     $recipients = \Util\get_users_email($fid, $pid);
                     $html = \Util\get_html($step);
                     if (!empty($recipients))
