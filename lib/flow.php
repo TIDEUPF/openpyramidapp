@@ -380,3 +380,48 @@ function get_default_field_values() {
 
     return $defaults;
 }
+
+function get_flow_status() {
+    global $fid;
+
+    $properties = [];
+
+    //available students
+    $sql = <<<SQL
+select * from available_students
+where fid = {$fid}
+SQL;
+
+    $properties['available_students'] = \Util\exec_sql($sql);
+
+    //pyramids
+    $sql = <<<SQL
+select * from pyramid_students
+where fid = {$fid}
+group by pid
+SQL;
+
+    $properties['pyramids'] = \Util\exec_sql($sql);
+
+    //students with pyramid
+    $sql = <<<SQL
+select * from pyramid_students
+where fid = {$fid}
+SQL;
+
+    $properties['students_with_pyramid'] = \Util\exec_sql($sql);
+
+    //students without pyramid
+    $sql = <<<SQL
+select * from available_students
+where fid = {$fid}
+and sid not in (
+    select * from pyramid_students
+    where fid = {$fid}
+)
+SQL;
+
+    $properties['students_without_pyramid'] = \Util\exec_sql($sql);
+
+    return $properties;
+}

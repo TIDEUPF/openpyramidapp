@@ -168,6 +168,9 @@ $flow = $flow_data;
 \Pyramid\set_pid(0);
 \Util\sql_gen();
 
+//retrieve global flow last keys
+$last_flow_keys = \Flow\get_flow_status();
+
 //pyramid creation timestamp
 $answer_timeout_data = \Answer\get_answer_timeout();
 $pyramid_creation_timestamp = (int)$answer_timeout_data['start_timestamp'];
