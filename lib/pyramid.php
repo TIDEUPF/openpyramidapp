@@ -395,12 +395,16 @@ function get_current_flow() {
         
         if(isset($_SESSION['fid'])) {
             if($_SESSION['fid'] != $fid) {
+                session_start();
                 $_SESSION['fid'] = $fid;
+                session_write_close();
 
                 return false;
             }
         } else {
+            session_start();
             $_SESSION['fid'] = $fid;
+            session_write_close();
         }
         return $fid;
     }
