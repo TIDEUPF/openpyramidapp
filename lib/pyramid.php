@@ -415,10 +415,10 @@ function get_current_flow() {
     }
 }
 
-function get_flows() {
+function get_flows($sync = 0) {
     global $levels, $fname, $fdes,  $fid, $ps, $n_selected_answers, $random_selection, $link, $ftimestamp, $flow_data, $timeout, $answer_timeout, $pyramid_size, $pyramid_minsize, $answer_required_percentage, $answer_submit_required_percentage;
 
-    $result = mysqli_query($link, "select * from flow order by fid desc");
+    $result = mysqli_query($link, "select * from flow where sync = {$sync} order by fid desc");
 
     $flows_array = [];
     while($row = mysqli_fetch_assoc($result)) {
@@ -992,7 +992,6 @@ function create_pyramid_structure($fid, $pid, $sarry, $fl, $fsg) {
 function get_level_activity_rate($activity_level) {
     global $link, $pyramid_size, $fid, $pid, $ps, $flow_data, $peer_array, $pid, $activity_level, $peer_group_id;
 
-    $activity_level = 0;
     mysqli_query($link, "start transaction");
     $result = mysqli_query($link, "select * from pyramid_groups where pg_fid='$fid' and pg_pid='$pid' and pg_level='{$activity_level}'");
 

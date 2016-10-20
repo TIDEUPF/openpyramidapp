@@ -104,10 +104,10 @@ $pg_group_id = $pyramid_query_row["pg_group_id"];
 $rated_questions_sql = <<<SQL
     select * from (
     select (select fs_answer from flow_student
-    where fid = fsr_fid and pid = fsr_pid and sid = fsr_to_whom_rated_id)
+    where fid = fsr_fid and sid = fsr_to_whom_rated_id)
     as answer, sum(fsr_rating) as rating
     from flow_student_rating
-    where fsr_fid = {$fid} and fsr_pid = {$i} and fsr_level = {$level} and fsr_group_id = {$pg_group_id} and fsr_to_whom_rated_id <> '-1' and skip = 0
+    where fsr_fid = {$fid} and fsr_pid = {$i} and fsr_level = {$level} and fsr_group_id = {$pg_group_id} and fsr_to_whom_rated_id <> -1 and skip = 0
 group by fsr_to_whom_rated_id
 ) as rated_answers
 order by rating desc
@@ -204,12 +204,53 @@ header('Content-Type: text/html; charset=utf-8');
     <script src="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
     <link rel="stylesheet" type="text/css" href="elements/resources/css/teacher/styles.css">
 
-    <script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
+    <!--<script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
     <script src="lib/actions.js"></script>
     <script type="text/javascript">
         var socket = io({multiplex : false, 'reconnection': true,'reconnectionDelay': 3000,'maxReconnectionAttempts':Infinity, path: '/<?=$node_path?>/'});
     </script>
+-->
+    <style>
+        .ranking-position {
+            width: 10px;
+        }
 
+        .ranking-text {
+            width: 400px;
+        }
+
+        .ranking-position,
+        .ranking-text {
+            float: left;
+            min-width: 20px;
+        }
+
+        .ranking-score {
+            float: right;
+            min-width: 20px;
+        }
+
+        .group-popup {
+            width: 500px;
+            padding: 20px;
+        }
+
+        .group-popup ul {
+            list-style-type: none;
+        }
+
+        .activity-pyramid-level-group-block {
+            width: 300px;
+            margin: 0 30px 0 30px;
+            display: inline-block;
+        }
+
+    .activity-pyramid-group-block-list {
+        width: 800px;
+        margin: 0 auto 40px auto;
+        text-align: center;
+    }
+    </style>
 </head>
 <body>
 
@@ -222,7 +263,7 @@ header('Content-Type: text/html; charset=utf-8');
     <div data-role="main" class="ui-content">
 <pre>
         <?php
-        echo var_export($users_and_groups);
+        //echo var_export($users_and_groups);
         ?>
 </pre>
         <div id="activity-info-main">
@@ -272,14 +313,14 @@ header('Content-Type: text/html; charset=utf-8');
 
                     <?php foreach($pyramid['levels'] as $lkey => $level):?>
                         <div class="activity-pyramid-level-block">
-                            <div class="activity-pyramid-group-block-number">Pyramid <?=($pkey+1)?> level <?=($lkey+2)?></div>
+                            <div class="activity-pyramid-group-block-number"><b>Pyramid <?=($pkey+1)?> level <?=($lkey+2)?></b></div>
 
                             <div class="activity-pyramid-group-block-list">
                                 <?php foreach($level['groups'] as $gkey => $group):?>
                                     <div class="activity-pyramid-level-group-block">
                                         <a href="#grp<?=($pkey+1)?><?=$lkey?><?=($gkey+1)?>" data-rel="popup" class="ui-btn ui-corner-all">Group <?=($gkey+1)?> </a>
                                         <div data-role="popup" id="grp<?=($pkey+1)?><?=$lkey?><?=($gkey+1)?>" data-theme="a" class="group-popup ui-corner-all">
-                                            <div class="popup-members-title"><?=TS("Members")?></div>
+                                            <div class="popup-members-title"><b><?=TS("Members")?></b></div>
                                             <ul class="popup-members-list">
                                                 <?php $members = explode(',', $group['members']);?>
                                                 <?php foreach($members as $mkey => $member):?>
@@ -288,7 +329,7 @@ header('Content-Type: text/html; charset=utf-8');
                                             </ul>
 
                                             <div class="ranking">
-                                                <div class="popup-ranking-title"><?=TS("Ranking")?></div>
+                                                <div class="popup-ranking-title"><b><?=TS("Ranking")?></b></div>
                                                 <ul>
                                                     <?php $i=0; foreach($group['ranking'] as $ar):?>
                                                         <li><div class="ranking-position"><?=(($i++)+1)?></div><div class="ranking-text"><?=htmlspecialchars($ar['answer'])?></div><div class="ranking-score"><?=$ar['rating']?></div><div style="clear:both"></div></li>
@@ -299,6 +340,7 @@ header('Content-Type: text/html; charset=utf-8');
                                         <?=htmlspecialchars($group['answer'])?>
                                     </div>
                                 <?php endforeach;?>
+                                <div style="clear:both"></div>
                             </div>
                         </div>
                     <?php endforeach;?>
