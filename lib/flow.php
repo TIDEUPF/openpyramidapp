@@ -388,7 +388,7 @@ function get_flow_status() {
 
     //available students
     $sql = <<<SQL
-select * from available_students
+select fid, sid, `timestamp` from flow_available_students
 where fid = {$fid}
 SQL;
 
@@ -396,7 +396,7 @@ SQL;
 
     //pyramids
     $sql = <<<SQL
-select * from pyramid_students
+select fid, pid, `timestamp` from pyramid_students
 where fid = {$fid}
 group by pid
 SQL;
@@ -405,7 +405,7 @@ SQL;
 
     //students with pyramid
     $sql = <<<SQL
-select * from pyramid_students
+select fid, pid, sid, `timestamp` from pyramid_students
 where fid = {$fid}
 SQL;
 
@@ -413,7 +413,7 @@ SQL;
 
     //students without pyramid
     $sql = <<<SQL
-select * from available_students
+select fid, pid, sid, `timestamp` from available_students
 where fid = {$fid}
 and sid not in (
     select * from pyramid_students

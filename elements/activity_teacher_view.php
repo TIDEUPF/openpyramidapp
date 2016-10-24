@@ -170,6 +170,7 @@ $flow = $flow_data;
 
 //retrieve global flow last keys
 $last_flow_keys = \Flow\get_flow_status();
+$flow_properties = $flow_data;
 
 //pyramid creation timestamp
 $answer_timeout_data = \Answer\get_answer_timeout();
@@ -193,6 +194,18 @@ foreach($users_with_groups as $k_sid => &$users_with_groups_item) {
     $users_with_groups_item['details'] = \Student\get_student_details($k_sid);
 }
 
+$pyramid_data[] = [
+    'pyramid_creation_timestamp' => $pyramid_creation_timestamp,
+    'users_with_groups' => $users_with_groups,
+    'groups_activity' => $groups_activity,
+];
+
+$current_flow_status = [
+    'last_flow_keys' => $last_flow_keys,
+    'flow_properties' => $flow_properties,
+    'pyramid_data' => $pyramid_data,
+];
+
 header('Content-Type: text/html; charset=utf-8');
 ?><!DOCTYPE html>
 <html lang="en">
@@ -203,7 +216,9 @@ header('Content-Type: text/html; charset=utf-8');
     <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
     <link rel="stylesheet" type="text/css" href="elements/resources/css/teacher/styles.css">
-
+    <script>
+        var current_flow_status = <?=json_encode($current_flow_status);?>;
+    </script>
     <!--<script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
     <script src="lib/actions.js"></script>
     <script type="text/javascript">

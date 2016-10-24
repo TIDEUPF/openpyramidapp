@@ -106,7 +106,7 @@ SQL;
         $group_students_sid = explode(',', $group['members']);
 
         foreach($group_students_sid as $group_students_sid_item) {
-            $students[$group_students_sid_item]['levels'][(int)$group['pg_level']] = [
+            $students[$group_students_sid_item]['level'][(int)$group['pg_level']] = [
                 'group_id' => $group['pg_group_id'],
                 'combined_group_ids' => explode(',', $group['combined_group_ids'])
             ];
@@ -246,9 +246,9 @@ function get_group_rating_table() {
 
     $sql = <<< SQL
 select * from (
-    select (select fs_answer from flow_student
-    where fid = fsr_fid and pid = fsr_pid and sid = fsr_to_whom_rated_id)
-    as answer, sum(fsr_rating) as rating
+    select fsr_fid/*(select fs_answer from flow_student
+    where fid = fsr_fid and sid = fsr_to_whom_rated_id)*/
+    as answer_id, sum(fsr_rating) as rating
     from flow_student_rating
     where {$ps['fsr']} and fsr_level = {$activity_level} and fsr_group_id = {$peer_group_id} and fsr_to_whom_rated_id <> '-1' and skip = 0
 group by fsr_to_whom_rated_id

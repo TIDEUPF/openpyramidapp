@@ -2,7 +2,7 @@
 namespace Student;
 
 function get_student_details($student) {
-    global $ps, $peer_array;
+    global $ps, $fid, $peer_array;
 
     //submitted question and when
     $sql = <<<SQL
@@ -34,13 +34,13 @@ select
 `timestamp`
 from `flow_available_students`
 WHERE 
-{$ps['e']}
+fid = {$fid}
 and `sid` = '{$student}'
 SQL;
 
     $flow_access_row = \Util\exec_sql($sql);
 
-    $flow_access_timestamp = $flow_access_row[0]['timestamp'];
+    $flow_access_timestamp = (int)$flow_access_row[0]['timestamp'];
 
     $sql = <<<SQL
 select
