@@ -206,7 +206,30 @@ $current_flow_status = [
     'pyramid_data' => $pyramid_data,
 ];
 
+$context = "global";
+$item = "group";
+$pyramid_template[$context][$item] = <<< HTML
+<div class="{$context}-{$item}">
+    <div class="{$context}-{$item}-name"></div>
+</div>
+HTML;
+
+$item = "level";
+$pyramid_template[$context][$item] = <<< HTML
+<div class="{$context}-{$item}">
+    <div class="{$context}-{$item}-name"></div>
+</div>
+HTML;
+
+$item = "pyramid";
+$pyramid_template[$context][$item] = <<< HTML
+<div class="{$context}-{$item}">
+    <div class="{$context}-{$item}-name"></div>
+</div>
+HTML;
+
 header('Content-Type: text/html; charset=utf-8');
+    global $url;
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -215,9 +238,12 @@ header('Content-Type: text/html; charset=utf-8');
     <link rel="stylesheet" href="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
     <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <script src="../../lib/js/activity_tracking.js"></script>
     <link rel="stylesheet" type="text/css" href="elements/resources/css/teacher/styles.css">
     <script>
         var current_flow_status = <?=json_encode($current_flow_status);?>;
+
+        var pyramid_template = <?=json_encode($pyramid_template)?>;
     </script>
     <!--<script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
     <script src="lib/actions.js"></script>
@@ -269,6 +295,8 @@ header('Content-Type: text/html; charset=utf-8');
 </head>
 <body>
 
+<div id="flow-frame"></div>
+
 <input name="page" type="hidden" value="activity_tracking"/>
 <input name="username" type="hidden" value="<?=htmlspecialchars($teacher_id)?>"/>
 <div data-role="page">
@@ -276,11 +304,7 @@ header('Content-Type: text/html; charset=utf-8');
         <h1>View Pyramid details</h1>
     </div>
     <div data-role="main" class="ui-content">
-<pre>
-        <?php
-        //echo var_export($users_and_groups);
-        ?>
-</pre>
+
         <div id="activity-info-main">
 
             <?php if(isset($final_answers)):?>
