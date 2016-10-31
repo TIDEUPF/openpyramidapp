@@ -186,7 +186,7 @@ foreach($pyramid_groups as $pyramid_groups_item) {
     $group_id = $pyramid_groups_item['group_id'];
     $group_activity = \Group\get_group_activity($group_level, $group_id);
 
-    $groups_activity['level'][$group_level]['group'][$group_id] = $group_activity;
+    $groups_activity['levels'][$group_level]['groups'][$group_id] = $group_activity;
 }
 
 $students_details = [];
@@ -197,7 +197,7 @@ foreach($users_with_groups as $k_sid => &$users_with_groups_item) {
 $pyramid_data[] = [
     'pyramid_creation_timestamp' => $pyramid_creation_timestamp,
     'users_with_groups' => $users_with_groups,
-    'groups_activity' => $groups_activity,
+    'levels' => $groups_activity['levels'],
 ];
 
 $current_flow_status = [
@@ -243,6 +243,14 @@ $pyramid_template[$context][$item] = <<< HTML
 </div>
 HTML;
 
+$item = "group-user";
+$pyramid_template[$context][$item] = <<< HTML
+<div class="{$context}-{$item}">
+    <div class="{$context}-{$item}-name"></div>
+</div>
+HTML;
+
+
 
 header('Content-Type: text/html; charset=utf-8');
     global $url;
@@ -263,6 +271,7 @@ header('Content-Type: text/html; charset=utf-8');
 
         $(function() {
             pyramid_status.init.start();
+            //$('[data-role="popup"]').popup();
         });
 
     </script>
@@ -273,6 +282,19 @@ header('Content-Type: text/html; charset=utf-8');
     </script>
 -->
     <style>
+        .activity-pyramid-level-block {
+            text-align: center;
+        }
+
+        .activity-pyramid-level-group-block a {
+            height: 100px;
+            width: 100px;
+            vertical-align: middle;
+            display: table-cell;
+            font-size: 400%;
+            padding: 0.2em;
+        }
+
         .ranking-position {
             width: 10px;
         }
@@ -302,7 +324,7 @@ header('Content-Type: text/html; charset=utf-8');
         }
 
         .activity-pyramid-level-group-block {
-            width: 300px;
+            /*width: 300px;*/
             margin: 0 30px 0 30px;
             display: inline-block;
         }
