@@ -208,15 +208,22 @@ $current_flow_status = [
 
 $context = "global";
 $item = "group";
-$pyramid_template[$context][$item] = <<< HTML
+/*$pyramid_template[$context][$item] = <<< HTML
 <div class="{$context}-{$item}">
     <div class="{$context}-{$item}-name"></div>
+</div>
+HTML;
+*/
+
+$pyramid_template[$context][$item] = <<< HTML
+<div class="activity-pyramid-level-group-block">
+    <a class="{$context}-{$item} ui-btn ui-corner-all" data-rel="popup"></a>
 </div>
 HTML;
 
 $item = "level";
 $pyramid_template[$context][$item] = <<< HTML
-<div class="{$context}-{$item}">
+<div class="{$context}-{$item} activity-pyramid-level-block">
     <div class="{$context}-{$item}-name"></div>
 </div>
 HTML;
@@ -231,7 +238,7 @@ HTML;
 $context = "detail";
 $item = "group";
 $pyramid_template[$context][$item] = <<< HTML
-<div class="{$context}-{$item}">
+<div class="{$context}-{$item}" data-role="popup">
     <div class="{$context}-{$item}-name"></div>
 </div>
 HTML;
@@ -254,7 +261,10 @@ header('Content-Type: text/html; charset=utf-8');
 
         var pyramid_template = <?=json_encode($pyramid_template)?>;
 
-        pyramid_status.init.start();
+        $(function() {
+            pyramid_status.init.start();
+        });
+
     </script>
     <!--<script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
     <script src="lib/actions.js"></script>
@@ -306,8 +316,6 @@ header('Content-Type: text/html; charset=utf-8');
 </head>
 <body>
 
-<div id="flow-frame"></div>
-<div id="detail-frame"></div>
 
 <input name="page" type="hidden" value="activity_tracking"/>
 <input name="username" type="hidden" value="<?=htmlspecialchars($teacher_id)?>"/>
@@ -316,6 +324,10 @@ header('Content-Type: text/html; charset=utf-8');
         <h1>View Pyramid details</h1>
     </div>
     <div data-role="main" class="ui-content">
+
+        <div id="flow-frame"></div>
+        <div id="detail-frame"></div>
+
 
         <div id="activity-info-main">
 
