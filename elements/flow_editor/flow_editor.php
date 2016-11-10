@@ -604,12 +604,12 @@ header('Content-Type: text/html; charset=utf-8');
                         <div data-role="popup" id="popupAdvanced" data-theme="a" class="ui-corner-all">
 
                             <div style="padding:10px 20px;">
-                                <h4><?=TS("Advanced Pyramid Configurations")?></h4>
-                                <h5><?=TS("It is optional to change these default values")?>.</h5>
+                                <h4><?=TS("Set maximum time limits")?></h4>
+                                <h4><?=TS("Set countdown timers to notify inactive participants")?></h4>
 
                                 <div id="pop-background"></div>
 
-                                <label for="s_question"><?=TS("Option submission timer")?>:<a text-data="#cpopup1" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
+                                <label for="s_question"><?=TS("Level 1 submission countdown timer")?>:<a text-data="#cpopup1" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
                                                                                               title="This timer specifies the time permitted for initial option (artifact) submission for students"><?=TS("More")?></a>
                                     <div id="cpopup1-text" class="ui-content tooltip-popup" data-theme="a" style="display:none">
                                         <p><?=TS("This timer specifies the time permitted for initial option (artifact) submission for students")?>.</p>
@@ -630,7 +630,7 @@ header('Content-Type: text/html; charset=utf-8');
                                     </fieldset></div>
                                 <div style="clear:both;"></div>
 
-                                <label for="h_question"><?=TS("Option submission hard timer")?>:<a text-data="#cpopup2" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
+                                <label for="h_question"><?=TS("Time limit for level 1 submission")?>:<a text-data="#cpopup2" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
                                                                                                    title="This timer specifies the maximum time permitted for initial option (artifact) submission for students. Once expired, every student will be promoted next level."><?=TS("More")?></a>
                                     <div id="cpopup2-text" class="ui-content tooltip-popup" data-theme="a" style="display:none">
                                         <p><?=TS("This timer specifies the maximum time permitted for initial option (artifact) submission for students. Once expired, every student will be promoted next level")?>.</p>
@@ -652,7 +652,7 @@ header('Content-Type: text/html; charset=utf-8');
                                     </fieldset></div>
                                 <div style="clear:both;"></div>
 
-                                <label for="s_rating"><?=TS("Rating timer")?>:<a text-data="#cpopup3" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
+                                <label for="s_rating"><?=TS("Discussion and rating countdown timer")?>:<a text-data="#cpopup3" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
                                                                                  title="This timer specifies the time permitted for rating at each level including discussion time."><?=TS("More")?></a>
                                     <div id="cpopup3-text" class="ui-content tooltip-popup" data-theme="a" style="display:none">
                                         <p><?=TS("This timer specifies the time permitted for rating at each level including discussion time")?>.</p>
@@ -674,7 +674,7 @@ header('Content-Type: text/html; charset=utf-8');
                                     </fieldset></div>
                                 <div style="clear:both;"></div>
 
-                                <label for="h_rating"><?=TS("Rating hard timer")?>:<a text-data="#cpopup4" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
+                                <label for="h_rating"><?=TS("Time limit for discussing and rating in other levels")?>:<a text-data="#cpopup4" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
                                                                                       title="This is the maximum time allowed for rating and discussion at each level. Once expired everyone is promoted to next level."><?=TS("More")?></a>
                                     <div id="cpopup4-text" class="ui-content tooltip-popup" data-theme="a" style="display:none">
                                         <p><?=TS("This is the maximum time allowed for rating and discussion at each level. Once expired everyone is promoted to next level")?>.</p>
@@ -696,7 +696,7 @@ header('Content-Type: text/html; charset=utf-8');
                                     </fieldset></div>
                                 <div style="clear:both;"></div>
 
-                                <label for="satisfaction"><?=TS("Satisfaction percentage")?>:<a text-data="#cpopup5" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
+                                <label for="satisfaction"><?=TS("Minimum number of active participants before countdown starts")?>:<a text-data="#cpopup5" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
                                                                                                 title="When this percentage is reached, students will be promoted for the next level. This is important when longer timer values are defined at MOOC scenarios with less participation."><?=TS("More")?></a>
                                     <div id="cpopup5-text" class="ui-content tooltip-popup" data-theme="a" style="display:none">
                                         <p><?=TS("When this percentage is reached, students will be promoted for the next level. This is important when longer timer values are defined at MOOC scenarios with less participation")?>.</p>
