@@ -337,3 +337,56 @@ button.current-activity {
 .activity-list-entry-text-name {
     font-size: 130%;
 }
+
+#popupAdvanced a.my-tooltip-btn {
+    border-radius: 14px;
+    width: 15px;
+    height: 15px;
+    margin-left: 5px;
+}
+
+#popupAdvanced h4 {
+    margin-bottom: 0px;
+    margin-top: 0px;
+    padding: 5px 0 5px 5px;
+    background-color: #f7f7f7;
+    margin-left: -5px;
+}
+
+#popupAdvanced label {
+    margin-bottom: -5px;
+}
+
+.numk-hard-rating {
+    width: 70px;
+}
+
+#advanced-n_levels-block {
+    float: left;
+    width: 70px;
+    height: 53px;
+    display: table;
+    margin-left: 10px;
+}
+
+.middle-cell {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+#advanced-total-time-block label {
+    display: inline;
+}
+
+#advanced-total-time-read-only {
+    padding: 5px;
+    color: grey;
+    border-radius: 7px;
+    border: 1px solid lightgray;
+    display: inline-table;
+}
+
+#advanced-expand-button {
+    font-size: 140%;
+    font-weight: bold;
+}

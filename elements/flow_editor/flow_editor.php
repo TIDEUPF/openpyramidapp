@@ -8,7 +8,7 @@ header('Content-Type: text/html; charset=utf-8');
     <link rel="stylesheet" href="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
     <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="elements/resources/css/teacher/styles.css">
+    <link rel="stylesheet" type="text/css" href="elements/resources/css/teacher/styles.css?<?=mt_rand()?>=0">
 
     <script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
     <script src="lib/actions.js"></script>
@@ -605,10 +605,85 @@ header('Content-Type: text/html; charset=utf-8');
 
                             <div style="padding:10px 20px;">
                                 <h4><?=TS("Set maximum time limits")?></h4>
+
+                                <!-- question hard timer-->
+                                <label for="h_question"><?=TS("Time limit for level 1 submission")?>:<a text-data="#cpopup2" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
+                                                                                                        title="This timer specifies the maximum time permitted for initial option (artifact) submission for students. Once expired, every student will be promoted next level."><?=TS("More")?></a>
+                                    <div id="cpopup2-text" class="ui-content tooltip-popup" data-theme="a" style="display:none">
+                                        <p><?=TS("This timer specifies the maximum time permitted for initial option (artifact) submission for students. Once expired, every student will be promoted next level")?>.</p>
+                                    </div>
+
+                                </label>
+                                <div style="position:relative;float:left;">
+                                    <input type="number" name="h_question_unit_value" id="h_question_unit_value" data-wrapper-class="numk" value="" data-clear-btn="true" />
+                                </div>
+
+                                <div style="position:relative;float:left; margin-left:10px; margin-top:2px;">
+                                    <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
+                                        <input type="radio" name="h_question_unit" id="h_question_unit-a" value="m" checked="checked">
+                                        <label for="h_question_unit-a"><?=TS("Minutes")?></label>
+                                        <input type="radio" name="h_question_unit" id="h_question_unit-b" value="h">
+                                        <label for="h_question_unit-b"><?=TS("Hours")?></label>
+                                        <input type="radio" name="h_question_unit" id="h_question_unit-c" value="d">
+                                        <label for="h_question_unit-c"><?=TS("Days")?></label>
+                                    </fieldset></div>
+                                <div style="clear:both;"></div>
+
+                                <!-- rating hard timer-->
+                                <label for="h_rating"><?=TS("Time limit for discussing and rating in other levels")?>:<a text-data="#cpopup4" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
+                                                                                                                         title="This is the maximum time allowed for rating and discussion at each level. Once expired everyone is promoted to next level."><?=TS("More")?></a>
+                                    <div id="cpopup4-text" class="ui-content tooltip-popup" data-theme="a" style="display:none">
+                                        <p><?=TS("This is the maximum time allowed for rating and discussion at each level. Once expired everyone is promoted to next level")?>.</p>
+                                    </div>
+
+                                </label>
+                                <div style="position:relative;float:left;">
+                                    <input type="number" name="h_rating_unit_value" id="h_rating_unit_value" data-wrapper-class="numk-hard-rating" value="" data-clear-btn="true">
+                                </div>
+
+                                <div id="advanced-n_levels-block"><div class="middle-cell"> <b>x</b> <span id="advanced-n_levels"></span> levels</div></div>
+
+                                <div style="position:relative;float:left; margin-left:10px; margin-top:2px;">
+                                    <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
+                                        <input type="radio" name="h_rating_unit" id="h_rating_unit-a" value="m" checked="checked">
+                                        <label for="h_rating_unit-a"><?=TS("Minutes")?></label>
+                                        <input type="radio" name="h_rating_unit" id="h_rating_unit-b" value="h">
+                                        <label for="h_rating_unit-b"><?=TS("Hours")?></label>
+                                        <input type="radio" name="h_rating_unit" id="h_rating_unit-c" value="d">
+                                        <label for="h_rating_unit-c"><?=TS("Days")?></label>
+                                    </fieldset></div>
+                                <div style="clear:both;"></div>
+
+                                <!-- total time limit -->
+                                <div id="advanced-total-time-block">
+                                    <label><?=TS("Total time limit for the activity")?></label>
+                                    <div id="advanced-total-time-read-only">
+                                        <div class="middle-cell"><span id="advanced-total-time-n_minutes"></span> minutes</div>
+                                    </div>
+                                </div>
+
+                                <!-- expand button-->
+                                <div id="advanced-expand-button">
+                                    <button class="ui-btn"><span>+</span></button>
+                                </div>
+
+                                <!-- expanded panel-->
                                 <h4><?=TS("Set countdown timers to notify inactive participants")?></h4>
+
+                                <!-- satisfaction percentage -->
+                                <label for="satisfaction"><?=TS("Minimum number of active participants before countdown starts")?>:<a text-data="#cpopup5" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
+                                                                                                                                      title="When this percentage is reached, students will be promoted for the next level. This is important when longer timer values are defined at MOOC scenarios with less participation."><?=TS("More")?></a>
+                                    <div id="cpopup5-text" class="ui-content tooltip-popup" data-theme="a" style="display:none">
+                                        <p><?=TS("When this percentage is reached, students will be promoted for the next level. This is important when longer timer values are defined at MOOC scenarios with less participation")?>.</p>
+                                    </div>
+
+                                </label>
+                                <input type="range" name="satisfaction" id="satisfaction" value="60" min="30" max="100" data-highlight="true">
+
 
                                 <div id="pop-background"></div>
 
+                                <!-- soft question timer-->
                                 <label for="s_question"><?=TS("Level 1 submission countdown timer")?>:<a text-data="#cpopup1" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
                                                                                               title="This timer specifies the time permitted for initial option (artifact) submission for students"><?=TS("More")?></a>
                                     <div id="cpopup1-text" class="ui-content tooltip-popup" data-theme="a" style="display:none">
@@ -630,28 +705,8 @@ header('Content-Type: text/html; charset=utf-8');
                                     </fieldset></div>
                                 <div style="clear:both;"></div>
 
-                                <label for="h_question"><?=TS("Time limit for level 1 submission")?>:<a text-data="#cpopup2" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
-                                                                                                   title="This timer specifies the maximum time permitted for initial option (artifact) submission for students. Once expired, every student will be promoted next level."><?=TS("More")?></a>
-                                    <div id="cpopup2-text" class="ui-content tooltip-popup" data-theme="a" style="display:none">
-                                        <p><?=TS("This timer specifies the maximum time permitted for initial option (artifact) submission for students. Once expired, every student will be promoted next level")?>.</p>
-                                    </div>
 
-                                </label>
-                                <div style="position:relative;float:left;">
-                                    <input type="number" name="h_question_unit_value" id="h_question_unit_value" data-wrapper-class="numk" value="" data-clear-btn="true" />
-                                </div>
-
-                                <div style="position:relative;float:left; margin-left:10px; margin-top:2px;">
-                                    <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
-                                        <input type="radio" name="h_question_unit" id="h_question_unit-a" value="m" checked="checked">
-                                        <label for="h_question_unit-a"><?=TS("Minutes")?></label>
-                                        <input type="radio" name="h_question_unit" id="h_question_unit-b" value="h">
-                                        <label for="h_question_unit-b"><?=TS("Hours")?></label>
-                                        <input type="radio" name="h_question_unit" id="h_question_unit-c" value="d">
-                                        <label for="h_question_unit-c"><?=TS("Days")?></label>
-                                    </fieldset></div>
-                                <div style="clear:both;"></div>
-
+                                <!-- soft question rating -->
                                 <label for="s_rating"><?=TS("Discussion and rating countdown timer")?>:<a text-data="#cpopup3" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
                                                                                  title="This timer specifies the time permitted for rating at each level including discussion time."><?=TS("More")?></a>
                                     <div id="cpopup3-text" class="ui-content tooltip-popup" data-theme="a" style="display:none">
@@ -674,36 +729,6 @@ header('Content-Type: text/html; charset=utf-8');
                                     </fieldset></div>
                                 <div style="clear:both;"></div>
 
-                                <label for="h_rating"><?=TS("Time limit for discussing and rating in other levels")?>:<a text-data="#cpopup4" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
-                                                                                      title="This is the maximum time allowed for rating and discussion at each level. Once expired everyone is promoted to next level."><?=TS("More")?></a>
-                                    <div id="cpopup4-text" class="ui-content tooltip-popup" data-theme="a" style="display:none">
-                                        <p><?=TS("This is the maximum time allowed for rating and discussion at each level. Once expired everyone is promoted to next level")?>.</p>
-                                    </div>
-
-                                </label>
-                                <div style="position:relative;float:left;">
-                                    <input type="number" name="h_rating_unit_value" id="h_rating_unit_value" data-wrapper-class="numk" value="" data-clear-btn="true">
-                                </div>
-
-                                <div style="position:relative;float:left; margin-left:10px; margin-top:2px;">
-                                    <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
-                                        <input type="radio" name="h_rating_unit" id="h_rating_unit-a" value="m" checked="checked">
-                                        <label for="h_rating_unit-a"><?=TS("Minutes")?></label>
-                                        <input type="radio" name="h_rating_unit" id="h_rating_unit-b" value="h">
-                                        <label for="h_rating_unit-b"><?=TS("Hours")?></label>
-                                        <input type="radio" name="h_rating_unit" id="h_rating_unit-c" value="d">
-                                        <label for="h_rating_unit-c"><?=TS("Days")?></label>
-                                    </fieldset></div>
-                                <div style="clear:both;"></div>
-
-                                <label for="satisfaction"><?=TS("Minimum number of active participants before countdown starts")?>:<a text-data="#cpopup5" data-rel="popup" data-transition="pop" class="my-tooltip-btn ui-btn ui-alt-icon ui-nodisc-icon ui-btn-inline ui-icon-info ui-btn-icon-notext"
-                                                                                                title="When this percentage is reached, students will be promoted for the next level. This is important when longer timer values are defined at MOOC scenarios with less participation."><?=TS("More")?></a>
-                                    <div id="cpopup5-text" class="ui-content tooltip-popup" data-theme="a" style="display:none">
-                                        <p><?=TS("When this percentage is reached, students will be promoted for the next level. This is important when longer timer values are defined at MOOC scenarios with less participation")?>.</p>
-                                    </div>
-
-                                </label>
-                                <input type="range" name="satisfaction" id="satisfaction" value="60" min="30" max="100" data-highlight="true">
 
                                 <a id="advancedPopUpBack" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-check"><?=TS("Submit")?></a>
                             </div>
@@ -914,6 +939,7 @@ header('Content-Type: text/html; charset=utf-8');
 
         $('[name="n_levels"]').attr("max", max_possible_levels);
         $('[name="n_levels"]').slider("refresh");
+
     }
 
     function update_fields() {
@@ -921,6 +947,13 @@ header('Content-Type: text/html; charset=utf-8');
         update_first_group_size();
         max_possible_levels_update();
         set_n_final_outcomes();
+
+        timers_to_seconds();
+        var h_question = time_field_to_seconds("h_question");
+        var h_rating = time_field_to_seconds("h_rating");
+        var n_levels = get_field_integer("n_levels");
+
+        $('#advanced-total-time-n_minutes').text(Math.floor(((n_levels-1) * h_rating + h_question)/60));
     }
 
     function get_number_of_pyramids() {
