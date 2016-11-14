@@ -127,7 +127,7 @@ function get_last_pyramid_expired_timestamp() {
     $rating_timer = (int)$flow_data['rating_timeout'];
     $max_users = (int)$flow_data['pyramid_minsize'] * 2 - 1;
 
-    //last created pyramid timestamp
+    //last created unfilled pyramid timestamp
     $sql = <<<SQL
 select * from
 (
@@ -178,13 +178,32 @@ SQL;
     }
 
     if(!$filled_timestamp and !$created_timestamp) {
-        //no pyramids created
-        return (int)$flow_data['start_timestamp'];
-    }
+        //if no pyramid was created return the tiemstamp of the first available_student
+        $sql = <<<SQL
+select
+`timestamp`
+from `flow_available_students`
+WHERE 
+fid = {$fid}
+order by `timestamp` ASC 
+limit 1
+SQL;
 
-    if(!$created_timestamp) {
+        $flow_access_row = \Util\exec_sql($sql);
+
+        if(is_array($flow_access_row) and count($flow_access_row) > 0)
+            $filled_timestamp = (int)$flow_access_row[0]['timestamp'];
+        else
+            $filled_timestamp = (int)$flow_data['start_timestamp'];
+
         return $filled_timestamp;
     }
+
+    /*
+    if(!$filled_timestamp and !$created_timestamp) {
+        //no pyramids created
+        return (int)$flow_data['start_timestamp'];
+    }*/
 
     if($filled_timestamp and ($filled_timestamp - $levels * $rating_timer) > $created_timestamp) {
         //the last created unfilled pyramid was expired when $filled_timestamp one was created

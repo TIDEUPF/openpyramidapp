@@ -12,7 +12,7 @@ select
 `timestamp`
 from `flow_student`
 WHERE 
-{$ps['e']}
+fid = {$fid}
 and `sid` = '{$student}'
 SQL;
 
@@ -20,7 +20,7 @@ SQL;
 
     if(count($answer_row) > 0) {
         $answer = $answer_row[0]['answer'];
-        $answer_skip = $answer_row[0]['skip'];
+        $answer_skip = (int)$answer_row[0]['skip'];
         $answer_timestamp = (int)$answer_row[0]['timestamp'];
     } else {
         $answer = null;
@@ -61,6 +61,7 @@ SQL;
         'answer_timestamp' => $answer_timestamp,
         'flow_access_timestamp' => $flow_access_timestamp,
         'username' => $username,
+        'sid' => $student,
     ];
 
     return $student_activity;

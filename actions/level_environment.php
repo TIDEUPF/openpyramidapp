@@ -40,7 +40,7 @@ if((int)$flow_data['sync'] == 0) {
     if($reset_flow)
         $output['reset'] = true;
 
-    $client_level = (int)$_REQUEST['level'] - 1;
+    $client_level = (int)$_REQUEST['level'];
     $result = mysqli_query($link, "select * from selected_answers where {$ps['sa']} and sa_level = {$client_level}");
     if (mysqli_num_rows($result) > 0) {
          $output['expired'] = true;

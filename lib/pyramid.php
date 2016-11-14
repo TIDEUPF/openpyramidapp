@@ -367,7 +367,7 @@ function show_final_answer() {
 }
 
 function get_current_flow() {
-    global $levels, $fname, $fdes,  $fid, $ps, $n_selected_answers, $random_selection, $link, $ftimestamp, $flow_data, $timeout, $answer_timeout, $pyramid_size, $pyramid_minsize, $answer_required_percentage, $answer_submit_required_percentage;
+    global $force_email, $levels, $fname, $fdes,  $fid, $ps, $n_selected_answers, $random_selection, $link, $ftimestamp, $flow_data, $timeout, $answer_timeout, $pyramid_size, $pyramid_minsize, $answer_required_percentage, $answer_submit_required_percentage;
 
     if(isset($_SESSION['ldshake_guid'])) {
         $res3 = mysqli_query($link, "select * from flow where fid = '{$_SESSION['ldshake_guid']}' order by fid desc limit 1");
@@ -391,6 +391,7 @@ function get_current_flow() {
         $random_selection = (int)$data3["random_selection"];
         $answer_required_percentage = (int)$data3["rating_required_percentage"];
         $answer_submit_required_percentage = (int)$data3["answer_submit_required_percentage"];
+        $force_email = ($data3["sync"] == 0);
 
         
         if(isset($_SESSION['fid'])) {
@@ -415,7 +416,7 @@ function get_current_flow() {
     }
 }
 
-function get_flows($sync = 0) {
+function get_flows($sync = 1) {
     global $levels, $fname, $fdes,  $fid, $ps, $n_selected_answers, $random_selection, $link, $ftimestamp, $flow_data, $timeout, $answer_timeout, $pyramid_size, $pyramid_minsize, $answer_required_percentage, $answer_submit_required_percentage;
 
     $result = mysqli_query($link, "select * from flow where sync = {$sync} order by fid desc");

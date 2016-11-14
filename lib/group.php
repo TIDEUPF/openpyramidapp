@@ -106,7 +106,8 @@ SQL;
         $group_students_sid = explode(',', $group['members']);
 
         foreach($group_students_sid as $group_students_sid_item) {
-            $students[$group_students_sid_item]['level'][(int)$group['pg_level']] = [
+            $students[$group_students_sid_item]['levels'][(int)$group['pg_level']] = [
+                'sid' => $group_students_sid_item,
                 'group_id' => $group['pg_group_id'],
                 'combined_group_ids' => explode(',', $group['combined_group_ids'])
             ];
@@ -246,7 +247,7 @@ function get_group_rating_table() {
 
     $sql = <<< SQL
 select * from (
-    select fsr_fid/*(select fs_answer from flow_student
+    select fsr_to_whom_rated_id/*(select fs_answer from flow_student
     where fid = fsr_fid and sid = fsr_to_whom_rated_id)*/
     as answer_id, sum(fsr_rating) as rating
     from flow_student_rating
@@ -286,16 +287,20 @@ function get_group_chat() {
 
     $sql = <<< SQL
 select 
-`sid` as `username`, 
+`sid`, 
 `message`,
 UNIX_TIMESTAMP(`date`) as `timestamp`
-from flow_student_rating 
+from `chat`
 where {$ps['e']} and
-`room` LIKE '{$room}'
-order BY `date` asc
+`room` = '{$room}'
+order BY `id` asc
 SQL;
 
     $messages = \Util\exec_sql($sql);
+
+    foreach ($messages as &$message_item) {
+        $message_item['timestamp'] = (int)$message_item['timestamp'];
+    }
 
     return $messages;
 }

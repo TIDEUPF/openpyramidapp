@@ -4,13 +4,13 @@ global $ldshake_mode;
 
 //TODO: mandatory ldshake token for students
 
-if($ldshake_mode) {
-    \ldshake\check_student_session_flow();
-}
-
 $error;
 global $force_email;
 
+if($ldshake_mode) {
+    \ldshake\check_student_session_flow();
+    \Pyramid\get_current_flow();
+}
 
 if(empty($_SESSION['user_id'])) {
     session_start(/*['read_and_close' => true]*/);
@@ -42,7 +42,7 @@ if(!isset($_SESSION['student'])) {
             }
 
             if($force_email and !$is_email) {
-                $error = T('You need to introduce a valid e-mail address.');
+                $error = T('You need to introduce a valid email address.');
             } else {
                 mysqli_query($link, "insert into students values ('$uname', '$sname', NOW() )");
                 if (mysqli_affected_rows($link) > 0) {
@@ -128,6 +128,10 @@ if(!isset($_SESSION['student'])) {
 
     $vars['hidden_input_array'] = array_merge($vars['hidden_input_array'], $hidden_input_array);
 
+
+    header("location: student.php");
+
+    /*
     if($first_time_user and (int)$flow_data['sync'] == 0) {
         //show activity explanation
         $activity_explanation_view = View\element("activity_explanation", $vars);
@@ -138,6 +142,6 @@ if(!isset($_SESSION['student'])) {
         ));
     } else {
         header("location: student.php");
-    }
+    }*/
     exit;
 }

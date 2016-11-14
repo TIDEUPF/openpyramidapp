@@ -195,12 +195,12 @@ function get_users_email($fid, $pid) {
 }
 
 function get_html($step) {
-    global $url;
+    global $url, $fid;
 
     $date_string = \Pyramid\end_date_string($step);
 
     if($step == 1) {
-
+/*
         $html = <<<HTML
 <html>
 <body>
@@ -219,6 +219,38 @@ function get_html($step) {
 <p>Best Regards<br />
 GTI - UPF<br />
 Barcelona</p>
+</body>
+</html>
+HTML;
+        */
+        $html = <<<HTML
+<html>
+<body>
+<div dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;">&nbsp;</div>
+
+<p dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;"><span id="docs-internal-guid-52bbb687-54d2-597e-6134-c9fcbfa6a018"><span style="vertical-align:baseline;white-space:pre-wrap;"><span style="font-family:Arial;"><span style="font-size:14.6667px;">Hi,</span></span></span></span></p>
+
+<div dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;">&nbsp;</div>
+
+<p dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;"><span id="docs-internal-guid-52bbb687-54d2-597e-6134-c9fcbfa6a018"><span style="vertical-align:baseline;white-space:pre-wrap;"><span style="font-family:Arial;"><span style="font-size:14.6667px;">Your submission was successful and you have been promoted to the next level where you can discuss and rate in small groups in the PyramidApp.</span></span></span></span></p>
+
+<p dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;"><span id="docs-internal-guid-52bbb687-54d2-597e-6134-c9fcbfa6a018"><span style="vertical-align:baseline;white-space:pre-wrap;"><span style="font-family:Arial;"><span style="font-size:14.6667px;">Login to the app using the same username as previously. This is the link to the app: </span></span></span>&nbsp;<a href="{$url}activity/{$fid}" style="text-decoration:none;"><span style="text-decoration:underline;vertical-align:baseline;white-space:pre-wrap;"><span style="background-color:#ffffff;"><span style="color:#1155cc;"><span style="font-family:Arial;"><span style="font-size:14.6667px;">{$url}activity/{$fid}</span></span></span></span></span></a> </span></p>
+
+<div dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;">&nbsp;</div>
+
+<p dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;"><span id="docs-internal-guid-52bbb687-54d2-597e-6134-c9fcbfa6a018"><span style="vertical-align:baseline;white-space:pre-wrap;"><span style="font-family:Arial;"><span style="font-size:14.6667px;">In this new level you can see options, about which you can discuss in the chat window and select the most relevant option with other group members. &nbsp;</span></span></span></span></p>
+
+<p dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;"><span id="docs-internal-guid-52bbb687-54d2-597e-6134-c9fcbfa6a018"><span style="vertical-align:baseline;white-space:pre-wrap;"><span style="font-family:Arial;"><span style="font-size:14.6667px;">You have time till {$date_string}</span></span></span><span style="vertical-align:super;white-space:pre-wrap;"><span style="font-family:Arial;"><span style="font-size:8.8px;"></span></span></span><span style="vertical-align:baseline;white-space:pre-wrap;"><span style="font-family:Arial;"><span style="font-size:14.6667px;"> to discuss and rate. You can modify once submitted rating till this deadline. &nbsp;</span></span></span></span></p>
+
+<div dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;">&nbsp;</div>
+
+<p dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;"><span id="docs-internal-guid-52bbb687-54d2-597e-6134-c9fcbfa6a018"><span style="vertical-align:baseline;white-space:pre-wrap;"><span style="font-family:Arial;"><span style="font-size:14.6667px;">Hope you will have a nice time in the app!</span></span></span></span></p>
+
+<div dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;">&nbsp;</div>
+
+<p dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;"><span id="docs-internal-guid-52bbb687-54d2-597e-6134-c9fcbfa6a018"><span style="vertical-align:baseline;white-space:pre-wrap;"><span style="font-family:Arial;"><span style="font-size:14.6667px;">Best Regards</span></span></span></span></p>
+
+<p><span id="docs-internal-guid-52bbb687-54d2-597e-6134-c9fcbfa6a018"><span style="vertical-align:baseline;white-space:pre-wrap;"><span style="font-family:Arial;"><span style="font-size:14.6667px;">PyramidApp team</span></span></span></span></p>
 </body>
 </html>
 HTML;
@@ -246,6 +278,7 @@ Barcelona</p>
 HTML;
 */
     } elseif($step == 2) {
+        /*
         $html = <<<HTML
 <html>
 <body>
@@ -264,6 +297,36 @@ HTML;
 <p>Best Regards<br />
 GTI - UPF<br />
 Barcelona</p>
+</body>
+</html>
+HTML;
+*/
+        $html = <<<HTML
+<html>
+<body>
+
+<p dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;"><span id="docs-internal-guid-52bbb687-54da-8bb3-752b-1e0381e27f35"><span style="vertical-align:baseline;white-space:pre-wrap;"><span style="font-family:Arial;"><span style="font-size:14.6667px;">Hi,</span></span></span></span></p>
+
+<div dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;">&nbsp;</div>
+
+<p dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;"><span id="docs-internal-guid-52bbb687-54da-8bb3-752b-1e0381e27f35"><span style="vertical-align:baseline;white-space:pre-wrap;"><span style="font-family:Arial;"><span style="font-size:14.6667px;">It&rsquo;s the final stage of the PyramidApp. You can login to the app using the same username as previously. This is the link to the app: </span></span></span><a href="{$url}activity/{$fid}" style="text-decoration:none;"><span style="text-decoration:underline;vertical-align:baseline;white-space:pre-wrap;"><span style="background-color:#ffffff;"><span style="color:#1155cc;"><span style="font-family:Arial;"><span style="font-size:14.6667px;">{$url}activity/{$fid}</span></span></span></span></span></a> &nbsp;</span></p>
+
+<div dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;">&nbsp;</div>
+
+<p dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;"><span id="docs-internal-guid-52bbb687-54da-8bb3-752b-1e0381e27f35"><span style="vertical-align:baseline;white-space:pre-wrap;"><span style="font-family:Arial;"><span style="font-size:14.6667px;">In the last level, you are joined to much larger group with highest rated options from previous level. You can once again discuss and rate the most relevant option till {$date_string}</span></span></span><span style="vertical-align:super;white-space:pre-wrap;"><span style="font-family:Arial;"><span style="font-size:8.8px;"></span></span></span><span style="vertical-align:baseline;white-space:pre-wrap;"><span style="font-family:Arial;"><span style="font-size:14.6667px;">. Also you can modify once submitted rating till this deadline. &nbsp;</span></span></span></span></p>
+
+<div dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;">&nbsp;</div>
+
+<p dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;"><span id="docs-internal-guid-52bbb687-54da-8bb3-752b-1e0381e27f35"><span style="vertical-align:baseline;white-space:pre-wrap;"><span style="font-family:Arial;"><span style="font-size:14.6667px;">Hope you will have a nice time in the app!</span></span></span></span></p>
+
+<div dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;">&nbsp;</div>
+
+<p dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;"><span id="docs-internal-guid-52bbb687-54da-8bb3-752b-1e0381e27f35"><span style="vertical-align:baseline;white-space:pre-wrap;"><span style="font-family:Arial;"><span style="font-size:14.6667px;">Best Regards</span></span></span></span></p>
+
+<p dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;"><span id="docs-internal-guid-52bbb687-54da-8bb3-752b-1e0381e27f35"><span style="vertical-align:baseline;white-space:pre-wrap;"><span style="font-family:Arial;"><span style="font-size:14.6667px;">PyramidApp team</span></span></span></span></p>
+
+<div>&nbsp;</div>
+
 </body>
 </html>
 HTML;
@@ -291,7 +354,7 @@ Barcelona</p>
 </html>
 HTML;
 
-    } elseif($step == 4) {
+    } elseif($step == 99) {
         $html = <<<HTML
 <html>
 <body>
@@ -311,6 +374,23 @@ Barcelona</p>
 </body>
 </html>
 HTML;
+
+        $html = <<<HTML
+<html>
+<body>
+
+<p dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;"><span id="docs-internal-guid-52bbb687-54db-9501-12a9-fc6011a3567e"><span style="vertical-align:baseline;white-space:pre-wrap;"><span style="font-family:Arial;"><span style="font-size:14.6667px;">Hi, </span></span></span></span></p>
+
+<div dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;">&nbsp;</div>
+
+<p dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;"><span id="docs-internal-guid-52bbb687-54db-9501-12a9-fc6011a3567e"><span style="vertical-align:baseline;white-space:pre-wrap;"><span style="font-family:Arial;"><span style="font-size:14.6667px;">Now you can see the top rated option from the complete activity and also what happened with other large groups in the class too if you login to PyramidApp : </span></span></span><a href="{$url}activity/{$fid}" style="text-decoration:none;"><span style="text-decoration:underline;vertical-align:baseline;white-space:pre-wrap;"><span style="background-color:#ffffff;"><span style="color:#1155cc;"><span style="font-family:Arial;"><span style="font-size:14.6667px;">{$url}activity/{$fid}</span></span></span></span></span></a> &nbsp;</span></p>
+
+<div>&nbsp;</div>
+
+
+</body>
+</html>
+HTML;
     }
 
     return $html;
@@ -318,6 +398,14 @@ HTML;
 
 function notification_mail($recipients, $html) {
     global $email;
+
+    echo date('l jS \of F Y h:i:s A') . "\n";
+    echo var_export($recipients) . "\n";
+    echo "$html" . "\n";
+
+    if(empty($email)) {
+        return false;
+    }
 
     $from = "Pyramid Interaction App <{$email['address']}>";
     $host = $email['host'];

@@ -1,5 +1,5 @@
 <?php
-global $node_path, $fid, $pid, $flow_data;
+global $node_path, $fid, $pid, $flow_data, $url;
 //obtain the flows pertaining to the current teacher
 
 $flow_data = [];
@@ -194,7 +194,7 @@ foreach($users_with_groups as $k_sid => &$users_with_groups_item) {
     $users_with_groups_item['details'] = \Student\get_student_details($k_sid);
 }
 
-$pyramid_data[] = [
+$pyramid_item[] = [
     'pyramid_creation_timestamp' => $pyramid_creation_timestamp,
     'users_with_groups' => $users_with_groups,
     'levels' => $groups_activity['levels'],
@@ -203,7 +203,7 @@ $pyramid_data[] = [
 $current_flow_status = [
     'last_flow_keys' => $last_flow_keys,
     'flow_properties' => $flow_properties,
-    'pyramid_data' => $pyramid_data,
+    'pyramid_data' => $pyramid_item,
 ];
 
 $context = "global";
@@ -239,17 +239,72 @@ $context = "detail";
 $item = "group";
 $pyramid_template[$context][$item] = <<< HTML
 <div class="{$context}-{$item}" data-role="popup">
-    <div class="{$context}-{$item}-name"></div>
+    <div class="{$context}-{$item}-name name"></div>
+    <ul class="{$context}-{$item}-messages messages"></ul>
+    <ul class="{$context}-{$item}-users users"></ul>
+    <ul class="{$context}-{$item}-ratings ratings"></ul>
 </div>
 HTML;
 
 $item = "group-user";
 $pyramid_template[$context][$item] = <<< HTML
-<div class="{$context}-{$item}">
+<li class="{$context}-{$item}">
     <div class="{$context}-{$item}-name"></div>
+</li>
+HTML;
+
+$item = "user";
+$pyramid_template[$context][$item] = <<< HTML
+<div class="{$context}-{$item}">
+    <div class="{$context}-{$item}-username"></div>
+    <div class="{$context}-{$item}-answer"></div>
+    <div class="{$context}-{$item}-answer-skip"></div>
+    <div class="{$context}-{$item}-answer-date"></div>
+    
+    <div class="{$context}-{$item}-levels"></div>
+
 </div>
 HTML;
 
+$item = "user-level";
+$pyramid_template[$context][$item] = <<< HTML
+<div class="{$context}-{$item}">
+    <ul class="{$context}-{$item}-messages messages"></ul>
+    <ul class="{$context}-{$item}-ratings"></ul>
+</div>
+HTML;
+
+$item = "user-rating";
+$pyramid_template[$context][$item] = <<< HTML
+<li class="{$context}-{$item}">
+    <div class="{$context}-{$item}-messages answer"></div>
+    <div class="{$context}-{$item}-ratings rating"></div>
+</li>
+HTML;
+
+$item = "group-rating";
+$pyramid_template[$context][$item] = <<< HTML
+<li class="{$context}-{$item}">
+    <div class="{$context}-{$item}-messages answer"></div>
+    <div class="{$context}-{$item}-ratings rating"></div>
+</li>
+HTML;
+
+$item = "rating";
+$pyramid_template[$context][$item] = <<< HTML
+<div class="{$context}-{$item}">
+    <div class="{$context}-{$item}-answer"></div>
+    <div class="{$context}-{$item}-rating"></div>
+</div>
+HTML;
+
+$item = "message";
+$pyramid_template[$context][$item] = <<< HTML
+<li class="{$context}-{$item} message">
+    <span class="{$context}-{$item}-username username"></span>
+    <span class="{$context}-{$item}-message message"></span>
+</li>
+HTML;
 
 
 header('Content-Type: text/html; charset=utf-8');
@@ -271,9 +326,19 @@ header('Content-Type: text/html; charset=utf-8');
 
         $(function() {
             pyramid_status.init.start();
-            //$('[data-role="popup"]').popup();
+            $('[data-role="popup"]').popup();
         });
 
+        var pyramid_app_url = <?=json_encode($url)?>;
+
+
+        $.ajax(pyramid_app_url + 'activities_ajax.php?ldshake_fid=<?=$fid?>', {
+            "success" : function(data) {
+                console.log(data);
+            },
+            "dataType": "json",
+            "method": "POST"
+        });
     </script>
     <!--<script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
     <script src="lib/actions.js"></script>
@@ -349,6 +414,7 @@ header('Content-Type: text/html; charset=utf-8');
 
         <div id="flow-frame"></div>
         <div id="detail-frame"></div>
+        <div id="user-detail-frame"></div>
 
 
         <div id="activity-info-main">

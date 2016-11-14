@@ -151,6 +151,7 @@
 
         <div>
 
+            <?php if($flow_data['sync'] == 0) $answer_text = htmlspecialchars_decode($answer_text)?>
             <div><h2><?= $answer_text?></h2></div>
             <div id="answer-textarea">
                 <textarea name="qa" rows="10"></textarea>

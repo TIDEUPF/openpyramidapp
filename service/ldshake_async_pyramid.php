@@ -21,12 +21,11 @@ $email_sent = [
 
 echo "init passed\n";
 while(true) {
-    $flows = \Pyramid\get_flows(1);
+    $flows = \Pyramid\get_flows(0);
+    sleep(1);
     echo "iteration started\n";
 
     foreach ($flows as $current_flow) {
-        sleep(1);
-
         \Pyramid\set_current_flow($current_flow);
         echo $fid . "\n";
 
@@ -180,12 +179,12 @@ while(true) {
                 continue;
             } elseif ($time <= $level_timestamps[1]) {
                 //create the pyramids, must be executed once
-                echo "group formation stage\n";
+                echo "first rating stage\n";
                 continue;
 
-            } elseif ($time <= $level_timestamps[2] and $levels > 2) {
+            } elseif ($time <= $level_timestamps[2] and $levels > 1) {
                 //select the answers and enable the level
-                echo "selection answers 1 stage\n";
+                echo "select answers stage\n";
 
                 $activity_level = 0;
                 $next_level = $activity_level + 1;
@@ -212,7 +211,7 @@ while(true) {
                 mysqli_query($link, "update pyramid_groups set pg_started = 1, pg_start_timestamp='{$time}' where pg_started = '0' and pg_fid='{$fid}'  and pg_pid='{$pid}' and pg_level={$next_level}");
                 mysqli_query($link, "commit");
 
-                $step = $next_level + 1;
+                $step = $activity_level + 2;
                 try {
                     if (empty($email_sent[$fid][$pid][$step])) {
                         $email_sent[$fid][$pid][$step] = true;
@@ -227,9 +226,9 @@ while(true) {
                 }
 
                 continue;
-            } elseif ($time <= $level_timestamps[3] and $levels > 3) {
+            } elseif ($time <= $level_timestamps[3] and $levels > 2) {
                 //select the answers and enable the level
-                echo "selection answers 1 stage\n";
+                echo "selection answers stage\n";
 
                 $activity_level = 1;
                 $next_level = $activity_level + 1;
@@ -256,7 +255,7 @@ while(true) {
                 mysqli_query($link, "update pyramid_groups set pg_started = 1, pg_start_timestamp='{$time}' where pg_started = '0' and pg_fid='{$fid}'  and pg_pid='{$pid}' and pg_level={$next_level}");
                 mysqli_query($link, "commit");
 
-                $step = $next_level + 1;
+                $step = $activity_level + 2;
                 try {
                     if (empty($email_sent[$fid][$pid][$step])) {
                         $email_sent[$fid][$pid][$step] = true;
@@ -271,9 +270,9 @@ while(true) {
                 }
 
                 continue;
-            } elseif ($time <= $level_timestamps[4] and $levels > 4) {
+            } elseif ($time <= $level_timestamps[4] and $levels > 3) {
                 //select the answers and enable the level
-                echo "selection answers 1 stage\n";
+                echo "selection answers stage\n";
 
                 $activity_level = 2;
                 $next_level = $activity_level + 1;
@@ -300,7 +299,7 @@ while(true) {
                 mysqli_query($link, "update pyramid_groups set pg_started = 1, pg_start_timestamp='{$time}' where pg_started = '0' and pg_fid='{$fid}'  and pg_pid='{$pid}' and pg_level={$next_level}");
                 mysqli_query($link, "commit");
 
-                $step = $next_level + 1;
+                $step = $activity_level + 2;
                 try {
                     if (empty($email_sent[$fid][$pid][$step])) {
                         $email_sent[$fid][$pid][$step] = true;
@@ -386,7 +385,7 @@ while(true) {
                     }
                 }
 
-                $step = 4;
+                $step = 99;
                 try {
                     if (empty($email_sent[$fid][$pid][$step])) {
                         $email_sent[$fid][$pid][$step] = true;

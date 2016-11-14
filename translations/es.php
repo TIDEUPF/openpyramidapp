@@ -99,7 +99,7 @@ $translation = [
     =>
         "e-mail",
 
-    "You need to introduce a valid e-mail address."
+    "You need to introduce a valid email address."
     =>
         "Debes introducir una dirección de email válida.",
 
