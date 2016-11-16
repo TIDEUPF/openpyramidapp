@@ -270,7 +270,7 @@ $item = "user-level";
 $pyramid_template[$context][$item] = <<< HTML
 <div class="{$context}-{$item}">
     <ul class="{$context}-{$item}-messages messages"></ul>
-    <ul class="{$context}-{$item}-ratings"></ul>
+    <ul class="{$context}-{$item}-ratings ratings"></ul>
 </div>
 HTML;
 
