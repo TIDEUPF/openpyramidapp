@@ -685,7 +685,7 @@ function available_students($number = 0) {
 }
 
 //update the pyramid to add the latecomers
-function update_pyramid($fid, $pid, $number = 0) {
+function update_pyramid($fid, $pid, $number = 0, $add = true) {
     global $link;
 
     $pyramid_result = mysqli_query($link, "select * from pyramid_groups where pg_fid='$fid' and pg_pid='$pid' order by pg_level asc");
@@ -698,7 +698,13 @@ function update_pyramid($fid, $pid, $number = 0) {
     }
 
     $nbase_groups = count($pyramid["0"]);
-    $latecomers = available_students($number);
+
+    if($add) {
+        $latecomers = available_students($number);
+    } else {
+        $latecomers = [];
+    }
+
     //if(empty($latecomers))
     //    return false;
     $nlatecomers = count($latecomers);
@@ -1017,7 +1023,7 @@ function get_level_activity_rate($activity_level) {
     }
 
     $i=0;
-    while($remaining = array_pop($groups_sorted)) {
+    while(($remaining = array_pop($groups_sorted)) !== NULL) {
         $next_level[$i++][] = $remaining;
     }
 
@@ -1028,7 +1034,7 @@ function get_level_activity_rate($activity_level) {
         mysqli_query($link, "update pyramid_groups set pg_combined_group_ids='{$next_level_combined_ids_string}' where pg_fid='{$fid}' and pg_pid='{$pid}' and pg_level='{$next_level_activity_level}' and pg_group_id='{$next_level_group_id}'");
     }
 
-    \Pyramid\update_pyramid($fid, $pid);
+    \Pyramid\update_pyramid($fid, $pid, 0, false);
     mysqli_query($link, "commit");
     \Util\log(['activity' => 'group_activity_reorder', 'timestamp' => \Util\pyramid_time(), 'origin' => 'php_backend', 'entry' => ['scores' => $groups_score, 'fid' => $fid, 'pid' => $pid, 'level' => $activity_level, 'next_level' => $next_level]]);
 }

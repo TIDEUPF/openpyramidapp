@@ -20,10 +20,14 @@ $n_pyramids = floor($flow['expected_students']/$flow['pyramid_size']);
 else
 $n_pyramids = 1;
 
+date_default_timezone_set("Europe/Berlin");
+\Flow\set_fid($fid);
 //multiple async pyramids info
 if($flow['multi_py'] and $flow['sync'] == 0) {
 $unfilled_pyramids = \Flow\get_not_full_pyramids();
 $last_expired_timestamp = \Flow\get_last_pyramid_expired_timestamp();
+$flow_timestamps = \Flow\get_timestamps();
+$question_submit_expiry_timestamp = $flow_timestamps[0];
 
 if(empty($unfilled_pyramids)) {
 $available_students = \Flow\get_available_students();
@@ -99,18 +103,23 @@ $flow_name = $pyramid_query_row["fname"];
 $level = $pyramid_query_row["pg_level"];
 $group = $pyramid_query_row["pg_group"];
 $pg_group_id = $pyramid_query_row["pg_group_id"];
+$answer = null;
 
 //rated questions and score
 $rated_questions_sql = <<<SQL
     select * from (
     select (select fs_answer from flow_student
     where fid = fsr_fid and sid = fsr_to_whom_rated_id)
-    as answer, sum(fsr_rating) as rating
+    as answer, 
+    (select fs_id from flow_student
+    where fid = fsr_fid and sid = fsr_to_whom_rated_id)
+    as `id`,
+    sum(fsr_rating) as rating
     from flow_student_rating
     where fsr_fid = {$fid} and fsr_pid = {$i} and fsr_level = {$level} and fsr_group_id = {$pg_group_id} and fsr_to_whom_rated_id <> -1 and skip = 0
 group by fsr_to_whom_rated_id
 ) as rated_answers
-order by rating desc
+order by rating desc, `id` desc
 SQL;
 
 $ranking = [];
@@ -131,12 +140,13 @@ $res4 = mysqli_query($link, "select * from flow_student where fid = '$fid' and s
 if (mysqli_num_rows($res4) > 0) {
 $data4 = mysqli_fetch_assoc($res4);
 $answer = $data4['fs_answer'];
+
 }
 }
 }
 $pyramid_data[$i]['levels'][$level]['groups'][] = [
 'members' => $group,
-'answer' => $answer,
+'answer' => mb_strimwidth($answer, 0, 20, '...', 'UTF-8'),
 'ranking' => $ranking
 ];
 }
@@ -324,10 +334,12 @@ header('Content-Type: text/html; charset=utf-8');
 
         var pyramid_template = <?=json_encode($pyramid_template)?>;
 
+        /*
         $(function() {
             pyramid_status.init.start();
             $('[data-role="popup"]').popup();
         });
+        */
 
         var pyramid_app_url = <?=json_encode($url)?>;
 
@@ -356,7 +368,7 @@ header('Content-Type: text/html; charset=utf-8');
             width: 100px;
             vertical-align: middle;
             display: table-cell;
-            font-size: 400%;
+            font-size: 200%;
             padding: 0.2em;
         }
 
@@ -452,8 +464,13 @@ header('Content-Type: text/html; charset=utf-8');
                 <?php else:?>
                     <div id="activity-pyramid-state-block">
                         <ul class="activity-pyramid-state-block-pyramid-list">
-                            <li class="activity-pyramid-state-block-pyramid-list-item">Waiting for users since <?=date("l jS G:i", $last_expired_timestamp)?></li>
-                            <li class="activity-pyramid-state-block-pyramid-list-item">Available students <?=implode(', ', $available_students)?></li>
+                            <?php if(!(empty($available_students) and $npid === null)):?>
+                                <li class="activity-pyramid-state-block-pyramid-list-item">Submission started at <?=date("l jS G:i", $last_expired_timestamp)?></li>
+                                <li class="activity-pyramid-state-block-pyramid-list-item">Submission will end at <?=date("l jS G:i", $question_submit_expiry_timestamp)?></li>
+                                <li class="activity-pyramid-state-block-pyramid-list-item">Available students <?=implode(', ', $available_students)?></li>
+                            <?php else:?>
+                                <li>Waiting for the first student.</li>
+                            <?php endif;?>
                         </ul>
                     </div>
                 <?php endif;?>

@@ -159,7 +159,6 @@ function get_username() {
 }
 
 function enforce_login() {
-
     if(!\Student\get_username()) {
         unset($_SESSION['student']);
         unset($_SESSION['sname']);
@@ -168,6 +167,21 @@ function enforce_login() {
     if(!isset($_SESSION['student'])) {
         header("location: student_login.php");
         exit(0);
+    }
+}
+
+function enforce_email() {
+    global $flow_data;
+
+    if((int)$flow_data['sync'] == 0) {
+        if(!filter_var($_SESSION['student'], FILTER_VALIDATE_EMAIL)) {
+            session_start();
+            unset($_SESSION['student']);
+            unset($_SESSION['sname']);
+            session_write_close();
+            header("location: student_login.php");
+            exit(0);
+        }
     }
 }
 

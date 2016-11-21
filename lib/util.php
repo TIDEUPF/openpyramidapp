@@ -187,7 +187,7 @@ function get_users_email($fid, $pid) {
     $emails = [];
 
     while($students_row = mysqli_fetch_assoc($students_result)) {
-        if(filter_var($students_row['sid'], FILTER_VALIDATE_EMAIL))
+        if(filter_var($students_row['sid'], FILTER_VALIDATE_EMAIL) and strpos(strtolower($students_row['sid']), "@test.tt") === FALSE)
             $emails[] = $students_row['sid'];
     }
 
@@ -195,7 +195,7 @@ function get_users_email($fid, $pid) {
 }
 
 function get_html($step) {
-    global $url, $fid;
+    global $url, $fid, $flow_data;
 
     $date_string = \Pyramid\end_date_string($step);
 
@@ -241,7 +241,12 @@ HTML;
 <p dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;"><span id="docs-internal-guid-52bbb687-54d2-597e-6134-c9fcbfa6a018"><span style="vertical-align:baseline;white-space:pre-wrap;"><span style="font-family:Arial;"><span style="font-size:14.6667px;">In this new level you can see options, about which you can discuss in the chat window and select the most relevant option with other group members. &nbsp;</span></span></span></span></p>
 
 <p dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;"><span id="docs-internal-guid-52bbb687-54d2-597e-6134-c9fcbfa6a018"><span style="vertical-align:baseline;white-space:pre-wrap;"><span style="font-family:Arial;"><span style="font-size:14.6667px;">You have time till {$date_string}</span></span></span><span style="vertical-align:super;white-space:pre-wrap;"><span style="font-family:Arial;"><span style="font-size:8.8px;"></span></span></span><span style="vertical-align:baseline;white-space:pre-wrap;"><span style="font-family:Arial;"><span style="font-size:14.6667px;"> to discuss and rate. You can modify once submitted rating till this deadline. &nbsp;</span></span></span></span></p>
+<br>
+<p dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;"><span id="docs-internal-guid-52bbb687-54d2-597e-6134-c9fcbfa6a018"><span style="vertical-align:baseline;white-space:pre-wrap;"><span style="font-family:Arial;"><span style="font-size:14.6667px;">A reminder of the task: &nbsp;</span></span></span></span></p>
 
+<div>{$flow_data['question']}</div>
+
+<p></p>
 <div dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;">&nbsp;</div>
 
 <p dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;"><span id="docs-internal-guid-52bbb687-54d2-597e-6134-c9fcbfa6a018"><span style="vertical-align:baseline;white-space:pre-wrap;"><span style="font-family:Arial;"><span style="font-size:14.6667px;">Hope you will have a nice time in the app!</span></span></span></span></p>
@@ -314,6 +319,11 @@ HTML;
 <div dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;">&nbsp;</div>
 
 <p dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;"><span id="docs-internal-guid-52bbb687-54da-8bb3-752b-1e0381e27f35"><span style="vertical-align:baseline;white-space:pre-wrap;"><span style="font-family:Arial;"><span style="font-size:14.6667px;">In the last level, you are joined to much larger group with highest rated options from previous level. You can once again discuss and rate the most relevant option till {$date_string}</span></span></span><span style="vertical-align:super;white-space:pre-wrap;"><span style="font-family:Arial;"><span style="font-size:8.8px;"></span></span></span><span style="vertical-align:baseline;white-space:pre-wrap;"><span style="font-family:Arial;"><span style="font-size:14.6667px;">. Also you can modify once submitted rating till this deadline. &nbsp;</span></span></span></span></p>
+
+<br>
+<p dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;"><span id="docs-internal-guid-52bbb687-54d2-597e-6134-c9fcbfa6a018"><span style="vertical-align:baseline;white-space:pre-wrap;"><span style="font-family:Arial;"><span style="font-size:14.6667px;">A reminder of the task: &nbsp;</span></span></span></span></p>
+
+<div>{$flow_data['question']}</div>
 
 <div dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;">&nbsp;</div>
 

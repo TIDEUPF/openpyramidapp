@@ -12,8 +12,11 @@ if(!\Pyramid\get_current_flow()) {
 }
 */
 
+Student\enforce_email();
 
 \Pyramid\flow_add_student($fid, $sid);
+
+date_default_timezone_set("Europe/Berlin");
 
 \Util\log(['activity' => 'page_load']);
 

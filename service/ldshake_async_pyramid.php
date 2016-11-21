@@ -19,6 +19,8 @@ global $link, $fid, $pid, $pyramid_minsize, $levels, $flow_data, $activity_level
 $email_sent = [
 ];
 
+date_default_timezone_set("Europe/Berlin");
+
 echo "init passed\n";
 while(true) {
     $flows = \Pyramid\get_flows(0);
