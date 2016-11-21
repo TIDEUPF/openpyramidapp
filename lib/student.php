@@ -52,8 +52,13 @@ SQL;
 
     $student_row = \Util\exec_sql($sql);
 
-    if(count($student_row) > 0)
+    if (count($student_row) > 0) {
         $username = $student_row[0]['username'];
+    }
+
+    if(filter_var($student, FILTER_VALIDATE_EMAIL)) {
+        $student = mb_strtolower($student, 'UTF-8');
+    }
 
     $student_activity = [
         'answer' => $answer,

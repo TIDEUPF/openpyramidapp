@@ -334,12 +334,12 @@ header('Content-Type: text/html; charset=utf-8');
 
         var pyramid_template = <?=json_encode($pyramid_template)?>;
 
-        /*
+
         $(function() {
             pyramid_status.init.start();
             $('[data-role="popup"]').popup();
         });
-        */
+
 
         var pyramid_app_url = <?=json_encode($url)?>;
 
@@ -359,6 +359,12 @@ header('Content-Type: text/html; charset=utf-8');
     </script>
 -->
     <style>
+        .detail-user-username {
+            background: linear-gradient(to right, #f0f9ff 0%,#eff9ff 47%,#e5f5ff 100%);
+            padding: 0.5em;
+            font-weight: bold;
+        }
+        
         .activity-pyramid-level-block {
             text-align: center;
         }
