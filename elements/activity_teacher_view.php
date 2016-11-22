@@ -267,7 +267,9 @@ $item = "user";
 $pyramid_template[$context][$item] = <<< HTML
 <div class="{$context}-{$item}">
     <div class="{$context}-{$item}-username"></div>
+    <div class="margin-icon ui-icon-plus ui-btn-icon-notext"></div>
     <div class="{$context}-{$item}-answer"></div>
+    <div style="clear:both;"></div>
     <div class="{$context}-{$item}-answer-skip"></div>
     <div class="{$context}-{$item}-answer-date"></div>
     
@@ -287,8 +289,9 @@ HTML;
 $item = "user-rating";
 $pyramid_template[$context][$item] = <<< HTML
 <li class="{$context}-{$item}">
-    <div class="{$context}-{$item}-messages answer"></div>
     <div class="{$context}-{$item}-ratings rating"></div>
+    <div class="{$context}-{$item}-messages answer"></div>
+    <div style="clear:both;"></div>
 </li>
 HTML;
 
@@ -315,6 +318,7 @@ $pyramid_template[$context][$item] = <<< HTML
     <span class="{$context}-{$item}-message message"></span>
 </li>
 HTML;
+
 
 
 header('Content-Type: text/html; charset=utf-8');
@@ -359,12 +363,43 @@ header('Content-Type: text/html; charset=utf-8');
     </script>
 -->
     <style>
+        .detail-user-rating .rating {
+            display: block;
+            float: left;
+            background-color: black;
+            color: white;
+            border-radius: 1em;
+            width: 1.5em;
+            height: 1.5em;
+        }
+
+        .detail-user-rating .answer {
+            display: block;
+            padding-left: 1.5em;
+        }
+
+        .answer-skipped, .no-question {
+            color: red;
+        }
+
+        .margin-icon {
+            position:relative;
+            display: inline-block;
+            bottom: 5px;
+            float:left;
+        }
+
+        .detail-user-answer {
+            display: block;
+            padding-left: 28px;
+        }
+
         .detail-user-username {
             background: linear-gradient(to right, #f0f9ff 0%,#eff9ff 47%,#e5f5ff 100%);
             padding: 0.5em;
             font-weight: bold;
         }
-        
+
         .activity-pyramid-level-block {
             text-align: center;
         }
