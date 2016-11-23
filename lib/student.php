@@ -42,6 +42,23 @@ SQL;
 
     $flow_access_timestamp = (int)$flow_access_row[0]['timestamp'];
 
+    //Pyramid access time
+    $sql = <<<SQL
+select
+`timestamp`
+from `pyramid_students`
+WHERE 
+fid = {$fid}
+and `sid` = '{$student}'
+SQL;
+
+    $pyramid_access_row = \Util\exec_sql($sql);
+
+    if(count($pyramid_access_row) > 0)
+        $pyramid_access_timestamp = (int)$flow_access_row[0]['timestamp'];
+    else
+        $pyramid_access_timestamp = null;
+
     $sql = <<<SQL
 select
 `sname` as `username`
@@ -65,6 +82,7 @@ SQL;
         'answer_skip' => $answer_skip,
         'answer_timestamp' => $answer_timestamp,
         'flow_access_timestamp' => $flow_access_timestamp,
+        'pyramid_access_timestamp' => $pyramid_access_timestamp,
         'username' => $username,
         'sid' => $student,
     ];

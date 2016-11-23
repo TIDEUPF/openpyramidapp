@@ -281,6 +281,8 @@ HTML;
 $item = "user-level";
 $pyramid_template[$context][$item] = <<< HTML
 <div class="{$context}-{$item}">
+    <div class="level-label"></div>
+    <div class="level-absent"></div>
     <ul class="{$context}-{$item}-messages messages"></ul>
     <ul class="{$context}-{$item}-ratings ratings"></ul>
 </div>
@@ -289,7 +291,9 @@ HTML;
 $item = "user-rating";
 $pyramid_template[$context][$item] = <<< HTML
 <li class="{$context}-{$item}">
-    <div class="{$context}-{$item}-ratings rating"></div>
+    <div class="table-wrapper rating-wrapper">
+        <div class="{$context}-{$item}-ratings rating"></div>
+    </div>
     <div class="{$context}-{$item}-messages answer"></div>
     <div style="clear:both;"></div>
 </li>
@@ -363,19 +367,35 @@ header('Content-Type: text/html; charset=utf-8');
     </script>
 -->
     <style>
-        .detail-user-rating .rating {
-            display: block;
+        .table-wrapper {
+            display: table;
+        }
+
+        .rating-wrapper {
             float: left;
-            background-color: black;
-            color: white;
-            border-radius: 1em;
             width: 1.5em;
             height: 1.5em;
+            line-height: 1.5em;
+        }
+
+        .detail-user-rating {
+            list-style-type: none;
+            margin-bottom: 0.5em;
+        }
+
+        .detail-user-rating .rating {
+            display: table-cell;
+            background-color: #000;
+            color: #fff;
+            text-align: center;
+            vertical-align: middle;
+            border-radius: 1.5em;
         }
 
         .detail-user-rating .answer {
             display: block;
-            padding-left: 1.5em;
+            padding-left: 2em;
+            line-height: 1.5em;
         }
 
         .answer-skipped, .no-question {

@@ -174,13 +174,17 @@ select *
 from pyramid_groups
 where {$ps['pg']} and
 pg_level = {$group_level} AND 
-pg_group_id = {$group_id}
+pg_group_id = '{$group_id}'
 SQL;
 
     $group = \Util\exec_sql($sql);
 
-    $group_started_timestamp = (int)$group['pg_start_timestamp'];
-    $group_satisfaction_timestamp = (int)$group['pg_timestamp'];
+    if(count($group) > 0) {
+        $group_started_timestamp = (int)$group[0]['pg_start_timestamp'];
+        $group_satisfaction_timestamp = (int)$group[0]['pg_timestamp'];
+    } else {
+        throw new Exception("the group doesn't exists.");
+    }
 
     //is finished
     $group_is_finished = \Group\is_level_started() and \Group\is_level_timeout();
