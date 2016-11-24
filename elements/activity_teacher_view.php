@@ -249,10 +249,18 @@ $context = "detail";
 $item = "group";
 $pyramid_template[$context][$item] = <<< HTML
 <div class="{$context}-{$item}" data-role="popup">
-    <div class="{$context}-{$item}-name name"></div>
-    <ul class="{$context}-{$item}-messages messages"></ul>
+    <div class="{$context}-{$item}-label label"></div>
+    
+    <div class="{$context}-{$item}-users-label">Participants</div>
     <ul class="{$context}-{$item}-users users"></ul>
+    
+    <div class="{$context}-{$item}-ratings-label">Rating table</div>
     <ul class="{$context}-{$item}-ratings ratings"></ul>
+    
+    <div class="{$context}-{$item}-messages-label">Discussion</div>
+    <ul class="{$context}-{$item}-messages messages"></ul>
+    
+
 </div>
 HTML;
 
@@ -302,8 +310,11 @@ HTML;
 $item = "group-rating";
 $pyramid_template[$context][$item] = <<< HTML
 <li class="{$context}-{$item}">
+    <div class="table-wrapper rating-wrapper">
+        <div class="{$context}-{$item}-ratings rating"></div>
+    </div>
     <div class="{$context}-{$item}-messages answer"></div>
-    <div class="{$context}-{$item}-ratings rating"></div>
+    <div style="clear:both;"></div>
 </li>
 HTML;
 
@@ -378,12 +389,18 @@ header('Content-Type: text/html; charset=utf-8');
             line-height: 1.5em;
         }
 
-        .detail-user-rating {
+        .detail-user-rating,
+        .detail-group-rating {
             list-style-type: none;
             margin-bottom: 0.5em;
         }
 
-        .detail-user-rating .rating {
+        li.detail-group-rating {
+            min-width: 600px;
+        }
+
+        .detail-user-rating .rating,
+        .detail-group-rating .rating {
             display: table-cell;
             background-color: #000;
             color: #fff;
@@ -392,7 +409,8 @@ header('Content-Type: text/html; charset=utf-8');
             border-radius: 1.5em;
         }
 
-        .detail-user-rating .answer {
+        .detail-user-rating .answer,
+        .detail-group-rating .answer {
             display: block;
             padding-left: 2em;
             line-height: 1.5em;
