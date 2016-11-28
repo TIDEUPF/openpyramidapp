@@ -243,8 +243,17 @@ HTML;
 $item = "pyramid";
 $pyramid_template[$context][$item] = <<< HTML
 <div class="{$context}-{$item}">
-    <div class="{$context}-{$item}-name"></div>
+    <div class="{$context}-{$item}-name name"></div>
+    <div class="{$context}-{$item}-results results"></div>
 </div>
+HTML;
+
+$item = "winning-answer-summary";
+$pyramid_template[$context][$item] = <<< HTML
+<li class="{$context}-{$item}">
+    <div class="{$context}-{$item}-name name"></div>
+    <div class="{$context}-{$item}-results answers"></div>
+</li>
 HTML;
 
 $context = "detail";
@@ -510,6 +519,7 @@ header('Content-Type: text/html; charset=utf-8');
     </div>
     <div data-role="main" class="ui-content">
 
+        <div id="winning-answer-summary"></div>
         <div id="flow-frame"></div>
         <div id="detail-frame"></div>
         <div id="user-detail-frame"></div>

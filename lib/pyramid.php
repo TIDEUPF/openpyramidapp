@@ -221,6 +221,34 @@ function set_selected_answers_for_previous_groups() {
     }
 }
 
+function get_results() {
+    global $link, $sid,  $fid, $ps, $activity_level, $levels, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+
+    $activity_level = $levels;
+
+    if(\Pyramid\is_complete()) {
+        $results['is_complete'] = true;
+
+        $final_level = $levels - 1;
+        $result_11 = mysqli_query($link, "select * from selected_answers where {$ps['sa']} and sa_level = '$final_level' and skip = '0'");
+        $answers = [];
+        while ($data_t_11 = mysqli_fetch_assoc($result_11)) {
+            $qa_last_selected_id = $data_t_11['sa_selected_id'];
+            $result_12 = mysqli_query($link, "select * from flow_student where fid = '$fid' and sid = '$qa_last_selected_id'");
+            $data_t_12 = mysqli_fetch_assoc($result_12);
+            $answers[] = $data_t_12['fs_answer'];
+        }
+
+        $results['answers'] = $answers;
+
+    } else {
+        $results['is_complete'] = false;
+        $results['answers'] = null;
+    }
+
+    return $results;
+}
+
 function get_groups() {
     global $ps;
     $sql = <<<SQL
