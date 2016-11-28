@@ -254,10 +254,10 @@ $pyramid_template[$context][$item] = <<< HTML
     <div class="{$context}-{$item}-users-label">Participants</div>
     <ul class="{$context}-{$item}-users users"></ul>
     
-    <div class="{$context}-{$item}-ratings-label">Rating table</div>
+    <div class="{$context}-{$item}-ratings-label disabled">Rating table</div>
     <ul class="{$context}-{$item}-ratings ratings"></ul>
     
-    <div class="{$context}-{$item}-messages-label">Discussion</div>
+    <div class="{$context}-{$item}-messages-label disabled">Discussion</div>
     <ul class="{$context}-{$item}-messages messages"></ul>
     
 
@@ -378,6 +378,11 @@ header('Content-Type: text/html; charset=utf-8');
     </script>
 -->
     <style>
+
+        .disabled {
+            display: none;
+        }
+
         .table-wrapper {
             display: table;
         }
