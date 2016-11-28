@@ -187,6 +187,7 @@ $answer_timeout_data = \Answer\get_answer_timeout();
 $pyramid_creation_timestamp = (int)$answer_timeout_data['start_timestamp'];
 
 $pyramid_groups = \Pyramid\get_groups();
+$pyramid_results = \Pyramid\get_results();
 $users_with_groups = \Group\get_users_with_groups();
 $groups_activity = [];
 
@@ -208,6 +209,7 @@ $pyramid_item[] = [
     'pyramid_creation_timestamp' => $pyramid_creation_timestamp,
     'users_with_groups' => $users_with_groups,
     'levels' => $groups_activity['levels'],
+    'results' => $pyramid_results,
 ];
 
 $current_flow_status = [
