@@ -252,7 +252,7 @@ $item = "winning-answer-summary";
 $pyramid_template[$context][$item] = <<< HTML
 <li class="{$context}-{$item}">
     <div class="{$context}-{$item}-name name"></div>
-    <div class="{$context}-{$item}-results answers"></div>
+    <div class="{$context}-{$item}-results answer"></div>
 </li>
 HTML;
 
