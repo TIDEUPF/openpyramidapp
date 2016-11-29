@@ -248,11 +248,18 @@ $pyramid_template[$context][$item] = <<< HTML
 </div>
 HTML;
 
-$item = "winning-answer-summary";
+$item = "header-pyramid";
 $pyramid_template[$context][$item] = <<< HTML
 <li class="{$context}-{$item}">
     <div class="{$context}-{$item}-name name"></div>
-    <div class="{$context}-{$item}-results answer"></div>
+    <ul class="{$context}-{$item}-results results"></ul>
+</li>
+HTML;
+
+$item = "winning-answer-summary";
+$pyramid_template[$context][$item] = <<< HTML
+<li class="{$context}-{$item}">
+    <ul class="{$context}-{$item}-winning-answer winning-answer"></ul>
 </li>
 HTML;
 
@@ -302,6 +309,7 @@ $pyramid_template[$context][$item] = <<< HTML
 <div class="{$context}-{$item}">
     <div class="level-label"></div>
     <div class="level-absent"></div>
+    <div class="level-discussion-label disabled">Discussion</div>
     <ul class="{$context}-{$item}-messages messages"></ul>
     <ul class="{$context}-{$item}-ratings ratings"></ul>
 </div>
@@ -519,7 +527,10 @@ header('Content-Type: text/html; charset=utf-8');
     </div>
     <div data-role="main" class="ui-content">
 
-        <div id="winning-answer-summary"></div>
+        <div id="winning-answer-summary">
+            <div class="disabled winning-event-label">There are some winning submissions</div>
+            <ul class="winning-answers"></ul>
+        </div>
         <div id="flow-frame"></div>
         <div id="detail-frame"></div>
         <div id="user-detail-frame"></div>
