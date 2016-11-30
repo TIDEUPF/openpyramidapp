@@ -219,17 +219,21 @@ $current_flow_status = [
 ];
 
 $context = "global";
-$item = "group";
-/*$pyramid_template[$context][$item] = <<< HTML
-<div class="{$context}-{$item}">
-    <div class="{$context}-{$item}-name"></div>
-</div>
-HTML;
-*/
 
+$item = "group";
 $pyramid_template[$context][$item] = <<< HTML
 <div class="activity-pyramid-level-group-block">
     <a class="{$context}-{$item} ui-btn ui-corner-all" data-rel="popup"></a>
+</div>
+HTML;
+
+$item = "available-student";
+$pyramid_template[$context][$item] = <<< HTML
+<div class="activity-answer">
+    <div class="username"></div>
+    <div class="answer"></div>
+    <div class="skip"></div>
+    <div class="pyramid"></div>
 </div>
 HTML;
 
@@ -368,27 +372,30 @@ header('Content-Type: text/html; charset=utf-8');
     <script src="../../lib/js/activity_tracking.js"></script>
     <link rel="stylesheet" type="text/css" href="elements/resources/css/teacher/styles.css">
     <script>
-        var current_flow_status = <?=json_encode($current_flow_status);?>;
+        var current_flow_status;// = <?=json_encode($current_flow_status);?>;
 
         var pyramid_template = <?=json_encode($pyramid_template)?>;
 
-
         $(function() {
-            pyramid_status.init.start();
-            $('[data-role="popup"]').popup();
+            //pyramid_status.init.start();
+            //$('[data-role="popup"]').popup();
         });
-
 
         var pyramid_app_url = <?=json_encode($url)?>;
 
+        function update_pyramid_data() {
+            $.ajax(pyramid_app_url + 'activities_ajax.php?ldshake_fid=<?=$fid?>', {
+                "success": function (data) {
+                    console.log(data);
+                    current_flow_status = data;
+                    pyramid_status.init.start();
+                    $('[data-role="popup"]').popup();
+                },
+                "dataType": "json",
+                "method": "POST"
+            });
+        }
 
-        $.ajax(pyramid_app_url + 'activities_ajax.php?ldshake_fid=<?=$fid?>', {
-            "success" : function(data) {
-                console.log(data);
-            },
-            "dataType": "json",
-            "method": "POST"
-        });
     </script>
     <!--<script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
     <script src="lib/actions.js"></script>
@@ -534,6 +541,7 @@ header('Content-Type: text/html; charset=utf-8');
         <div id="flow-frame"></div>
         <div id="detail-frame"></div>
         <div id="user-detail-frame"></div>
+        <div id="available-students"></div>
 
 
         <div id="activity-info-main">

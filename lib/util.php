@@ -39,6 +39,11 @@ function exec_sql($sql) {
     if(mysqli_num_rows($result) > 0){ //get current level pyramid group info
         while($row = mysqli_fetch_assoc($result))
         {
+            if(isset($row['timestamp'])) $row['timestamp'] = (int)$row['timestamp'];
+            if(isset($row['fid'])) $row['fid'] = (int)$row['fid'];
+            if(isset($row['pid'])) $row['pid'] = (int)$row['pid'];
+            if(isset($row['skip'])) $row['skip'] = (int)$row['skip'];
+
             $result_rows[] = $row;
         }
         return $result_rows;

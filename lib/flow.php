@@ -413,6 +413,22 @@ SQL;
 
     $properties['available_students'] = \Util\exec_sql($sql);
 
+    //available answers
+    $sql = <<<SQL
+select fs_answer as `answer`, `skip`, sid, `timestamp` from flow_student
+where fid = {$fid}
+SQL;
+
+    $properties['available_answers'] = \Util\exec_sql($sql);
+    /*
+    $available_answers = \Util\exec_sql($sql);
+
+    $properties['available_answers'] = [];
+    foreach($available_answers as $available_answers_item) {
+        $properties['available_answers'][$available_answers_item['sid']] = $available_answers_item;
+    }
+*/
+
     //pyramids
     $sql = <<<SQL
 select fid, pid, `timestamp` from pyramid_students
