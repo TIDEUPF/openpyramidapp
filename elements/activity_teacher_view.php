@@ -230,7 +230,7 @@ HTML;
 $item = "available-student";
 $pyramid_template[$context][$item] = <<< HTML
 <div class="activity-answer">
-    <div class="username"></div>
+    <div class="username"><a></a></div>
     <div class="answer"></div>
     <div class="skip"></div>
     <div class="pyramid"></div>
@@ -270,7 +270,7 @@ HTML;
 $context = "detail";
 $item = "group";
 $pyramid_template[$context][$item] = <<< HTML
-<div class="{$context}-{$item}" data-role="popup">
+<div class="{$context}-{$item} disabled">
     <div class="{$context}-{$item}-label label"></div>
     
     <div class="{$context}-{$item}-users-label">Participants</div>
@@ -295,7 +295,7 @@ HTML;
 
 $item = "user";
 $pyramid_template[$context][$item] = <<< HTML
-<div class="{$context}-{$item}">
+<div class="{$context}-{$item} disabled">
     <div class="{$context}-{$item}-username"></div>
     <div class="margin-icon ui-icon-plus ui-btn-icon-notext"></div>
     <div class="{$context}-{$item}-answer"></div>
@@ -375,10 +375,49 @@ header('Content-Type: text/html; charset=utf-8');
         var current_flow_status;// = <?=json_encode($current_flow_status);?>;
 
         var pyramid_template = <?=json_encode($pyramid_template)?>;
+        var navigation_flow = [];
+        navigation_flow.push({
+            "id" : '#global-pyramid'
+        });
+
+
+        function pyramid_hide(nav) {
+            $(nav[nav.length-1].id).hide();
+        }
+
+        function show_page(nav) {
+            $(nav[nav.length-1].id).show();
+        }
+
+        function global_group_click(event) {
+            event.preventDefault();
+            var id = $(event.target).attr("href");
+
+            pyramid_hide(navigation_flow);
+            $(id).show();
+            navigation_flow.push({
+               "id" : id
+            });
+        }
 
         $(function() {
             //pyramid_status.init.start();
             //$('[data-role="popup"]').popup();
+            $('#back-button').click(function() {
+                var item = navigation_flow.pop();
+                $(item.id).hide();
+
+                show_page(navigation_flow);
+            });
+
+            $('#available-students-button').click(function() {
+                pyramid_hide(navigation_flow);
+                $('#available-students').show();
+
+                navigation_flow.push({
+                    "id" : '#available-students'
+                });
+            });
         });
 
         var pyramid_app_url = <?=json_encode($url)?>;
@@ -389,12 +428,13 @@ header('Content-Type: text/html; charset=utf-8');
                     console.log(data);
                     current_flow_status = data;
                     pyramid_status.init.start();
-                    $('[data-role="popup"]').popup();
+                    //$('[data-role="popup"]').popup();
                 },
                 "dataType": "json",
                 "method": "POST"
             });
         }
+
 
     </script>
     <!--<script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
@@ -404,6 +444,15 @@ header('Content-Type: text/html; charset=utf-8');
     </script>
 -->
     <style>
+
+        .activity-answer {
+            display: table-row;
+        }
+
+        .activity-answer > div {
+            display: table-cell;
+            width: 20%;
+        }
 
         .disabled {
             display: none;
@@ -521,6 +570,10 @@ header('Content-Type: text/html; charset=utf-8');
         margin: 0 auto 40px auto;
         text-align: center;
     }
+
+        #available-students {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -534,11 +587,17 @@ header('Content-Type: text/html; charset=utf-8');
     </div>
     <div data-role="main" class="ui-content">
 
-        <div id="winning-answer-summary">
-            <div class="disabled winning-event-label">There are some winning submissions</div>
-            <ul class="winning-answers"></ul>
+        <button id="back-button">Back</button>
+
+        <div id="global-pyramid">
+            <button id="available-students-button">Available students</button>
+            <div id="winning-answer-summary">
+                <div class="disabled winning-event-label">There are some winning submissions</div>
+                <ul class="winning-answers"></ul>
+            </div>
+            <div id="flow-frame"></div>
         </div>
-        <div id="flow-frame"></div>
+
         <div id="detail-frame"></div>
         <div id="user-detail-frame"></div>
         <div id="available-students"></div>
