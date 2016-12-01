@@ -229,12 +229,12 @@ HTML;
 
 $item = "available-student";
 $pyramid_template[$context][$item] = <<< HTML
-<div class="activity-answer">
-    <div class="username"><a></a></div>
-    <div class="answer"></div>
-    <div class="skip"></div>
-    <div class="pyramid"></div>
-</div>
+<tr class="activity-answer">
+    <td class="username"><a></a></td>
+    <td class="answer"></td>
+    <td class="skip"></td>
+    <td class="pyramid"></td>
+</tr>
 HTML;
 
 $item = "level";
@@ -418,6 +418,8 @@ header('Content-Type: text/html; charset=utf-8');
                     "id" : '#available-students'
                 });
             });
+
+            update_pyramid_data();
         });
 
         var pyramid_app_url = <?=json_encode($url)?>;
@@ -430,6 +432,10 @@ header('Content-Type: text/html; charset=utf-8');
                     pyramid_status.init.start();
                     //$('[data-role="popup"]').popup();
                 },
+                "complete": function (jqXHR, status) {
+                    setTimeout(update_pyramid_data, 10000);
+                },
+                "timeout": 15000,
                 "dataType": "json",
                 "method": "POST"
             });
@@ -444,6 +450,56 @@ header('Content-Type: text/html; charset=utf-8');
     </script>
 -->
     <style>
+        @font-face{
+            font-family: 'Glyphicons Halflings';
+            src: url('<?=$url?>vendors/fonts/glyphicons-halflings-regular.eot');
+            src: url('<?=$url?>vendors/fonts/glyphicons-halflings-regular.eot') format('embedded-opentype'),
+            url('<?=$url?>vendors/fonts/glyphicons-halflings-regular.woff2') format('woff2'),
+            url('<?=$url?>vendors/fonts/glyphicons-halflings-regular.woff') format('woff'),
+            url('<?=$url?>vendors/fonts/glyphicons-halflings-regular.ttf') format('truetype'),
+            url('<?=$url?>vendors/fonts/glyphicons-halflings-regular.svg') format('svg');
+        }
+
+        .global-header-pyramid-results {
+            list-style: none;
+        }
+
+        .winning-answers {
+            list-style: none;
+            padding: 10px;
+            border-left: solid #00f529 2px;
+            background-color: #d7ffd0;
+        }
+
+        .global-winning-answer-summary-winning-answer {
+            display: inline-block;
+            padding: 0px;
+        }
+
+        .global-header-pyramid-results > li:before {
+            font-family: 'Glyphicons Halflings';
+            content:"\e084";
+            position: relative;
+            top: 3px;
+            margin-right: 5px;
+        }
+
+        .global-pyramid {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .global-pyramid-name {
+            font-size: 30px;
+            background-color: #efefef;
+            border-radius: 30px;
+            padding: 0.2em;
+            text-align: center;
+            height: 40px;
+            width: 40px;
+        }
 
         .activity-answer {
             display: table-row;
@@ -561,7 +617,7 @@ header('Content-Type: text/html; charset=utf-8');
 
         .activity-pyramid-level-group-block {
             /*width: 300px;*/
-            margin: 0 30px 0 30px;
+            margin: 0 30px 15px 30px;
             display: inline-block;
         }
 
@@ -572,8 +628,31 @@ header('Content-Type: text/html; charset=utf-8');
     }
 
         #available-students {
-            display: none;
+            display: table;
+            border-spacing: 3px;
+            margin: 0 auto 40px auto;
         }
+
+        #available-students .username {
+            width: 100px;
+            background-color: #e2e2e2;
+        }
+
+        #available-students .answer {
+            width: 300px;
+            background-color: #efefef;
+        }
+
+        #available-students .skip {
+            width: 20px;
+            background-color: #e2e2e2;
+        }
+
+        #available-students .pyramid {
+            width: 80px;
+            background-color: #efefef;
+        }
+
     </style>
 </head>
 <body>
@@ -600,7 +679,7 @@ header('Content-Type: text/html; charset=utf-8');
 
         <div id="detail-frame"></div>
         <div id="user-detail-frame"></div>
-        <div id="available-students"></div>
+        <table id="available-students"><tbody></tbody></table>
 
 
         <div id="activity-info-main">
