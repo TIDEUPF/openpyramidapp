@@ -194,7 +194,7 @@ SQL;
         if(is_array($flow_access_row) and count($flow_access_row) > 0)
             $filled_timestamp = (int)$flow_access_row[0]['timestamp'];
         else
-            $filled_timestamp = PHP_INT_MAX;
+            $filled_timestamp = PHP_INT_MAX/2;
 
         return $filled_timestamp;
     }
