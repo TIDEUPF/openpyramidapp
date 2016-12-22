@@ -2,6 +2,9 @@
 global $node_path, $fid, $pid, $flow_data, $url;
 //obtain the flows pertaining to the current teacher
 
+   $parsed_url = parse_url($url);
+$url = 'https://'.$parsed_url['host'].$parsed_url['path'];
+
 $flow_data = [];
 $flows = [];
 
@@ -224,7 +227,15 @@ $item = "group";
 $pyramid_template[$context][$item] = <<< HTML
 <div class="activity-pyramid-level-group-block">
     <a class="{$context}-{$item} ui-btn ui-corner-all" data-rel="popup"></a>
+    <ul class="selected-answers"></ul>
 </div>
+HTML;
+
+$item = "selected-answer";
+$pyramid_template[$context][$item] = <<< HTML
+<li class="activity-pyramid-level-group-selected-answer">
+    <span class="answer selected-answer"></span>
+</li>
 HTML;
 
 $item = "available-student";
@@ -398,6 +409,10 @@ header('Content-Type: text/html; charset=utf-8');
             navigation_flow.push({
                "id" : id
             });
+
+            if(navigation_flow.length > 1) {
+                $('#back-button').show();
+            }
         }
 
         $(function() {
@@ -407,18 +422,23 @@ header('Content-Type: text/html; charset=utf-8');
                 var item = navigation_flow.pop();
                 $(item.id).hide();
 
+                if(navigation_flow.length <= 1) {
+                    $('#back-button').hide();
+                }
+
                 show_page(navigation_flow);
             });
 
-            $('#available-students-button').click(function() {
+            /*$('#available-students-button').click(function() {
                 pyramid_hide(navigation_flow);
                 $('#available-students').show();
 
                 navigation_flow.push({
                     "id" : '#available-students'
                 });
-            });
+            });*/
 
+            $('#available-students-button').click(global_group_click);
             update_pyramid_data();
         });
 
@@ -458,6 +478,18 @@ header('Content-Type: text/html; charset=utf-8');
             url('<?=$url?>vendors/fonts/glyphicons-halflings-regular.woff') format('woff'),
             url('<?=$url?>vendors/fonts/glyphicons-halflings-regular.ttf') format('truetype'),
             url('<?=$url?>vendors/fonts/glyphicons-halflings-regular.svg') format('svg');
+        }
+
+        .activity-pyramid-level-group-selected-answer,
+        #available-students .answer,
+        #available-students .username {
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .activity-pyramid-level-group-block .selected-answers {
+            padding: 0;
         }
 
         .global-header-pyramid-results {
@@ -616,7 +648,7 @@ header('Content-Type: text/html; charset=utf-8');
         }
 
         .activity-pyramid-level-group-block {
-            /*width: 300px;*/
+            width: 114px;
             margin: 0 30px 15px 30px;
             display: inline-block;
         }
@@ -628,23 +660,23 @@ header('Content-Type: text/html; charset=utf-8');
     }
 
         #available-students {
-            display: table;
             border-spacing: 3px;
             margin: 0 auto 40px auto;
         }
 
         #available-students .username {
-            width: 100px;
+            max-width: 280px;
             background-color: #e2e2e2;
         }
 
         #available-students .answer {
-            width: 300px;
+            max-width: 400px;
+            width: 400px;
             background-color: #efefef;
         }
 
         #available-students .skip {
-            width: 20px;
+            max-width: 20px;
             background-color: #e2e2e2;
         }
 
@@ -653,6 +685,13 @@ header('Content-Type: text/html; charset=utf-8');
             background-color: #efefef;
         }
 
+        #waiting-next-pyramid {
+            font-size: 120%;
+            text-align: center;
+            background-color: #fffac9;
+            padding: 10px;
+            border-radius: 15px;
+        }
     </style>
 </head>
 <body>
@@ -666,23 +705,30 @@ header('Content-Type: text/html; charset=utf-8');
     </div>
     <div data-role="main" class="ui-content">
 
-        <button id="back-button">Back</button>
+        <button id="back-button" class="disabled">Back</button>
 
         <div id="global-pyramid">
-            <button id="available-students-button">Available students</button>
-            <div id="winning-answer-summary">
-                <div class="disabled winning-event-label">There are some winning submissions</div>
+            <button id="available-students-button" href="#available-students">Student list</button>
+            <div id="winning-answer-summary" class="disabled">
+                <div class="winning-event-label">There are some winning submissions</div>
                 <ul class="winning-answers"></ul>
             </div>
+            <div id="waiting-next-pyramid"><span class="available"></span> available student(s), <span class="required"></span> required to create the next pyramid</div>
             <div id="flow-frame"></div>
         </div>
 
         <div id="detail-frame"></div>
         <div id="user-detail-frame"></div>
-        <table id="available-students"><tbody></tbody></table>
+        <table id="available-students" class="disabled"><thead>
+            <th>username</th>
+            <th>question</th>
+            <th>skip</th>
+            <th>pyramid</th>
+            </thead><tbody></tbody>
+        </table>
 
 
-        <div id="activity-info-main">
+        <div id="activity-info-main" class="disabled">
 
             <?php if(isset($final_answers)):?>
                 <div id="activity-winning-answers-block">

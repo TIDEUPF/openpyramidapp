@@ -213,6 +213,7 @@ SQL;
         'group_started_timestamp' => $group_started_timestamp,
         'group_satisfaction_timestamp' => $group_satisfaction_timestamp,
         'group_is_finished' => $group_is_finished,
+        'selected_answers' => $selected_answers,
         'group_finish_timestamp' => $group_finish_timestamp,
         'group_ratings' => $group_ratings,
         'group_users' => $group_users,

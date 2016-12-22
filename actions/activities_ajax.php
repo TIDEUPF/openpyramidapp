@@ -13,6 +13,12 @@ global $fis, $pid, $flow_data;
 $last_flow_keys = \Flow\get_flow_status();
 $flow_properties = $flow_data;
 
+foreach($flow_properties as &$flow_properties_item) {
+    if(is_numeric($flow_properties_item)) {
+        $flow_properties_item = (int)$flow_properties_item;
+    }
+}
+
 $pyramid_ids = \Flow\get_pyramid_ids();
 $pyramid_item = [];
 
@@ -53,6 +59,7 @@ foreach($pyramid_ids as $pyramid_ids_item) {
 $current_flow_status = [
     'last_flow_keys' => $last_flow_keys,
     'flow_properties' => $flow_properties,
+    'remaining_pyramids' => \Pyramid\remaining_pyramids(),
     'pyramid_data' => $pyramid_item,
 ];
 

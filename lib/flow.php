@@ -448,10 +448,11 @@ SQL;
 
     //students without pyramid
     $sql = <<<SQL
-select fid, pid, sid, `timestamp` from available_students
+select fid, sid, `timestamp` from flow_available_students
 where fid = {$fid}
 and sid not in (
-    select * from pyramid_students
+    select sid 
+    from pyramid_students
     where fid = {$fid}
 )
 SQL;
