@@ -27,14 +27,16 @@ date_default_timezone_set("Europe/Berlin");
 \Flow\set_fid($fid);
 //multiple async pyramids info
 if($flow['multi_py'] and $flow['sync'] == 0) {
-$unfilled_pyramids = \Flow\get_not_full_pyramids();
-$last_expired_timestamp = \Flow\get_last_pyramid_expired_timestamp();
-$flow_timestamps = \Flow\get_timestamps();
-$question_submit_expiry_timestamp = $flow_timestamps[0];
+    $unfilled_pyramids = \Flow\get_not_full_pyramids();
+    $last_expired_timestamp = \Flow\get_last_pyramid_expired_timestamp();
+    $last_expired_timestamp_data = date("l jS G:i", $last_expired_timestamp);
+    $flow_timestamps = \Flow\get_timestamps();
+    $question_submit_expiry_timestamp = $flow_timestamps[0];
+    $question_submit_expiry_timestamp_date = date("l jS G:i", $question_submit_expiry_timestamp);
 
-if(empty($unfilled_pyramids)) {
-$available_students = \Flow\get_available_students();
-}
+    if(empty($unfilled_pyramids)) {
+        $available_students = \Flow\get_available_students();
+    }
 }
 
 //obtain the data for every flow
@@ -713,6 +715,7 @@ header('Content-Type: text/html; charset=utf-8');
                 <div class="winning-event-label">There are some winning submissions</div>
                 <ul class="winning-answers"></ul>
             </div>
+            <div id="multi_async_status_html"></div>
             <div id="waiting-next-pyramid"><span class="available"></span> available student(s), <span class="required"></span> required to create the next pyramid</div>
             <div id="flow-frame"></div>
         </div>

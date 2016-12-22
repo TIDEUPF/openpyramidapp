@@ -19,6 +19,33 @@ foreach($flow_properties as &$flow_properties_item) {
     }
 }
 
+//async mode and multiple pyramids
+if($flow_data['multi_py'] == 1 and $flow_data['sync'] == 0) {
+    $unfilled_pyramids = \Flow\get_not_full_pyramids();
+    $last_expired_timestamp = \Flow\get_last_pyramid_expired_timestamp();
+    $last_expired_timestamp_date = date("l jS G:i", $last_expired_timestamp);
+    $flow_timestamps = \Flow\get_timestamps();
+    $question_submit_expiry_timestamp = $flow_timestamps[0];
+    $question_submit_expiry_timestamp_date = date("l jS G:i", $question_submit_expiry_timestamp);
+
+    if(empty($unfilled_pyramids)) {
+        $available_students = \Flow\get_available_students();
+    }
+
+    $multi_async_properties = [
+        'unfilled_pyramids' => $unfilled_pyramids,
+        'last_expired_timestamp' => $last_expired_timestamp,
+        'last_expired_timestamp_date' => $last_expired_timestamp_date,
+        'flow_timestamps' => $flow_timestamps,
+        'question_submit_expiry_timestamp' => $question_submit_expiry_timestamp,
+        'question_submit_expiry_timestamp_date' => $question_submit_expiry_timestamp_date,
+        'available_students' => $available_students,
+    ];
+
+    $flow_properties['async_multi'] = $multi_async_properties;
+    $flow_properties['async_multi_html'] = \View\element("activity_async_multi_status", $multi_async_properties);
+}
+
 $pyramid_ids = \Flow\get_pyramid_ids();
 $pyramid_item = [];
 
