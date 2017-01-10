@@ -4,6 +4,8 @@ include('dbvar.php');
 //$teacher_id = $_SESSION['user'];
 global $fis, $pid, $flow_data;
 
+date_default_timezone_set("Europe/Berlin");
+
 \Flow\set_fid($_REQUEST['ldshake_fid']);
 
 //\Pyramid\set_current_flow($fid);
@@ -20,6 +22,8 @@ foreach($flow_properties as &$flow_properties_item) {
 }
 
 //async mode and multiple pyramids
+$flow_properties['async_multi'] = null;
+$flow_properties['async_multi_html'] = "";
 if($flow_data['multi_py'] == 1 and $flow_data['sync'] == 0) {
     $unfilled_pyramids = \Flow\get_not_full_pyramids();
     $last_expired_timestamp = \Flow\get_last_pyramid_expired_timestamp();
@@ -40,6 +44,7 @@ if($flow_data['multi_py'] == 1 and $flow_data['sync'] == 0) {
         'question_submit_expiry_timestamp' => $question_submit_expiry_timestamp,
         'question_submit_expiry_timestamp_date' => $question_submit_expiry_timestamp_date,
         'available_students' => $available_students,
+        'npid' => \Flow\get_last_pyramid_id(),
     ];
 
     $flow_properties['async_multi'] = $multi_async_properties;
@@ -86,7 +91,7 @@ foreach($pyramid_ids as $pyramid_ids_item) {
 $current_flow_status = [
     'last_flow_keys' => $last_flow_keys,
     'flow_properties' => $flow_properties,
-    'remaining_pyramids' => \Pyramid\remaining_pyramids(),
+    'remaining_pyramids' => \Pyramid\remaining_pyramids(),/*in distance mode this variable is not applicable*/
     'pyramid_data' => $pyramid_item,
 ];
 

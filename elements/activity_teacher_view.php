@@ -382,7 +382,7 @@ header('Content-Type: text/html; charset=utf-8');
     <link rel="stylesheet" href="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
     <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
-    <script src="../../lib/js/activity_tracking.js"></script>
+    <script src="../../lib/js/activity_tracking.js?t=<?=time()?>"></script>
     <link rel="stylesheet" type="text/css" href="elements/resources/css/teacher/styles.css">
     <script>
         var current_flow_status;// = <?=json_encode($current_flow_status);?>;
@@ -694,6 +694,26 @@ header('Content-Type: text/html; charset=utf-8');
             padding: 10px;
             border-radius: 15px;
         }
+
+        #activity-pyramid-state-block {
+            font-size: 120%;
+            text-align: center;
+            background-color: greenyellow;
+            padding: 0.325em;
+            border-radius: 15px;
+            margin: 1em auto 1em auto;
+        }
+
+        #activity-pyramid-state-block-title {
+            text-align: center;
+            font-weight: bold;
+        }
+
+        #activity-pyramid-state-block ul {
+            list-style-type: none;
+            margin: 0;
+        }
+
     </style>
 </head>
 <body>
