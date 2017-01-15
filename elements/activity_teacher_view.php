@@ -326,9 +326,10 @@ $pyramid_template[$context][$item] = <<< HTML
 <div class="{$context}-{$item}">
     <div class="level-label"></div>
     <div class="level-absent"></div>
+    <div class="{$context}-{$item}-ratings-label disabled">Ratings</div>
+    <ul class="{$context}-{$item}-ratings ratings"></ul>
     <div class="level-discussion-label disabled">Discussion</div>
     <ul class="{$context}-{$item}-messages messages"></ul>
-    <ul class="{$context}-{$item}-ratings ratings"></ul>
 </div>
 HTML;
 
@@ -714,6 +715,53 @@ header('Content-Type: text/html; charset=utf-8');
             margin: 0;
         }
 
+        .detail-group-label.label,
+        .level-label {
+            padding: 7px;
+            background-color: white;
+            border-bottom: 2px solid #c5c5c5;
+            padding-bottom: 3px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .detail-group-users-label,
+        .detail-group-ratings-label,
+        .detail-group-messages-label,
+        .detail-user-level-ratings-label,
+        .level-discussion-label {
+            margin-left: 10px;
+            background-color: white;
+            padding: 5px;
+            margin-bottom: 0;
+            font-size: 85%;
+            font-weight: bold;
+        }
+
+        ul.detail-group-users.users,
+        ul.detail-group-ratings.ratings,
+        ul.detail-group-messages.messages,
+        ul.detail-user-level-ratings,
+        ul.detail-user-level-messages {
+            margin: 0 0 10px 10px;
+            list-style-type: none;
+            background-color: white;
+            padding-left: 20px;
+        }
+
+        ul.detail-group-ratings.ratings {
+            padding-bottom: 1px;
+        }
+
+        li.detail-group-user {
+            text-transform: lowercase;
+            padding: 1px;
+        }
+
+        span.detail-message-username.username {
+            color: grey;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>

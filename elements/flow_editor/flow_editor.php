@@ -659,7 +659,7 @@ header('Content-Type: text/html; charset=utf-8');
                                 <div id="advanced-total-time-block">
                                     <label><?=TS("Total time limit for the activity")?></label>
                                     <div id="advanced-total-time-read-only">
-                                        <div class="middle-cell"><span id="advanced-total-time-n_minutes"></span> minutes</div>
+                                        <div class="middle-cell"><span id="advanced-total-time-n_minutes"></span> <span id="advanced-total-time-n_minutes_unit">minutes</span></div>
                                     </div>
                                 </div>
 
@@ -957,8 +957,23 @@ header('Content-Type: text/html; charset=utf-8');
         var h_question = time_field_to_seconds("h_question");
         var h_rating = time_field_to_seconds("h_rating");
         var n_levels = get_field_integer("n_levels");
+        var total_time_minutes = Math.floor(((n_levels-1) * h_rating + h_question)/60);
+        var total_time;
+        var total_time_unit_text;
 
-        $('#advanced-total-time-n_minutes').text(Math.floor(((n_levels-1) * h_rating + h_question)/60));
+        if(total_time_minutes >= 60*24) {
+            total_time = total_time_minutes/(60*24);
+            total_time_unit_text = "day(s)";
+        } else if (total_time_minutes >= 60) {
+            total_time = total_time_minutes/(60);
+            total_time_unit_text = "hour(s)";
+        } else {
+            total_time = total_time_minutes;
+            total_time_unit_text = "minute(s)";
+        }
+
+        $('#advanced-total-time-n_minutes').text(Math.round(total_time));
+        $('#advanced-total-time-n_minutes_unit').text(total_time_unit_text);
         $('#advanced-n_levels').text(n_levels-1);
     }
 
