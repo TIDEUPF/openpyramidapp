@@ -666,6 +666,7 @@ header('Content-Type: text/html; charset=utf-8');
 
     function flow_load_fields() {
         for(var field in default_flow_fields) {
+            create_field(default_flow_fields[field]);
             set_field(default_flow_fields[field], current_default[default_flow_fields[field]]);
         }
     }
@@ -843,10 +844,24 @@ header('Content-Type: text/html; charset=utf-8');
 
     function set_field(field, value) {
         $('#' + field).text(value);
+        $('[name="' + field + '"]').val(value);
+    }
+
+    function create_field(field) {
+        //search for existing field
+        var $existing_field = $('[name="' + field + '"]');
+
+        if($existing_field.length > 0)
+            return false;
+
+        var $new_field = $('<input type="hidden" value="" />');
+        $new_field.prop('name', field);
+        $('body').append($new_field);
     }
 
     function get_field_integer(field) {
-        var field_text = $('#' + field).text();
+        var field_text = $('[name="' + field + '"]').length ? $('[name="' + field + '"]').val() : $('#' + field).text();
+        //var field_text = $('#' + field).text();
         var field_setting = parseInt(field_text, 10);
         if(!(field_setting > 0 || field_setting < 0 || field_text === "0"))
             throw field_text + " is not an integer";
