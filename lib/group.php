@@ -103,14 +103,32 @@ SQL;
     $students = [];
 
     foreach($groups as $group) {
+
+        if(empty(trim($group['members'])))
+            continue;
+
         $group_students_sid = explode(',', $group['members']);
 
+        $max_level = -1;
+
         foreach($group_students_sid as $group_students_sid_item) {
+            $max_level = max($max_level, (int)$group['pg_level']);
             $students[$group_students_sid_item]['levels'][(int)$group['pg_level']] = [
                 'sid' => $group_students_sid_item,
                 'group_id' => $group['pg_group_id'],
                 'combined_group_ids' => explode(',', $group['combined_group_ids'])
             ];
+        }
+
+        foreach($group_students_sid as $group_students_sid_item) {
+            $levels = [];
+            for($i=0;$i<=$max_level;$i++) {
+                if(!isset($students[$group_students_sid_item]['levels'][$i]))
+                    $levels[] = null;
+                else
+                    $levels[] = $students[$group_students_sid_item]['levels'][$i];
+            }
+            $students[$group_students_sid_item]['levels'] = $levels;
         }
 
     }

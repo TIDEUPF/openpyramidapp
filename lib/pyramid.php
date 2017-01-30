@@ -256,6 +256,7 @@ select pg_group_id as `group_id`,
  pg_level as `group_level`
 from pyramid_groups 
 where {$ps['pg']}
+and CHAR_LENGTH(`pg_group`) > 0
 SQL;
 
     $groups = \Util\exec_sql($sql);
