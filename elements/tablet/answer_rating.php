@@ -425,7 +425,7 @@
 
 </div>
 <script>
-    var polling_interval = 30;
+    var polling_interval = 20;
     var time_left = 0;
     var countdown_started = false;
     var countdown_interval = null;
