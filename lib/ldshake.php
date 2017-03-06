@@ -145,6 +145,9 @@ function write_flow($params) {
 
     $teacher_id = $params['teacher_id'];
     $ldshake_guid = $params['ldshake_guid'];
+    $published_id = $params['published_id'];
+
+    $fid_query = $published_id ? $published_id : 'NULL';
 
     $sname = $teacher_id;
     \Util\log_submit();
@@ -212,7 +215,7 @@ function write_flow($params) {
 
     $sql = <<<SQL
 insert into flow values (
-'{$ldshake_guid}', 
+{$fid_query}, 
 '{$teacher_id}', 
 '{$flow_data['activity']}',
 '', /*legacy*/
@@ -291,5 +294,12 @@ SQL;
         throw new Exception("Error inserting the flow");
     }
 
-    return true;
+    if(!$published_id) {
+        $published_id = mysqli_insert_id($link);
+
+        if(!$published_id)
+            throw new Exception("Error inserting the flow");
+    }
+
+    return $published_id;
 }
