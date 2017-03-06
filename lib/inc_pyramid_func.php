@@ -34,7 +34,7 @@ function noSc_pyramid($levels, $student_arr, $student_amount){
 				
 				$spare_index = 1;
 				foreach($spare as $spare_temp){			
-					$group[$i][ count($group[$i]) - $spare_index ][] = $spare_temp;
+					$group[$i][ $spare_index % count($group[$i]) ][] = $spare_temp;
 					$spare_index++;
 				}
 			}
@@ -70,7 +70,7 @@ function noSc_pyramid($levels, $student_arr, $student_amount){
 				
 				$spare_index = 1;
 				foreach($spare as $spare_temp){			
-					$group[$i][ count($group[$i]) - $spare_index ][] = $spare_temp;
+					$group[$i][ $spare_index % count($group[$i]) ][] = $spare_temp;
 					$spare_index++;
 				}
 			}
