@@ -424,6 +424,32 @@
     <div id="countdown"><span id="countdown-text"></span></div>
 
 </div>
+
+<div id="popup-unrating-warning" class="ui-content" data-role="popup" data-theme="a" data-shadow="true">
+    <p><?=TS("All options must be rated")?>.</p>
+</div>
+
+<script>
+    /*validation*/
+    function get_unrated_widgets() {
+        var $rating_widgets = $('.rating-widget');
+        var $unrated_widgets = [];
+
+        $rating_widgets.each(function () {
+            if ($(this).val() == "0") {
+                $unrated_widgets.push($(this));
+            }
+        });
+
+        return $unrated_widgets;
+    }
+
+    function unrated_widgets_warning() {
+        $('#popup-unrating-warning').popup("open");
+    }
+
+</script>
+
 <script>
     var polling_interval = 20;
     var time_left = 0;
