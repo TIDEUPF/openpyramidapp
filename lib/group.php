@@ -26,6 +26,12 @@ function get_sibling_groups_questions() {
 
         $pyramid_users_with_groups = get_users_with_groups();
 
+        if(!isset($pyramid_users_with_groups[$sid]['levels'][$target_level - 1]))
+            return [];
+
+        if(!isset($pyramid_users_with_groups[$sid]['levels'][$target_level]))
+            return [];
+
         $current_user_group_id = $pyramid_users_with_groups[$sid]['levels'][$target_level - 1]['group_id'];
         $combined_ids = $pyramid_users_with_groups[$sid]['levels'][$target_level]['combined_group_ids'];
     } else {
@@ -124,7 +130,7 @@ SQL;
             $levels = [];
             for($i=0;$i<=$max_level;$i++) {
                 if(!isset($students[$group_students_sid_item]['levels'][$i]))
-                    $levels[] = null;
+                    $levels[] = null;//something wrong in the db
                 else
                     $levels[] = $students[$group_students_sid_item]['levels'][$i];
             }
