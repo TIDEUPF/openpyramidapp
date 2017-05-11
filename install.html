@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pyramid Interaction App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="vendors/jquerymobile/jquery.mobile-1.4.5.css"/>
+    <script src="vendors/jquery/jquery-2.1.4.min.js"></script>
+    <script src="vendors/jquerymobile/jquery.mobile.custom.js"></script>
+    <script>
+        var timeoutPeriod = 10000;
+        function refreshp() {
+            window.location.href = "http://sos.gti.upf.edu/app/student.php";
+        }
+    </script>
+
+</head>
+
+<body>
+<style>
+
+    button.ui-btn,
+    .ui-page-theme-a {
+        color: #696969 !important;
+    }
+
+    body > .ui-page, #answer-frame {
+        height: 100%;
+    }
+
+    #answer-middle-frame,
+    #answer-footer-frame > div{
+        padding: 0 1em 0 1em;
+    }
+
+    #answer-header-frame > #topbar {
+        padding: 0.5em 1em 0.25em 1em;
+        background-color: #DFE5EC;
+    }
+
+    #answer-middle-frame {
+        height: 60%;
+        overflow: hidden;
+    }
+
+    #answer-header-frame,
+    #answer-footer-frame {
+        height: 20%;
+        overflow: hidden;
+    }
+
+    #answer-header-level {
+        float: left;
+        text-align: center;
+        width: 20%;
+    }
+
+    #answer-header-user {
+        float: left;
+        width: 40%;
+    }
+
+    #answer-header-logout {
+        float: right;
+        text-align: right;
+        width: 20%;
+        cursor: pointer;
+    }
+
+    .topbar_item {
+        width: 33%;
+    }
+
+    #answer-textarea > textarea {
+        height: auto !important;
+    }
+
+    #student-error {
+        margin-top: 1em;
+        text-align: center;
+        color: red;
+        font-size: 130%;
+        font-weight: bold;
+    }
+
+    #answer-header-text {
+        text-align: center;
+        font-size: 1.35em;
+        margin-top: 0.5em;
+    }
+
+    #answer_submitted {
+        padding: 10px;
+        text-align: center;
+        font-size: 120%;
+        position: relative;
+        top: 30%;
+        margin-top: 50px;
+    }
+
+    #answer_submitted img {
+        display: inline-block;
+    }
+
+    #answer_submitted a {
+        text-decoration: none;
+    }
+</style>
+<div id="answer-frame">
+    <form method="post">
+        <div id="answer-header-frame">
+
+            <div id="answer_submitted">
+                <a href="pyramid.apk" data-ajax="false"><img src="elements/resources/ic_launcher.png"/></a>
+                <br>
+                <a href="pyramid.apk" data-ajax="false">Click here to install the Pyramid Interaction App</a>
+            </div>
+
+        </div>
+        <div id="answer-middle-frame">
+
+            <div>
+
+
+            </div>
+
+        </div>
+
+        <div id="answer-footer-frame">
+
+            <div>
+                <div id="answer-submitted-message"></div>
+                <div id="answer-rating-ready"></div>
+            </div>
+
+        </div>
+    </form>
+</div>
+<script>
+    timeoutPeriod = 5000;
+    //setTimeout("refreshp();",timeoutPeriod);
+</script>
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-74070171-1', 'auto');
+    ga('send', 'pageview');
+
+</script>
+</body>
+</html>

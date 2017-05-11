@@ -5,27 +5,16 @@ namespace Answer;
 function is_submitted($params) {
     global $link, $sid, $fid;
 
-    $res4 = mysqli_query($link, "select * from flow_student where sid = '$sid' and fid = '$fid'");
+    $result = mysqli_query($link, "select * from flow_student where sid = '$sid' and fid = '$fid'");
     //the user already submitted the answer
-    if(mysqli_num_rows($res4) > 0)
-        return true;
-
-    return false;
-}
-
-function is_rated($params) {
-    //check if rated
-    global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_group_id;
-
-    $sa_result_4 = mysqli_query($link, "select * from flow_student_rating where fsr_fid = '$fid' and fsr_sid= '$sid' and fsr_level = '$activity_level'");
-    if(mysqli_num_rows($sa_result_4) > 0)
+    if(mysqli_num_rows($result) > 0)
         return true;
 
     return false;
 }
 
 function get_user_answer($sid, $fid) {
-    global $link;
+    global $link, $ps;
 
     $cua_result_1 = mysqli_query($link, "select * from flow_student where sid = '$sid' and fid = '$fid'");
     if(mysqli_num_rows($cua_result_1) > 0)
@@ -38,31 +27,30 @@ function get_user_answer($sid, $fid) {
 }
 
 function submit($params) {
-    global $link, $sid, $fid, $input_result, $answer_submit_required_percentage, $peer_array;
+    global $link, $sid, $fid, $ps, $pid, $input_result, $answer_submit_required_percentage, $peer_array;
 
-    if( !isset($_POST['answer']) and
-        !isset($_POST['skip']))
-        return false;
+    if(!empty($pid)) {
+        if (\Answer\is_timeout())
+            return false;
+    }
 
-    if(is_timeout())
+    $sql_pid = $pid;
+    if($pid === false)
+        $sql_pid = -1;
+
+    $answertimestamp = \Util\pyramid_time();
+
+    if(isset($_POST['skip'])) {
+        mysqli_query($link, "insert into flow_student values ('', '$fid', '$sql_pid', '$sid', '', 1, $answertimestamp)");
+        $input_result['updated'] = 'true';
+        \Util\log(['activity' => 'skip_answer_form']);
+        return true;
+    }
+
+    if(!isset($_POST['answer']))
         return false;
 
     $input_result['op'] = 'submit';
-
-    //check for the minimum participants for timeout start
-    $answertimestamp = 0;
-    $required_peers = \Group\get_needed_results_to_end_level();
-    $peer_array_sql = implode("','", \Util\sanitize_array($peer_array));
-    $n_submitted_answers = mysqli_num_rows(mysqli_query($link, "select * from flow_student where fid = '$fid' and sid in ('{$peer_array_sql}')"));
-
-    if($n_submitted_answers + 1 >= $required_peers)
-        $answertimestamp = time();
-
-    if(isset($_POST['skip'])) {
-        mysqli_query($link, "insert into flow_student values ('', '$fid', '$sid', '', 1, $answertimestamp)");
-        $input_result['updated'] = 'true';
-        return true;
-    }
 
     $ans_input = mysqli_real_escape_string($link, \Request\param('qa'));
 
@@ -70,14 +58,12 @@ function submit($params) {
         //why can't edit the answer once submitted? because should not rate while editing. wrong answer will be rated
         if (mysqli_num_rows(mysqli_query($link, "select * from flow_student where sid = '$sid' and fid = '$fid'")) > 0) {
             return true;
+            //edit if already answered
+            //mysqli_query($link,"update flow_student set fs_answer = '$ans_input' where sid = '$sid' and fid_ = '$fid'");
+            //if(mysqli_affected_rows($link) > 0){ $success = 'Submitted.'; }
         } else {
             //insert new
-            mysqli_query($link, "insert into flow_student values ('', '$fid', '$sid', '$ans_input', 0, $answertimestamp)");
-            if (mysqli_affected_rows($link) > 0) {
-                $success = 'Submitted.';
-            } else {
-                $error = 'Database error!';
-            }
+            mysqli_query($link, "insert into flow_student values (null, '$fid', '$sql_pid', '$sid', '$ans_input', 0, $answertimestamp)");
         }
     } else {
         $error = 'Field cannot be empty!';
@@ -85,7 +71,7 @@ function submit($params) {
 
     if (isset($error)) {
         //ask the answer again
-        $input_result['error'] = "You are out of time";
+        $input_result['error'] = $error;
         return false;
     } else {
         //follow the next step in the flow
@@ -109,16 +95,24 @@ function retry() {
 }
 
 function request($params) {
-    global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_group_id, $peer_array;
+    global $link, $sid, $fid, $pid, $ps, $sname, $levels, $activity_level, $peer_group_id, $peer_array, $flow_data, $peer_toolbar_strlen;
 
     $timeout = get_answer_timeout();
+    $petition = (empty($flow_data['question'])) ? 'Write a question' : $flow_data['question'];
+    $level_text = (\Pyramid\get_current_level() >= 0) ? T('Level') . ' ' . \Pyramid\get_current_level() .'/' . ($levels+1) : '';
+    $username_text = (count(\Group\get_status_bar_peers()) > 0) ? $sname . ' + ' . (count(\Group\get_status_bar_peers())-1) : $sname;
+
+    $peers = implode(', ', \group\get_peers_sname());
+    if(strlen($peers) > $peer_toolbar_strlen)
+        $peers = substr($peers, 0, $peer_toolbar_strlen) . '...';
 
     $vars = array(
         'username' 				    => $sname . ' + ' . (count(\Group\get_status_bar_peers())-1),
-        'level' 				    => 'Level ' . \Pyramid\get_current_level() .'/' . $levels,
-        'answer_text' 			    => 'Write a question',
-        'answer_submit_button' 	    => 'Submit your question',
-        'answer_submit_skip_button' => 'Skip the question',
+        'username' 				    => $sname . ' + ' . $peers,
+        'level' 				    => $level_text,
+        'answer_text' 			    => $petition,
+        'answer_submit_button' 	    => T('Submit'),
+        'answer_submit_skip_button' => T('Skip'),
         'answer_timeout'            => $timeout['time_left'],
         'answer_skip_timeout'       => $timeout['time_left_skip'],
         'hidden_input_array' 	    => array(
@@ -127,8 +121,24 @@ function request($params) {
         ),
     );
 
+    $hidden_input_array['username'] = $sname;
+    $hidden_input_array['fid'] = $fid;
+    $hidden_input_array['pid'] = $pid;
+    $hidden_input_array['level'] = $level_text;
+    $hidden_input_array['group_id'] = $peer_group_id;
+    $hidden_input_array['page'] = "answer_form";
+    $hidden_input_array['levels'] = $levels;
+    $hidden_input_array['level'] = -1;
+
+    $vars['hidden_input_array'] = array_merge($vars['hidden_input_array'], $hidden_input_array);
+
     if(isset($params['error']))
         $vars['error'] = $params['error'];
+
+    if((int)$flow_data['sync'] == 0) {
+        $vars['username'] = $sname;
+        $vars['answer_skip_timeout'] = 99999;
+    }
 
     $body = \View\element("answer_form", $vars);
 
@@ -140,20 +150,23 @@ function request($params) {
 }
 
 function request_rate($params) {
-    global $link, $fid, $levels, $sname, $activity_level, $peer_group_id, $peer_array;
+    global $link, $fid, $device, $flow_data, $pid, $levels, $sname, $peer_toolbar_strlen, $activity_level, $peer_group_id, $peer_array;
 
     $answer_text_array = array();
     $hidden_input_array = array();
     $i = 1;
 
     $answer_ids = get_selected_ids();
-    foreach($answer_ids as $answer_id){
+    foreach($answer_ids as $answer_id) {
         $res5 = mysqli_query($link, "select * from flow_student where sid = '$answer_id' and fid = '$fid' and skip = 0");// to get peer answer
         if(mysqli_num_rows($res5) > 0) {//the peer already submitted the answer
             $data5 = mysqli_fetch_assoc($res5);
             $peer_answer = $data5['fs_answer'];
 
-            $answer_text_array['optradio'.$i] = $peer_answer;
+            $answer_data = array('answer_text' => $peer_answer);
+            $answer_data['selected'] = (int)\Student\get_rating($answer_id);
+            $answer_text_array[] = $answer_data;
+
             $hidden_input_array = array_merge(array(
                 'group_id'.$i          => $peer_group_id,
                 'to_whom_rated_id'.$i  => $answer_id,
@@ -164,40 +177,108 @@ function request_rate($params) {
     }
 
     $hidden_input_array['numofqustions'] = $i-1;
+    $hidden_input_array['username'] = $sname;
+    $hidden_input_array['fid'] = $fid;
+    $hidden_input_array['pid'] = $pid;
+    $hidden_input_array['group_id'] = $peer_group_id;
+    $hidden_input_array['level'] = $activity_level;
+    $hidden_input_array['page'] = "answer_rating";
+    $hidden_input_array['levels'] = $levels;
+
+    $peers = implode(', ', \group\get_peers_sname());
+    if(strlen($peers) > $peer_toolbar_strlen)
+        $peers = substr($peers, 0, $peer_toolbar_strlen) . '...';
+
+    $scripted_buttons = [
+        'i_like' => [
+            "value" => "I like...",
+            "label" => "I like...",
+        ],
+        'i_propose' => [
+            "value" => "I propose that...",
+            "label" => "I propose that...",
+        ],
+        'i_can_t_agree' => [
+            "value" => "I can't agree because...",
+            "label" => "I can't agree because...",
+        ],
+        'aspects_not_clear' => [
+            "value" => "These aspects are not clear to me yet...",
+            "label" => "These aspects are not clear to me yet...",
+        ],
+    ];
+
     $vars = array(
         'username'              => $sname . ' + ' . (count(\Group\get_status_bar_peers())-1),
-        'level'                 => 'Level '. \Pyramid\get_current_level() .'/' . $levels,
-        'header_text'           => 'Rate the following answers',
+        'username'              => $sname . ' + ' . $peers,
+        'level'                 => T('Level') . ' '. (\Pyramid\get_current_level()+1) .'/' . ($levels+1),
+        'header_text'           => T('Rate the following answers'),
         'answer_text_array'     => $answer_text_array,
-        'answer_rate_submit'    => 'Rate',
-        'rating_labels'         => array('Not rated', 'Awful', 'Bad', 'Good', 'Great', 'Awesome'),
+        'answer_rate_submit'    => T('Rate'),
+        'rating_labels'         => array(T('Not rated'), T('Awful'), T('Bad'), T('Good'), T('Great'), T('Awesome')),
+        'scripted_buttons'      => $scripted_buttons,
         'hidden_input_array'    => $hidden_input_array,
     );
+
+    if($flow_data['ch'] == 1) {
+        $room = \Util\get_room_string($fid, $pid, $activity_level, $peer_group_id);
+
+        $messages_result = mysqli_query($link, "select * from chat where fid = '$fid' and room = '{$room}'");// to get peer answer
+        $messages = [];
+        while ($message_row = mysqli_fetch_assoc($messages_result))
+            $messages[] = $message_row;
+
+        $vars['messages'] = $messages;
+
+        $chat_vars = [
+            'username' => $sname,
+            'room' => $room,
+            'fid' => $fid,
+            'pid' => $pid,
+        ];
+
+        $vars['chat_vars'] = $chat_vars;
+    }
+
+    $timestamp_level = $activity_level + 1;
+    $end_time_string = \Pyramid\end_date_string($timestamp_level);
+    $next_level_messages = [
+        'phone' => [
+            1 => T("Submitted rating can be discussed and modified till {$end_time_string}. Login afterwards to see selected questions at the next level!"),
+            2 => T("Submitted rating can be discussed and modified."),
+        ],
+        'desktop' => [
+            1 => T("You submitted rating in this level successfully. You still can further discuss or modify your rating till {$end_time_string}. Make sure you login afterwards to see which questions have been selected for the next pyramid level to continue!"),
+            2 => T("You submitted rating in this level successfully. You still can further discuss or modify your rating."),
+        ]
+    ];
+    if (\Student\level_is_rated() and (int)$flow_data['sync'] == 0) {//the peer already submitted the answer
+        if($device == 'phone') {
+            $vars['async_rated'] = $next_level_messages['phone'][((int)\Pyramid\get_current_level())];//"Submitted rating can be discussed and modified till today midnight. Login tomorrow to see selected questions at the next level!";
+        } else {
+            $vars['async_rated'] = $next_level_messages['desktop'][((int)\Pyramid\get_current_level())];//"You submitted rating in this level successfully. You still can further discuss or modify your rating till today midnight. Make sure you login tomorrow to see which questions have been selected for the next pyramid level to continue!";
+            $vars['async_rated'] = $next_level_messages['desktop'][1];//"You submitted rating in this level successfully. You still can further discuss or modify your rating till today midnight. Make sure you login tomorrow to see which questions have been selected for the next pyramid level to continue!";
+        }
+    }
 
     if(isset($params['error']))
         $vars['error'] = $params['error'];
 
     $body = \View\element("answer_rating", $vars);
     \View\page(array(
-        'title' => 'Rating',
+        'title' => T('Rating'),
         'body' => $body,
     ));
     exit;
 }
 
 function submit_rate() {
-    global $link, $sid, $fid, $timeout, $input_result;
+    global $link, $sid, $fid, $pid, $ps, $timeout, $input_result, $activity_level;
 
     if(!isset($_POST['rate']))
         return false;
 
     $input_result['op'] = 'submit_rate';
-
-    if(\Group\is_level_timeout()) {
-        $input_result['error'] = "You are out of time";
-        return false;
-    }
-
     $numofqustions = \Request\param('numofqustions');
     $rating_array = array();
 
@@ -215,12 +296,16 @@ function submit_rate() {
             $value = \Request\param($rating_var . $i);
 
             if (empty($value) and $value !== "0")
-                $error = 'Please Rate All!';
+                $error = T('Please Rate All!');
 
             $question_rating_values[$rating_var] = mysqli_real_escape_string($link, $value);
         }
         if(empty($question_rating_values['optradio']))
-            $error = 'Please Rate All!';
+            $error =  T('Please Rate All!');
+
+        //timeout
+        if($question_rating_values['lvl'] != $activity_level)
+            return false;
 
         $rating_array[] = $question_rating_values;
     }
@@ -230,9 +315,11 @@ function submit_rate() {
         return false;
     }
 
+    $i=0;
+    mysqli_query($link, "start transaction");
     foreach($rating_array as $rating) {
-        mysqli_query($link,"insert into flow_student_rating values ('', '$fid', '$sid', '{$rating['lvl']}', '{$rating['group_id']}', '{$rating['optradio']}', '{$rating['to_whom_rated_id']}', NOW(), 0 )");
-
+        mysqli_query($link, "insert into flow_student_rating values ('', '$fid', '$pid', '$sid', '{$rating['lvl']}', '{$rating['group_id']}', '{$rating['optradio']}', '{$rating['to_whom_rated_id']}', NOW(), 0, {$i}) on duplicate key update fsr_rating='{$rating['optradio']}'");
+        $i++;
         if(mysqli_affected_rows($link) <= 0) {
             //TODO: database inconsistency
         }
@@ -240,40 +327,68 @@ function submit_rate() {
 
     //insert dummy rating for each possible skipped group answer
     skip_rating();
+    mysqli_query($link, "commit");
 
     $input_result['updated'] = true;
+
+    //post_rating_submit();
 
     return true;
 }
 
+function post_rating_submit() {
+    global $link, $sid, $fid, $pid, $ps, $levels, $sname, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+
+    $room = \Util\get_room_string($fid, $pid, $activity_level, $peer_group_id);
+
+    $rating_table = \Group\get_group_rating_table();
+    $rating_table_json = json_encode($rating_table);
+    $count = 0;
+    $rating_table_json_sql = mysqli_real_escape_string($link, $rating_table_json);
+    $sql = <<<SQL
+insert VALUES 
+(
+null,
+{'$rating_table_json_sql'},
+{'$room'},
+{$count}
+) into rating_table
+SQL;
+
+    \Util\exec_sql($sql);
+}
+
 function skip_rating() {
-    global $link, $sid, $fid, $levels, $sname, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+    global $link, $sid, $fid, $pid, $ps, $levels, $sname, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
-    //number of supposed to be rated
-    if($activity_level == 0)
-        $st_count = count($peer_array);
-    else
-        $st_count = count($peer_group_combined_ids_temp);
+    //TODO: in asynchronous mode we select the first two questions
 
-    //sids of students with real answers
-    $available_answers = is_available_answers();
-    if(empty($available_answers))
-        $available_answers = array();
+    $n_real_answers = count(get_selected_ids(false));
+    $time = \Util\pyramid_time();
 
-    $remaining_answers = $st_count - count($available_answers);
+    //if there are no real answers just set a dummy selected answer
+    if(!$n_real_answers) {
+        mysqli_query($link, "insert into selected_answers values ('$fid', '$pid', '$activity_level', '$peer_group_id', '-1', '0', '1', FROM_UNIXTIME({$time}))");
+    }
+
+    //number of skip answers supposed to be rated
+    $remaining_answers = count(get_selected_ids(true)) - $n_real_answers;
+
+    mysqli_query($link, "start transaction");
     for($i=0;$i<$remaining_answers;$i++) {
-        mysqli_query($link, "insert into flow_student_rating values ('', '$fid', '$sid', '{$activity_level}', '$peer_group_id', '0', '-1', NOW(), 1 )");
+        mysqli_query($link, "insert into flow_student_rating values (null, '$fid', '$pid', '$sid', '{$activity_level}', '$peer_group_id', '0', '-1', NOW(), 1, {$i})");
         if (mysqli_affected_rows($link) <= 0) {
             //TODO: database inconsistency
         }
     }
+    mysqli_query($link, "commit");
 }
 
 function is_available_answers() {
-    global $link, $sid, $fid, $levels, $sname, $activity_level;
+    global $link, $sid, $fid, $ps, $levels, $sname, $activity_level;
 
     try {
-        $result = get_selected_ids();
+        $result = count(get_selected_ids()) > 0;
     } catch(\Exception $e) {
         //all group skipped answers
         return null;
@@ -282,93 +397,225 @@ function is_available_answers() {
     return $result;
 }
 
-function get_selected_ids($params) {
-    global $link, $sid, $fid, $levels, $sname, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
+function get_selected_ids($full=false, $current_level = false) {
+    global $link, $sid, $fid, $ps, $levels, $sname, $flow_data, $activity_level, $peer_array, $peer_group_id, $peer_group_combined_ids, $peer_group_combined_ids_temp;
 
-    $result = array();
-    $activity_level_previous = $activity_level-1;
+    $selected_ids = [];
+
+    //instead of selecting answers from the previous level, select answers from the current one.
+    if($current_level) {
+        $activity_level_previous = $activity_level;
+    } else {
+        $activity_level_previous = $activity_level - 1;
+    }
+
+    $skip_answers = ' and skip = \'0\'';
+    if($full)
+        $skip_answers = '';
+
     if($activity_level == 0) {
+        if($flow_data['no_submit'] == 1) {
+            $i=0;
+            $remaining = true;
+
+            while($remaining) {
+                $nosubmit_id = "group_{$peer_group_id}_{$i}";
+                $no_submit_result = mysqli_query($link, "select * from flow_student where sid = '$nosubmit_id' and fid = '$fid'");// to get peer answer
+                if (mysqli_num_rows($no_submit_result) > 0) {//the peer already submitted the answer
+                    $selected_ids[] = $nosubmit_id;
+                    $i++;
+                } else {
+                    $remaining = false;
+                }
+            }
+
+            return $selected_ids;
+        }
+
         foreach ($peer_array as $rate_peer_id) {
-            $res5 = mysqli_query($link, "select * from flow_student where sid = '$rate_peer_id' and fid = '$fid' and skip = '0'");// to get peer answer
+            $res5 = mysqli_query($link, "select * from flow_student where sid = '$rate_peer_id' and fid = '$fid' {$skip_answers}");// to get peer answer
             if (mysqli_num_rows($res5) > 0) {//the peer already submitted the answer
-                $result[] = $rate_peer_id;
+                $selected_ids[] = $rate_peer_id;
             }
         }
-        if(empty($result)) {//TODO: the peer did not submit the answer
-            throw new \Exception ("peer answer not submitted");
+        if(empty($selected_ids)) {//TODO: the peers did not submit the answer
+            return [];
+            //throw new \Exception ("peer answer not submitted");
         }
     } else {
+        //FIXME: ugly fix for async
+        if($current_level) {
+            $activity_level_previous = $activity_level - 1;
+        }
         foreach ($peer_group_combined_ids_temp as $pgcid_group_id_temp) {
-            $sa_result_2 = mysqli_query($link, "select * from selected_answers where sa_fid = '$fid' and sa_level = '$activity_level_previous' and sa_group_id = '$pgcid_group_id_temp' and skip = '0'");
+            $sa_result_2 = mysqli_query($link, "select * from selected_answers where {$ps['sa']} and sa_level = '$activity_level_previous' and sa_group_id = '$pgcid_group_id_temp' {$skip_answers}");
             if (mysqli_num_rows($sa_result_2) > 0) {
-                $sa_data_2 = mysqli_fetch_assoc($sa_result_2);
-                $result[] = $sa_data_2['sa_selected_id'];
+                while($sa_data_2 = mysqli_fetch_assoc($sa_result_2)) {
+                    $selected_ids[] = $sa_data_2['sa_selected_id'];
+                }
             }
         }
-        if(empty($result)) {//no answers from the other peer, user must wait
-            throw new \Exception("group answer not rated");
+        if(empty($selected_ids)) {//no answers from the other peer, user must wait
+            return [];
+            //throw new \Exception("group answer not rated");
         }
     }
 
-    return $result;
+    return $selected_ids;
 }
 
 function view_final_answer($params) {
-    global $link, $sid, $fid, $sname, $levels, $activity_level, $peer_group_id;
+    global $link, $sid, $fid, $pid, $flow_data, $ps, $sname, $levels, $activity_level, $peer_group_id;
+
+    if(count($params['final_answer_array'])>1)
+        $winning_text = 'Winning questions from this Pyramid';
+    else
+        $winning_text = 'Winning question from this Pyramid';
+
+    if(count($params['other_answers'])>1)
+        $other_header_text = 'Winning questions from other Pyramids';
+    else
+        $other_header_text = 'Winning question from other Pyramid';
+
+    if($flow_data['no_submit'] == 1)
+        $winning_text = 'Winning link from this Pyramid';
 
     $vars = array(
         'username' 					=> $sname . ' + ' . (count(\Group\get_status_bar_peers())-1),
-        'level' 					=> 'Level ' . \Pyramid\get_current_level() .'/' . $levels,
-        'header_text' 			    => 'The winning question is',
+        'level' 					=> T('Level') . ' ' . (\Pyramid\get_current_level()+1) .'/' . ($levels+1),
+        'header_text' 			    => $winning_text,
+        'other_header_text' 	    => $other_header_text,
         'final_answer_array' 		=> $params['final_answer_array'],
+        'other_answer_array' 		=> $params['other_answers'],
         'hidden_input_array' 		=> array(
             'a_lvl' 			=> $activity_level,
             'a_peer_group_id'	=> $peer_group_id,
         ),
     );
 
+    $hidden_input_array['username'] = $sname;
+    $hidden_input_array['fid'] = $fid;
+    $hidden_input_array['pid'] = $pid;
+    $hidden_input_array['level'] = \Pyramid\get_current_level();
+    $hidden_input_array['levels'] = $levels;
+    $hidden_input_array['page'] = "winning_answers";
+    $hidden_input_array['group_id'] = $peer_group_id;
+
+    $vars['hidden_input_array'] = array_merge($vars['hidden_input_array'], $hidden_input_array);
+
     if(isset($params['error']))
         $vars['error'] = $params['error'];
+
+    $feedback_result = mysqli_query($link, "select * from feedback where fid='{$fid}' and sid='{$sid}' and feedback > 0");
+    if(mysqli_num_rows($feedback_result) > 0)
+        $vars['no_feedback'] = true;
+
+    if($flow_data['sync'] == 1)
+        $vars['no_feedback'] = true;
 
     $body = \View\element("final_answer", $vars);
 
     \View\page(array(
         'title' => 'Question',
         'body' => $body,
+        'nosocket' => true,
     ));
     exit;
 }
 
 function get_answer_timeout() {
-    global $link, $sid, $fid, $ftimestamp, $answer_timeout, $answer_skip_timeout;
+    global $link, $sid, $fid, $ps, $pid, $ftimestamp, $answer_timeout, $answer_skip_timeout, $peer_array;
 
-    //$time_left = $answer_timeout - (time() - $ftimestamp);
-    $time_left = 0;
-    $time_left_skip = $answer_skip_timeout - (time() - $ftimestamp);
+    $peer_array_sql = implode("','", \Util\sanitize_array($peer_array));
+    $r_start = mysqli_query($link, "select * from pyramid_students where timestamp > 0 and {$ps['e']} order by `timestamp` asc limit 1");
+    $pyramid = mysqli_fetch_assoc($r_start);
+
+    $r_submitted_answers = mysqli_query($link, "select * from flow_student where fid = '$fid' and sid in ('{$peer_array_sql}') order by `timestamp` asc");
+    $n_submitted_answers = mysqli_num_rows($r_submitted_answers);
+
+    $answer_timeout_start = null;
+
+    //all student submitted
+    if($n_submitted_answers >= \Group\get_needed_results_to_end_level(true, 'answer'))
+        $answer_timeout_start = null;
+
+    $required_peers = \Group\get_needed_results_to_end_level(false, 'answer');
+
+    if($n_submitted_answers < $required_peers)
+        $answer_timeout_start = null;
+
+    if($n_submitted_answers >= $required_peers) {
+        for ($i = 0; $i < $required_peers; $i++)
+            $a_submitted_answers = mysqli_fetch_assoc($r_submitted_answers);
+
+        $answer_timeout_start = $a_submitted_answers['timestamp'];
+    }
+
     $time_left_skip = $answer_skip_timeout;
 
     return array(
-        'time_left' => $time_left,
+        'time_left' => $answer_timeout_start,
         'time_left_skip' => $time_left_skip,
+        'start_timestamp' => $pyramid['timestamp'],
     );
 }
 
 function is_timeout() {
-    global $link, $sid, $fid, $ftimestamp, $answer_timeout, $peer_array;
+    global $link, $sid, $fid, $ps, $ftimestamp, $answer_timeout, $peer_array, $activity_level, $peer_group_id, $flow_data;
+    //check for the minimum participants for timeout
+    $answertimestamp = 0;
 
     //if the user is not present on any group in the current level it has been eliminated
+    //obsolete?
     if(empty($peer_array))
         return true;
 
-    //TODO: improve answer timeout
+    /*
+    if($activity_level > 0)
+        return true;
+
+    if(\Student\level_is_rated())
+        return true;
+    */
+
+    //rating has started(even if still is not submitted by anyone)
+    if(\Group\is_level_zero_rating_started())
+        return true;
+
+    /*
+    $result = mysqli_query($link, "select * from pyramid_groups where {$ps['pg']} and pg_level='0' and pg_group_id='{$peer_group_id}' and pg_started=1");
+    if(mysqli_num_rows($result) > 0)
+        return true;
+    */
+
     $peer_array_sql = implode("','", \Util\sanitize_array($peer_array));
-    if(!(mysqli_num_rows(mysqli_query($link, "select * from flow_student where `timestamp` > 0 and fid = '$fid' and sid in ('$peer_array_sql')")) > 0))
-        return false;
+    $r_submitted_answers = mysqli_query($link, "select * from flow_student where fid = '$fid' and sid in ('{$peer_array_sql}') order by `timestamp` asc");
+    $n_submitted_answers = mysqli_num_rows($r_submitted_answers);
 
-    $query_result = mysqli_query($link, "select * from flow_student where `timestamp` > 0 and fid = '$fid' and sid in ('$peer_array_sql') order by timestamp asc limit 1");
-    $result = mysqli_fetch_assoc($query_result);
+    //all students submitted the answer
+    if($n_submitted_answers >= \Group\get_needed_results_to_end_level(true, 'answer'))
+        return true;
 
-    if(time() > $result['timestamp'] + $answer_timeout)
+    $timeout_data = get_answer_timeout();
+
+    //check the soft timer in case we have enough answers
+    $required_peers = \Group\get_needed_results_to_end_level(false, 'answer');
+    if($n_submitted_answers >= $required_peers) {
+
+        //obtain the answer with the latest timestamp
+        for($i=0;$i<$required_peers;$i++)
+            $a_submitted_answers = mysqli_fetch_assoc($r_submitted_answers);
+
+        //if the pyramid was created after the last answer we use the pyramid creation time timestamp
+        if($timeout_data['start_timestamp'] > $a_submitted_answers['timestamp'])
+            $a_submitted_answers['timestamp'] = $timeout_data['start_timestamp'];
+
+        if(\Util\pyramid_time() > $a_submitted_answers['timestamp'] + $answer_timeout)
+            return true;
+    }
+
+    //check hardtimer
+    if(\Util\pyramid_time() > $flow_data['hardtimer_question'] + $timeout_data['start_timestamp'])
         return true;
 
     return false;
@@ -377,6 +624,9 @@ function is_timeout() {
 function is_new_data() {
     global $input_result;
 
+    if(!empty($input_result['error']))
+        return true;
+
     return !empty($input_result['updated']);
 }
 
@@ -384,4 +634,37 @@ function submit_error() {
     global $input_result;
 
     return !empty($input_result['error']);
+}
+
+function answer_submitted_wait($params) {
+    global $link, $sid,  $fid, $ps, $sname, $levels, $activity_level, $peer_group_id, $peer_array, $peer_group_combined_ids;
+
+    $initial_level = $activity_level;
+
+    $vars = array(
+        'username' 					=> $sname,
+        'level' 				    => 'Level 1' . '/' . ($levels+1),
+        'answer_text' 			=> 'Write a question',
+        'answer_submit_button' 	=> 'Submit your question',
+        'next_step_date' 	    => \Flow\end_date_string(0),
+        'hidden_input_array' 		=> array(
+            'a_lvl' 			=> $activity_level,
+            'a_peer_group_id'	=> $peer_group_id,
+        ),
+    );
+
+    $hidden_input_array['username'] = $sname;
+    $hidden_input_array['fid'] = $fid;
+    $hidden_input_array['level'] = 1;
+    $hidden_input_array['page'] = "question_submitted_message";
+
+    $vars['hidden_input_array'] = array_merge($vars['hidden_input_array'], $hidden_input_array);
+
+    $body = \View\element("answer_submitted", $vars);
+
+    \View\page(array(
+        'title' => 'Question',
+        'body' => $body,
+    ));
+    exit;
 }

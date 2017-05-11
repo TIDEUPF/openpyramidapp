@@ -1,223 +1,251 @@
 <?php
-session_start(); 
+session_start();
 include('dbvar.php');
+global $node_path;
 
-include('inc_pyramid_func.php');
+$flow_fields = \Flow\get_flow_default_fields();
 
-if(isset($_SESSION['user'])){
-	$teacher_id = $_SESSION['user'];
-	
-	$student_count = mysqli_num_rows(mysqli_query($link, "select * from students"));
-	
-if(isset($_POST['cflow'])){
-	$fname = mysqli_real_escape_string($link, stripslashes(trim(strip_tags($_POST['fname']))));
-	$fdes =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['fdes']))));
-	$fcname =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['fcname']))));	
-	$fesname = '';//$fesname =  mysqli_real_escape_string($link, stripslashes(strip_tags(trim($_POST['fesname']))));
-	$fl = (int) $_POST['fl'];
-	$fsg = (int) $_POST['fsg'];
-	$rps = 1;//$rps = (int) $_POST['rps'];	
-	
-	if($fl < 1 || $rps < 1 || $fsg < 1)
-	{
-		$error = 'Levels and Responses cannot be 0';
-	}
-	else{		
-		$res = mysqli_query($link, "select * from students");
-		while($data = mysqli_fetch_assoc($res)){
-			$sarry[] = $data["sid"];
-		}
-		
-		$pyramid_list = noSc_pyramid($fl, $sarry, $fsg);		
-		//$pyramid_json = json_encode($pyramid_list);
-		//var_dump($pyramid_list);
-		//var_dump($pyramid_json);
-		
-		$datestamp = time();
-		mysqli_query($link,"insert into flow values ('', '$teacher_id', '$fname', '$fdes', '$fcname', '$fesname', '$fsg', '$fl', '$rps', '$datestamp')");
-		if(mysqli_affected_rows($link) > 0){
-			
-			$mysql_last_id = mysqli_insert_id($link);
-			$success = 'Flow Created.';
-			for($tl=0; $tl<$fl; $tl++)
-			{				
-				if($tl == 0){
-					
-					$t_group_items = $pyramid_list[$tl][0];					
-					for($tin=0; $tin<count($t_group_items); $tin++){
-						
-						$group_comma = implode(",",$t_group_items[$tin]);
-						mysqli_query($link,"insert into pyramid_groups values ($mysql_last_id, '$group_comma', '$tl', '$tin', '0', 0)");
-					}	
-				}
-				else{
-					$t_group_items = $pyramid_list[$tl][0];
-					$t_group_items_relation = $pyramid_list[$tl][1];
-					for($tin=0; $tin<count($t_group_items); $tin++){
-						$group_comma = implode(",", $t_group_items[$tin]);
-						$group_comma_relations = implode(",", $t_group_items_relation[$tin]);
-						mysqli_query($link,"insert into pyramid_groups values ($mysql_last_id, '$group_comma', '$tl', '$tin', '$group_comma_relations', 0)");
-					}
-				}
-			}
-		}
-		else{
-			$error = 'Database error!';
-		}
-	}	
+if(isset($_SESSION['user'])) {
+    $teacher_id = $_SESSION['user'];
+
+    if($_REQUEST['edit']) {
+        $fid = (int)$_REQUEST['edit'];
+
+        $sql = <<<SQL
+select * from `flow` where `fid` = '{$fid}' AND `teacher_id` = '{$teacher_id}'
+SQL;
+
+        $flow_result = mysqli_query($link, $sql);
+        if(!(mysqli_num_rows($flow_result) > 0)) {
+            $error = true;
+        }
+
+        $row = mysqli_fetch_assoc($flow_result);
+
+        $flow_object = json_decode($row['json']);
+
+        //check fields
+        foreach ($flow_fields as $field) {
+            if (!isset($flow_object->$field)) {
+                $error = true;
+                break;
+            }
+        }
+
+        $edit = true;
+    } elseif(isset($_POST['create_flow'])) {
+        global $sname;
+
+        $sname = $teacher_id;
+        \Util\log_submit();
+
+        $action = $_POST['create_flow'];
+        $flow_data_decoded = json_decode($_POST['flow_data']);
+
+        //validate
+        $error = false;
+        $flow_object = new stdClass();
+        foreach ($flow_fields as $field) {
+            /*
+            if (!isset($flow_data_decoded->$field)) {
+                $error = true;
+                break;
+            }
+
+            if (empty($flow_data_decoded->$field) and $flow_data_decoded->$field !== "0" and $flow_data_decoded->$field !== 0) {
+                $error = true;
+                break;
+            }*/
+
+            $flow_object->$field = is_numeric($flow_data_decoded->$field) ? ((int)$flow_data_decoded->$field) : $flow_data_decoded->$field;
+        }
+
+        //validate n_levels
+        $n_levels_fields = [
+            'min_students_per_pyramid',
+            'first_group_size',
+        ];
+
+        foreach ($n_levels_fields as $field) {
+            if (!(is_integer($flow_object->$field) and $flow_object->$field > 0)) {
+                //$error = true;
+            }
+        }
+
+        //encode the json object before making the flow safety checks
+        $flow_object_json = json_encode($flow_object);
+        $flow_object_json_sql = mysqli_real_escape_string($link, $flow_object_json);
+
+        $min_students_per_pyramid = $flow_object->min_students_per_pyramid;
+        if(!$flow_object->multiple_pyramids)
+            $min_students_per_pyramid = $flow_object->expected_students;
+
+        if($min_students_per_pyramid > $flow_object->expected_students)
+            $min_students_per_pyramid = $flow_object->expected_students;
+
+        //number of levels
+        $n_levels = floor(log(floor($min_students_per_pyramid / $flow_object->first_group_size), 2)) + 2;
+        if ($flow_object->n_levels -1 > $n_levels)
+            $flow_object->n_levels = $n_levels + 1;
+
+        //sanitize sql
+        $flow_data = [];
+        foreach ($flow_fields as $field) {
+            $flow_data[$field] = mysqli_real_escape_string($link, $flow_object->$field);
+        }
+
+        //substract the individual level
+        $flow_data['n_levels']--;
+        $flow_data['min_students_per_pyramid'] = $min_students_per_pyramid;
+
+        $datestamp = \Util\pyramid_time();
+
+        if($action == "create") {
+            $sql = <<<SQL
+insert into flow values (
+null, 
+'{$teacher_id}', 
+'{$flow_data['activity']}',
+'', /*legacy*/
+'', /*legacy*/
+'', /*legacy*/
+'{$flow_data['first_group_size']}', 
+'{$flow_data['n_levels']}', 
+'{$flow_data['min_students_per_pyramid']}', /*$pyramid_size*/
+'{$flow_data['min_students_per_pyramid']}', /*$min_pyramid*/ 
+'{$flow_data['expected_students']}', 
+'1', /*legacy*/
+'{$datestamp}', 
+'{$flow_data['s_question']}', 
+'{$flow_data['s_rating']}', 
+'{$flow_data['h_question']}', 
+'{$flow_data['h_rating']}',
+'{$flow_data['satisfaction']}',
+'{$flow_data['satisfaction']}',
+'{$datestamp}',
+'{$flow_data['task_description']}',
+'{$flow_data['discussion']}',
+'{$flow_data['sync']}',
+'{$flow_data['multiple_pyramids']}',
+'{$flow_data['n_selected_answers']}',
+'{$flow_data['random_selection']}',
+'{$flow_object_json_sql}'
+)
+SQL;
+
+            $insert_result = mysqli_query($link, $sql);
+
+            if (!$fid = mysqli_insert_id($link))
+                $error = true;
+        } else {
+            $fid = (int)$_REQUEST['fid'];
+
+            $sql = <<<SQL
+update flow set
+fname = '{$flow_data['activity']}',
+nostupergrp = '{$flow_data['first_group_size']}', 
+levels = '{$flow_data['n_levels']}', 
+pyramid_size = '{$flow_data['min_students_per_pyramid']}', /*$pyramid_size*/
+pyramid_minsize = '{$flow_data['min_students_per_pyramid']}', /*$min_pyramid*/ 
+expected_students = '{$flow_data['expected_students']}', 
+`timestamp` = '{$datestamp}', 
+question_timeout = '{$flow_data['s_question']}', 
+rating_timeout = '{$flow_data['s_rating']}', 
+hardtimer_question = '{$flow_data['h_question']}', 
+hardtimer_rating = '{$flow_data['h_rating']}', 
+answer_submit_required_percentage = '{$flow_data['satisfaction']}', 
+rating_required_percentage = '{$flow_data['satisfaction']}', 
+question = '{$flow_data['task_description']}',
+ch = '{$flow_data['discussion']}',
+sync = '{$flow_data['sync']}',
+multi_py = '{$flow_data['multiple_pyramids']}',
+n_selected_answers = '{$flow_data['n_selected_answers']}',
+random_selection = '{$flow_data['random_selection']}',
+`json`= '{$flow_object_json_sql}'
+WHERE
+fid = '{$fid}' AND 
+teacher_id = '{$teacher_id}'
+SQL;
+
+            $update_result = mysqli_query($link, $sql);
+
+            if (!(mysqli_affected_rows($link) > 0))
+                $error = true;
+
+            $edit = true;
+        }
+        /*
+        //80 per cent of expected students
+        if($multi_py) {
+            $multi_pyramid_max_size = 20;
+            $multi_pyramid_min_size = 4;
+            $pyramid_size = max(min($multi_pyramid_max_size, floor($expe / 2)), $multi_pyramid_min_size);
+            if($pyramid_size > 4)
+                $min_pyramid = floor($pyramid_size * 0.8);
+            else
+                $min_pyramid = $pyramid_size;
+        } else {
+            $pyramid_size = $expe;
+
+            //assume everyone participating for experiments <=8
+            if($expe > 8)
+                $min_pyramid = floor($expe * 0.8);
+            else
+                $min_pyramid = $expe;
+        }
+*/
+        if(!$error) {
+            header("location: summary.php?edit=" . $fid);
+            exit(0);
+        }
+    }
+} else {
+    header("location: login.php");
+    exit(0);
 }
 
-}
-else{
-	header("location: login.php");
-	exit(0);
-}	
+global $default_teacher_question;
+$tq = $default_teacher_question;
 
-?><!DOCTYPE html>
-<html>
-  <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="vendors/bootstrap/bootstrap.min.css">
-	<script src="vendors/jquery/jquery-2.1.4.min.js"></script>
-	<script type="text/javascript">
-	$(document).ready(function(){
-		var student_c = <?php echo $student_count.';'; ?>
-		$("#fsg").change(function() {	
-			var lval = $("#fsg :selected").val();
-			if(lval != 0)
-			{
-				var	newgroup = 0;
-				var first_groups = Math.floor(student_c/lval);
-				if(first_groups > 3)
-				{					
-					$("#fl").find('option').remove();
-					$("#fl").append($("<option>").attr("value", "1").text("1"));
-					
-					var i = 2;	
-					do{
-						var x = Math.pow(2,i);
-						var result = first_groups/x;
-						$("#fl").append($("<option>").attr("value", i).text(i));						
-						i++;
-					}while(result >= 2);
-					
-					$("#fl").append($("<option>").attr("value", i).text(i));
-					
-				}
-				else
-				{	
-					$("#fl").find('option').remove();
-					if(first_groups == 2 || first_groups == 3)
-					{
-						$("#fl").append($("<option>").attr("value", "1").text("1"));
-						$("#fl").append($("<option>").attr("value", "2").text("2"));
-					}
-					else
-					{
-						
-						$("#fl").append($("<option>").attr("value", "0").text("Select"));
-						alert("Only 1 level can be created.");
-					}	
-				}	
-				//alert(first_groups);
-				
-			}
-			else
-			{
-				$("#fl").find('option').remove();
-				$("#fl").append($("<option>").attr("value", "0").text("Select"));
-			}			
-		});
-	});	
-	</script>
-  </head>
-  <body>
-  
-  <?php include('topnav.php'); ?>
-    <div class="container">
-		<h3><b>Create Flow</b></h3>
-		<?php if(!empty($error)) {echo '<br /><span class="label label-danger">'.$error.'</span><br /><br />';} ?>
-		<?php if(!empty($success)) {echo '<br /><span class="label label-success">'.$success.'</span><br /><br />';} ?>
-		<form role="form" action="" method="post">
-        <div class="form-group">
-          <label for="fname">Flow Name:</label>
-          <input type="text" class="form-control" id="fname" name="fname">
-        </div>
-		<div class="form-group">
-          <label for="fdes">Description:</label>
-          <textarea class="form-control" id="fdes" name="fdes"></textarea>
-        </div>
-		<div class="form-group">
-          <label for="fcname">Course Name:</label>
-          <input type="text" class="form-control" id="fcname" name="fcname">
-        </div>
-		<!--
-		<div class="form-group">
-          <label for="fesname">Enrolled Students:</label>
-          <input type="text" class="form-control" id="fesname" name="fesname">
-        </div>
-		-->
-        <h4>Pyramid Details</h4>
-		<div class="form-group">
-          <label for="fsg">No. Students. Group:</label>
-		  <select class="form-control" id="fsg" name="fsg">	
-			<option value="0">Select</option>
-			<option value="2">2</option>
-			<option value="3">3</option>
-			<option value="4">4</option>
-			<option value="5">5</option>
-			<option value="6">6</option>
-			<option value="7">7</option>
-			<option value="8">8</option>
-			<option value="9">9</option>
-			<option value="10">10</option>
-          </select>
-        </div>
-		
-		<div class="form-group">
-          <label for="fl">No. Levels:</label>
-		  <select class="form-control" id="fl" name="fl">
-			<option value="0">Select</option>			
-          </select>
-        </div>
-		<!--
-		<div class="form-group">
-          <label for="rps">No. Responses per student:</label>
-          <input type="text" class="form-control" id="rps" name="rps">
-        </div>
-		-->
-		
-		<div class="form-group">
-          <input type="submit" class="btn btn-info" value="Create Flow" name="cflow">
-        </div>
-		
-		</form>
-		
-		<br />
-		<h3><b>Flows</b></h3>
-		<?php
-		$res2 = mysqli_query($link, "select * from flow where teacher_id = '$teacher_id'");
-		if(mysqli_num_rows($res2) > 0){
-		
-			echo '<table class="table"><tr><th>Flow Name</th><th>View Groups</th></tr>';
-		
-			while($data2 = mysqli_fetch_assoc($res2)){
-				$flow_id = $data2["fid"];
-				$flow_name = $data2["fname"];
-				$flow_pyramid = $data2["pyramid"];				
-		?>		
-		<tr><td><?php echo $flow_name; ?></td><td><?php echo '<a traget="_blank" href="view_group.php?fid='.$flow_id.'">View</a>'; ?></td></tr>		
-		<?php
-			}
-			echo '</table>';
-		}
-		else{
-			echo '<span>No flows found.</span>';
-		}
-		?>
-		
-    </div>
-	<br />
-	
-  </body>
-</html>
+//TODO: restore form http://stackoverflow.com/questions/19109884/serializing-and-deserializing-a-form-with-its-current-state
+
+
+/*
+    //sanitize data
+    foreach($data as $key => &$element) {
+        if(isset($_REQUEST[$key])) {
+            if(is_string($element))
+                $element = trim($element);
+
+            if(is_bool($element))
+                $element = true;
+        } else {
+            if(is_bool($element) and $element)
+                $element = false;
+        }
+
+        if(is_string($element))
+            $element = htmlentities($element);
+
+        if(is_bool($element))
+            $element = $element ? " checked " : "";
+    }
+*/
+if(!isset($_REQUEST['save']))	{
+    //default values
+} else {
+    $datestamp = \Util\pyramid_time();
+    $data_sql = mysqli_real_escape_string($link, json_encode($data));
+    mysqli_query($link,"insert into activity values (null, '$teacher_id', '$data_sql')");
+    $activity_id = mysqli_insert_id($link);
+
+    header("location: activity.php?activity=" . $activity_id);
+}
+
+$defaults = \Flow\get_default_field_values();
+$data_disabled = "";
+if(isset($edit)) {
+    $data_disabled = "data-disabled=\"true\"";
+}
+
+include '../elements/flow_editor/flow_editor.php';
