@@ -198,8 +198,8 @@ function write_flow($params) {
 
     //number of levels
     $n_levels = floor(log(floor($min_students_per_pyramid / $flow_object->first_group_size), 2)) + 2;
-    if ($flow_object->n_levels -1 > $n_levels)
-        $flow_object->n_levels = $n_levels + 1;
+    if ($flow_object->n_levels > $n_levels)
+        $flow_object->n_levels = $n_levels;
 
     //sanitize sql
     $flow_data = [];

@@ -918,7 +918,14 @@ header('Content-Type: text/html; charset=utf-8');
     function get_n_groups() {
         var expected_students_setting = get_field_integer("expected_students");
         var number_of_pyramids = get_number_of_pyramids();
-        var expected_students_per_pyramid = Math.floor(expected_students_setting / number_of_pyramids);
+        var multiple_pyramids_setting = get_field_integer("multiple_pyramids");
+
+        if(multiple_pyramids_setting) {
+            var expected_students_per_pyramid = Math.min(get_field_integer("min_students_per_pyramid"), expected_students_setting);
+        } else {
+            var expected_students_per_pyramid = Math.floor(expected_students_setting / number_of_pyramids);
+        }
+
         var first_group_size_setting = get_field_integer("first_group_size");
 
         if(!(expected_students_per_pyramid > 0 && first_group_size_setting > 0))
@@ -934,7 +941,7 @@ header('Content-Type: text/html; charset=utf-8');
         var n_groups = get_n_groups();
 
         if(n_groups < 2)
-            return false;
+            max_possible_levels = 2;
         else if (n_groups < 4)
             max_possible_levels = 3;
         else if (n_groups < 8)
@@ -942,9 +949,13 @@ header('Content-Type: text/html; charset=utf-8');
         else
             max_possible_levels = 5;
 
+        var n_levels_field = get_field_integer("n_levels");
+        if(n_levels_field > max_possible_levels) {
+            set_field("n_levels", max_possible_levels)
+        }
+
         $('[name="n_levels"]').attr("max", max_possible_levels);
         $('[name="n_levels"]').slider("refresh");
-
     }
 
     function update_fields() {
@@ -999,9 +1010,19 @@ header('Content-Type: text/html; charset=utf-8');
         var expected_students_setting = get_field_integer("expected_students");
         var number_of_pyramids = get_number_of_pyramids();
         var first_group_size_setting = get_field_integer("first_group_size");
-        var expected_students_per_pyramid = Math.floor(expected_students_setting / number_of_pyramids);
+        var multiple_pyramids_setting = get_field_integer("multiple_pyramids");
+
+        if(multiple_pyramids_setting) {
+            var expected_students_per_pyramid = Math.min(get_field_integer("min_students_per_pyramid"), expected_students_setting);
+        } else {
+            var expected_students_per_pyramid = Math.floor(expected_students_setting / number_of_pyramids);
+        }
 
         var max_possible_size = Math.min(10, Math.floor(expected_students_per_pyramid/2));
+
+        if(max_possible_size<2) {
+            max_possible_size = 2;
+        }
 
         if(first_group_size_setting > max_possible_size)
             set_field("first_group_size", max_possible_size);
